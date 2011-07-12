@@ -43,7 +43,7 @@ handle.each_line do |line|
 		response_as_64+= 1 if r == 1
 		response_as_64 <<= 1
 	end
-	inputs << response_as_64
+	inputs << { :area => split_elements[0], :vector => response_as_64}
 end
 
 
@@ -66,7 +66,7 @@ def initialised_map(rows, columns)
 	rows.times do |r|
 		row = []
 		columns.times.each do |c|
-			row<< rand(2^56)
+			row<< rand(2**57 - 1)
 		end
 		map<< row
 	end
@@ -83,12 +83,12 @@ def circle_hash(rof)
 end
 
 def eta(iteration)
-	50000000 * Math.exp(- iteration / 3)
+	50 * Math.exp(- iteration / 20000)
 end
 
 rows = 70
 columns = 70
-radius_of_effect = 10
+radius_of_effect = 30
 inputs = inputs[1..200]
 
 rings = circle_hash(radius_of_effect)
@@ -98,14 +98,27 @@ data_points = []
 puts "Done initialising map\n"
 
 index = 0
-iterations = 90
+iterations = 20
 animated_gif = ImageList.new
 animated_gif.delay= 1000
+
+f = Image.new(columns,rows) { self.background_color = "black" }
+map.each_index do |row|
+	map[row].each_index do |column|
+		h = hamming_distance_64(map[row][column], 0)
+		intensity = hamming_distance_64(map[row][column], 0) * 4
+#		p "Distance between 0 and #{map[row][column]} is #{h}"
+		f.pixel_color(column, row, "rgb(0,#{intensity},0)")
+	end
+end
+
+f.write("som/initial.jpg")
 
 iterations.times do |iteration|
 	f = Image.new(columns,rows) { self.background_color = "black" }
 	data_points = []
-	inputs.each do |input|
+	inputs.each do |sample|
+		input = sample[:vector]
 		closest = {:row => 0, :column => 0}
 		smallest_distance = hamming_distance_64(map[0][0], input)
 		map.each_index do |row|
