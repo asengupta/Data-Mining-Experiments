@@ -83,13 +83,13 @@ def circle_hash(rof)
 end
 
 def eta(iteration)
-	50 * Math.exp(- iteration / 20000)
+	500 * Math.exp(- iteration / 2)
 end
 
 rows = 70
 columns = 70
-radius_of_effect = 30
-inputs = inputs[1..200]
+radius_of_effect = 20
+inputs = inputs[1..300]
 
 rings = circle_hash(radius_of_effect)
 map = initialised_map(rows, columns)
@@ -98,7 +98,7 @@ data_points = []
 puts "Done initialising map\n"
 
 index = 0
-iterations = 20
+iterations = 40
 animated_gif = ImageList.new
 animated_gif.delay= 1000
 
