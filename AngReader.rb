@@ -37,7 +37,7 @@ handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', '
 inputs = []
 handle.each_line do |line|
 	split_elements = line.split('|')
-	pre_test_responses = split_elements[8..56].collect {|e| e.to_i}
+	pre_test_responses = split_elements[8..63].collect {|e| e.to_i}
 	response_as_64 = 0
 	pre_test_responses.each do |r|
 		response_as_64+= 1 if r == 1
@@ -89,7 +89,7 @@ end
 rows = 70
 columns = 70
 radius_of_effect = 20
-inputs = inputs[1..300]
+inputs = inputs[1..2]
 
 rings = circle_hash(radius_of_effect)
 map = initialised_map(rows, columns)
@@ -98,7 +98,7 @@ data_points = []
 puts "Done initialising map\n"
 
 index = 0
-iterations = 40
+iterations = 1
 animated_gif = ImageList.new
 animated_gif.delay= 1000
 
