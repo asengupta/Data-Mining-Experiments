@@ -1,11 +1,13 @@
 require 'set'
+require 'RMagick'
 
 include Math
+include Magick
 
 def improvement_category(r)
 	return "BETTER_THAN_NOTHING" if r[:before] == 0 && r[:after] > r[:before]
 	improvement = (r[:after] - r[:before]).to_f/r[:before].to_f
-	return "EXCELLENT" if improvement >= 0.5
+	return "EXCELLENT" if improvement >= 1
 	return "GOOD" if improvement >= 0.4
 	return "AVERAGE" if improvement >= 0.25
 	return "SLIGHT" if improvement >= 0.15
@@ -53,7 +55,7 @@ dimension_keys = [:language, :gender, :area, :pre_performance]
 dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new, :pre_performance => Set.new, :improvement => Set.new}
 languages = Set.new
 
-samples = 3000
+samples = 28535
 i = 1
 handle.each_line do |line|
 	break if i > samples
@@ -90,16 +92,21 @@ class DecisionNode
 	end
 
 
-	def describe
-		p "#{@attribute} - #{@range_bin}"
-		p @prediction if @is_leaf
-		@nodes.each {|n| n.describe}
+	def describe(level)
+		return if @prediction == "FAILURE"
+		puts "\t"*level + "#{@attribute} - #{@range_bin} #{("Prediction = " + @prediction) if @is_leaf}"
+		@nodes.each {|n| n.describe(level + 1)}
 	end
 end
 
 def build(root, current_dimensions, attribute_to_predict, dimension_ranges)
+	if (root.records.empty?)
+		root.prediction = "FAILURE"
+		root.is_leaf = true
+		return
+	end
 	if (current_dimensions.empty?)
-		dominant_prediction_value = ""
+		dominant_prediction_value = "lol"
 		largest_count = 0
 		dimension_ranges[attribute_to_predict].each do |v|
 			records_valued_v = root.records.select {|r| r[attribute_to_predict] == v}
@@ -110,11 +117,6 @@ def build(root, current_dimensions, attribute_to_predict, dimension_ranges)
 		end
 		
 		root.prediction = dominant_prediction_value
-		root.is_leaf = true
-		return
-	end
-	if (root.records.empty?)
-		root.prediction = "FAILURE"
 		root.is_leaf = true
 		return
 	end
@@ -143,5 +145,5 @@ root = DecisionNode.new
 root.records = inputs
 
 build(root, dimension_keys, :improvement, dimensions)
-root.describe
+root.describe(0)
 
