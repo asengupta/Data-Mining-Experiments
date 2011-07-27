@@ -89,7 +89,7 @@ end
 rows = 70
 columns = 70
 radius_of_effect = 20
-inputs = inputs[1..2]
+inputs = inputs[1..200]
 
 rings = circle_hash(radius_of_effect)
 map = initialised_map(rows, columns)
@@ -98,7 +98,7 @@ data_points = []
 puts "Done initialising map\n"
 
 index = 0
-iterations = 1
+iterations = 20
 animated_gif = ImageList.new
 animated_gif.delay= 1000
 
