@@ -89,6 +89,7 @@ class DecisionNode
 		@nodes = []
 	end
 
+
 	def describe
 		p "#{@attribute} - #{@range_bin}"
 		p @prediction if @is_leaf
