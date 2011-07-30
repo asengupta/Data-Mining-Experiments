@@ -51,7 +51,7 @@ end
 
 handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', 'r')
 inputs = []
-dimension_keys = [:language, :gender, :area, :pre_performance]
+dimension_keys = [:language, :gender, :pre_performance]
 dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new, :pre_performance => Set.new, :improvement => Set.new}
 languages = Set.new
 
