@@ -46,6 +46,9 @@ end
 
 inputs.each do |input|
 	last_x = last_y = 0
+	value = dimensions[:area].index(input[:area])
+	hue_scale = 360.0/dimensions[:area].count
+	gc.stroke("hsl(#{value*hue_scale},100,100)")
 	axes.each_index do |axis_index|
 		axis_x = x_scale(axis_index, width, axes)
 		dimension_range = dimensions[axes[axis_index]]
@@ -62,7 +65,7 @@ inputs.each do |input|
 	end
 end
 
-gc.stroke('green')
+gc.stroke('white')
 axes.each_index do |axis_index|
 	axis_x = x_scale(axis_index, width, axes)
 	gc.line(axis_x, 0, axis_x, height)
