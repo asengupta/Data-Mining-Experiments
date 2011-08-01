@@ -1,5 +1,6 @@
 require 'rubygems'
-require 'activerecord'
+gem 'activerecord', "=3.0.9"
+require 'active_record'
 
 ActiveRecord::Base.establish_connection(
   :adapter => "mysql",
