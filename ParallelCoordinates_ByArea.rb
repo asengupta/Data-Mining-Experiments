@@ -8,8 +8,8 @@ handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', '
 inputs = []
 dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
 
-#samples = 28535
-samples = 5000
+samples = 28535
+#samples = 5000
 i = 1
 handle.each_line do |line|
 	break if i > samples
