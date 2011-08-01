@@ -22,7 +22,7 @@ handle.each_line do |line|
 		post_response_as_64 <<= 1
 	end
 	input =   { 
-			:student_id => split_elements[0], 
+			:student_id => split_elements[3], 
 			:area => split_elements[1].gsub(/'/,''), 
 		    	:before => pre_response_as_64, 
 		    	:after => post_response_as_64, 
