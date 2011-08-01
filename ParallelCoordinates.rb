@@ -1,27 +1,24 @@
 require 'set'
 require 'RMagick'
+require 'schema'
 
 include Math
 include Magick
 
-handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', 'r')
+responses = Response.find(:all)
+
 inputs = []
 dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
 
 samples = 28535
 #samples = 500
 i = 1
-handle.each_line do |line|
+responses.each do |r|
 	break if i > samples
-	split_elements = line.split('|')
-	pre_score = 0
-	post_score = 0
-	split_elements[8..63].each {|e| pre_score+= e.to_i}
-	split_elements[65..120].each {|e| post_score+= e.to_i}
-	record = {:language => split_elements[5], :gender => split_elements[4], :before => pre_score, :after => post_score, :id => split_elements[0], :area => split_elements[1]}
-	dimensions[:language].add(record[:language])
-	dimensions[:gender].add(record[:gender])
-	dimensions[:area].add(record[:area])
+	record = {:language => r.language, :gender => r.gender, :before => r.pre_total, :after => r.post_total, :id => r.student_id, :area => r.area}
+	dimensions[:language].add(r.language)
+	dimensions[:gender].add(r.gender)
+	dimensions[:area].add(r.area)
 	inputs << record
 	i += 1
 end
