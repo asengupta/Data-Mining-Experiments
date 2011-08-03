@@ -1,9 +1,10 @@
 require 'rubygems'
+require 'arjdbc'
 gem 'activerecord', "=3.0.9"
 require 'active_record'
 
 ActiveRecord::Base.establish_connection(
-  :adapter => "mysql",
+  :adapter => "jdbcmysql",
   :host => "localhost",
   :database => "data_mining",
   :username => "root",

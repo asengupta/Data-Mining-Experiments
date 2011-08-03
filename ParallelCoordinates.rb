@@ -1,74 +1,78 @@
-require 'set'
-require 'RMagick'
 require 'schema'
+require 'set'
+require 'ruby-processing'
 
 include Math
-include Magick
 
-responses = Response.find(:all)
+class MySketch < Processing::App
+	  def setup
+		frame_rate(30)
+		smooth
+		background(0,0,0)
 
-inputs = []
-dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
+		responses = Response.find(:all)
+		@height = 800
+		@width = 1400
+		@inputs = []
+		@dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
 
-samples = 28535
-#samples = 500
-i = 1
-responses.each do |r|
-	break if i > samples
-	record = {:language => r.language, :gender => r.gender, :before => r.pre_total, :after => r.post_total, :id => r.student_id, :area => r.area}
-	dimensions[:language].add(r.language)
-	dimensions[:gender].add(r.gender)
-	dimensions[:area].add(r.area)
-	inputs << record
-	i += 1
-end
-
-dimensions[:language] = dimensions[:language].to_a
-dimensions[:gender] = dimensions[:gender].to_a
-dimensions[:area] = dimensions[:area].to_a
-
-axes = [:language, :gender, :area, :before, :after]
-
-height = 1200
-width = 1400
-f = Image.new(width,height) { self.background_color = "black" }
-gc = Magick::Draw.new
-gc.stroke('red')
-gc.stroke_width(1)
-
-def x_scale(index, width, axes)
-	index * width.to_f / axes.count
-end
-
-
-inputs.each do |input|
-	last_x = last_y = 0
-	value = dimensions[:area].index(input[:area])
-	hue_scale = 360.0/dimensions[:area].count
-	gc.stroke("hsl(#{value*hue_scale},100,100)")
-	axes.each_index do |axis_index|
-		axis_x = x_scale(axis_index, width, axes)
-		dimension_range = dimensions[axes[axis_index]]
-		if (dimension_range != nil)
-			scale = height.to_f / dimension_range.count
-			y = dimension_range.index(input[axes[axis_index]]) * scale
-		else
-			y = input[axes[axis_index]] * height.to_f / 56
+		responses.each do |r|
+			record = {:language => r.language, :gender => r.gender, :before => r.pre_total, :after => r.post_total, :id => r.student_id, :area => r.area}
+			@dimensions[:language].add(r.language)
+			@dimensions[:gender].add(r.gender)
+			@dimensions[:area].add(r.area)
+			@inputs << record
+			i += 1
 		end
-#		p "(#{last_x},#{last_y}) -> (#{axis_x},#{y*5})"
-		gc.line(last_x,last_y,axis_x,y)
-		last_x = axis_x
-		last_y = y
+
+#		@inputs = @inputs.select {|i| i[:before] < 10 && (i[:after] - i[:before]).abs <= 5}
+
+		@dimensions[:language] = @dimensions[:language].to_a
+		@dimensions[:gender] = @dimensions[:gender].to_a
+		@dimensions[:area] = @dimensions[:area].to_a
+
+		@axes = [:language, :gender, :area, :before, :after]
+	  end
+	  
+	  def draw
+		color_mode(HSB, 360, 100, 100)
+		@inputs.each do |input|
+			last_x = last_y = 0
+			value = @dimensions[:area].index(input[:area])
+			hue_scale = 360.0/@dimensions[:area].count
+			stroke(value*hue_scale,100,100)
+			@axes.each_index do |axis_index|
+				axis_x = x_scale(axis_index, @width, @axes)
+				dimension_range = @dimensions[@axes[axis_index]]
+				if (dimension_range != nil)
+					scale = @height.to_f / dimension_range.count
+					y = dimension_range.index(input[@axes[axis_index]]) * scale
+				else
+					y = @height - input[@axes[axis_index]] * @height.to_f / 56
+				end
+				line(last_x, last_y, axis_x, y)
+				last_x = axis_x
+				last_y = y
+			end
+		end
+
+		color_mode(RGB, 1.0)
+		stroke(1,1,1)
+		@axes.each_index do |axis_index|
+			axis_x = x_scale(axis_index, @width, @axes)
+			line(axis_x, 0, axis_x, @height)
+		end
+	end
+
+	def x_scale(index, width, axes)
+		index * width.to_f / axes.count
 	end
 end
 
-gc.stroke('white')
-axes.each_index do |axis_index|
-	axis_x = x_scale(axis_index, width, axes)
-	gc.line(axis_x, 0, axis_x, height)
-end
 
+h = 800
+w = 1400
 
-gc.draw(f)
-f.write("parallel_coordinates.jpg")
+MySketch.new(:title => "My Sketch", :width => w, :height => h)
+
 
