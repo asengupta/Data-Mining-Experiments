@@ -25,8 +25,8 @@ class MySketch < Processing::App
 			@inputs << record
 		end
 
-#		@inputs = @inputs.select {|i| i[:before] < 10 && (i[:after] - i[:before]).abs <= 5}
-
+#		@inputs = @inputs.select {|i| i[:before] < 5 && (i[:after] - i[:before]).abs <= 5}
+		@inputs = @inputs[0..300]
 		@dimensions[:language] = @dimensions[:language].to_a
 		@dimensions[:gender] = @dimensions[:gender].to_a
 		@dimensions[:area] = @dimensions[:area].to_a
@@ -74,14 +74,33 @@ class MySketch < Processing::App
 		def initialize(lines, hue, parent)
 			@lines = lines
 			@hue = hue
-	#		parent.register_draw(self)
 		end
 
-		def draw
-			color_mode(HSB, 360, 100, 100)
-			stroke(@hue,100,100)
-			@lines.each do |l|
-				line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
+		def draw()
+			show = false
+#			color_mode(HSB, 360, 100, 100)
+#			stroke(10,1,5,1)
+			for l in @lines
+				smaller_y = [l[:from][:y], l[:to][:y]].min
+				larger_y = [l[:from][:y], l[:to][:y]].max
+				next if !(mouseX>=l[:from][:x] && mouseX<=l[:to][:x] && mouseY>=smaller_y && mouseY<=larger_y)
+				m = (l[:to][:y] - l[:from][:y]).to_f/(l[:to][:x] - l[:from][:x]).to_f
+				next if (m*mouseX - mouseY + l[:from][:y] - m*l[:from][:x]).abs > 1.5
+				show = true
+#				color_mode(HSB, 360, 100, 100)
+#				stroke(@hue,100,100,255)
+				break
+			end
+			if show
+				stroke(1,1,1,1)
+				@lines.each do |l|
+					line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
+				end
+			else
+				stroke(0.15,0.15,0.15,0.1)
+				@lines.each do |l|
+					line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
+				end
 			end
 		end
 	end
