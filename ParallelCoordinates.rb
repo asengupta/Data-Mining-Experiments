@@ -5,7 +5,8 @@ require 'ruby-processing'
 include Math
 
 class MySketch < Processing::App
-	  def setup
+	app = self
+	def setup
 		frame_rate(30)
 		smooth
 		background(0,0,0)
@@ -22,7 +23,6 @@ class MySketch < Processing::App
 			@dimensions[:gender].add(r.gender)
 			@dimensions[:area].add(r.area)
 			@inputs << record
-			i += 1
 		end
 
 #		@inputs = @inputs.select {|i| i[:before] < 10 && (i[:after] - i[:before]).abs <= 5}
@@ -35,12 +35,12 @@ class MySketch < Processing::App
 	  end
 	  
 	  def draw
-		color_mode(HSB, 360, 100, 100)
 		@inputs.each do |input|
 			last_x = last_y = 0
 			value = @dimensions[:area].index(input[:area])
 			hue_scale = 360.0/@dimensions[:area].count
 			stroke(value*hue_scale,100,100)
+			lines = []
 			@axes.each_index do |axis_index|
 				axis_x = x_scale(axis_index, @width, @axes)
 				dimension_range = @dimensions[@axes[axis_index]]
@@ -50,10 +50,12 @@ class MySketch < Processing::App
 				else
 					y = @height - input[@axes[axis_index]] * @height.to_f / 56
 				end
-				line(last_x, last_y, axis_x, y)
+
+				lines << {:from => {:x => last_x, :y => last_y}, :to => {:x => axis_x, :y => y}}
 				last_x = axis_x
 				last_y = y
 			end
+			Sample.new(lines, value*hue_scale, self).draw
 		end
 
 		color_mode(RGB, 1.0)
@@ -66,6 +68,22 @@ class MySketch < Processing::App
 
 	def x_scale(index, width, axes)
 		index * width.to_f / axes.count
+	end
+
+	class Sample
+		def initialize(lines, hue, parent)
+			@lines = lines
+			@hue = hue
+	#		parent.register_draw(self)
+		end
+
+		def draw
+			color_mode(HSB, 360, 100, 100)
+			stroke(@hue,100,100)
+			@lines.each do |l|
+				line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
+			end
+		end
 	end
 end
 
