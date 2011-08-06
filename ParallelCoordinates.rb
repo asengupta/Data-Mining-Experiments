@@ -10,12 +10,14 @@ class MySketch < Processing::App
 		frame_rate(30)
 		smooth
 		background(0,0,0)
+		color_mode(RGB, 1.0)
 
 		responses = Response.find(:all)
-		@height = 800
-		@width = 1400
+		@height = 600
+		@width = 1000
 		@inputs = []
 		@dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
+		@samples_to_highlight = []
 
 		responses.each do |r|
 			record = {:language => r.language, :gender => r.gender, :before => r.pre_total, :after => r.post_total, :id => r.student_id, :area => r.area}
@@ -25,21 +27,17 @@ class MySketch < Processing::App
 			@inputs << record
 		end
 
-#		@inputs = @inputs.select {|i| i[:before] < 5 && (i[:after] - i[:before]).abs <= 5}
-		@inputs = @inputs[0..300]
+		@inputs = @inputs[0..13000]
 		@dimensions[:language] = @dimensions[:language].to_a
 		@dimensions[:gender] = @dimensions[:gender].to_a
 		@dimensions[:area] = @dimensions[:area].to_a
 
 		@axes = [:language, :gender, :area, :before, :after]
-	  end
-	  
-	  def draw
+		@all_samples = []
 		@inputs.each do |input|
 			last_x = last_y = 0
 			value = @dimensions[:area].index(input[:area])
 			hue_scale = 360.0/@dimensions[:area].count
-			stroke(value*hue_scale,100,100)
 			lines = []
 			@axes.each_index do |axis_index|
 				axis_x = x_scale(axis_index, @width, @axes)
@@ -55,11 +53,24 @@ class MySketch < Processing::App
 				last_x = axis_x
 				last_y = y
 			end
-			Sample.new(lines, value*hue_scale, self).draw
+			sample = Sample.new(lines, value*hue_scale, self)
+			@all_samples << sample
+			sample.clear
+		end
+	  end
+	  
+	def draw
+		draw_axes
+		return if mouseX == 0 && mouseY == 0
+		@samples_to_highlight.each {|s| s.clear}
+		@samples_to_highlight = @all_samples.select do |s|
+			s.intersects(mouseX, mouseY)
 		end
 
-		color_mode(RGB, 1.0)
-		stroke(1,1,1)
+		@samples_to_highlight.each {|s| s.draw}
+	end
+
+	def draw_axes
 		@axes.each_index do |axis_index|
 			axis_x = x_scale(axis_index, @width, @axes)
 			line(axis_x, 0, axis_x, @height)
@@ -76,39 +87,37 @@ class MySketch < Processing::App
 			@hue = hue
 		end
 
-		def draw()
-			show = false
-#			color_mode(HSB, 360, 100, 100)
-#			stroke(10,1,5,1)
+		def intersects(x,y)
 			for l in @lines
 				smaller_y = [l[:from][:y], l[:to][:y]].min
 				larger_y = [l[:from][:y], l[:to][:y]].max
 				next if !(mouseX>=l[:from][:x] && mouseX<=l[:to][:x] && mouseY>=smaller_y && mouseY<=larger_y)
 				m = (l[:to][:y] - l[:from][:y]).to_f/(l[:to][:x] - l[:from][:x]).to_f
 				next if (m*mouseX - mouseY + l[:from][:y] - m*l[:from][:x]).abs > 1.5
-				show = true
-#				color_mode(HSB, 360, 100, 100)
-#				stroke(@hue,100,100,255)
-				break
+				return true
 			end
-			if show
-				stroke(1,1,1,1)
-				@lines.each do |l|
-					line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
-				end
-			else
-				stroke(0.15,0.15,0.15,0.1)
-				@lines.each do |l|
-					line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
-				end
+			false
+		end
+
+		def draw()
+			stroke(1,1,1,1)
+			@lines.each do |l|
+				line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
+			end
+		end
+
+		def clear()
+			stroke(0.1,0.1,0.1,1)
+			@lines.each do |l|
+				line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
 			end
 		end
 	end
 end
 
 
-h = 800
-w = 1400
+h = 600
+w = 1000
 
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
