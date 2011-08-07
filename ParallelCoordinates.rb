@@ -4,6 +4,7 @@ require 'ruby-processing'
 
 include Math
 
+
 class MySketch < Processing::App
 	app = self
 	def setup
@@ -13,8 +14,8 @@ class MySketch < Processing::App
 		color_mode(RGB, 1.0)
 
 		responses = Response.find(:all)
-		@height = 600
-		@width = 1000
+		@height = height
+		@width = width
 		@inputs = []
 		@dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
 		@samples_to_highlight = []
@@ -118,7 +119,6 @@ end
 
 h = 600
 w = 1000
-
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
 
