@@ -4,6 +4,61 @@ require 'ruby-processing'
 
 include Math
 
+class ContinuousRange
+	attr_accessor :minimum, :maximum
+
+	def initialize(range)
+		@minimum = range[:minimum]
+		@maximum = range[:maximum]
+	end
+
+	def interval
+		@maximum - @minimum
+	end
+
+	def index(element)
+		element.to_f
+	end
+end
+
+class DiscreteRange
+	attr_accessor :values
+	def initialize(v)
+		@values = v[:values]
+	end
+
+	def interval
+		@values.count
+	end
+
+	def index(element)
+		@values.index(element)
+	end
+end
+
+class Transform
+	def initialize(scale, rotation, origin)
+		@origin = origin
+		@scale = scale
+		@rotation = sin(rotation * PI / 180.0)
+	end
+
+	def apply(component)
+		@origin + component * @rotation * @scale
+	end
+end
+
+class Axis
+	def initialize(span, range, origin, sign, rotation)
+		@span = span
+		@range = range
+		@transform = Transform.new((sign<=>0.0) * @span / range.interval.to_f, rotation, origin)
+	end
+
+	def transform(component)
+		@transform.apply(@range.index(component))
+	end
+end
 
 class MySketch < Processing::App
 	app = self
@@ -14,6 +69,7 @@ class MySketch < Processing::App
 		color_mode(RGB, 1.0)
 
 		responses = Response.find(:all)
+		responses = responses[0..1500]
 		@height = height
 		@width = width
 		@inputs = []
@@ -34,27 +90,27 @@ class MySketch < Processing::App
 		@dimensions[:area] = @dimensions[:area].to_a
 
 		@axes = [:language, :gender, :area, :before, :after]
+		@real_axes =
+		{
+			:language => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:language]}), @height, -1, 90),
+			:gender => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:gender]}), @height, -1, 90),
+			:area => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:area]}), @height, -1, 90),
+			:before => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, 90),
+			:after => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, 90)
+		}
 		@all_samples = []
 		@inputs.each do |input|
 			last_x = last_y = 0
-			value = @dimensions[:area].index(input[:area])
-			hue_scale = 360.0/@dimensions[:area].count
 			lines = []
 			@axes.each_index do |axis_index|
+				axis = @axes[axis_index]
+				y = @real_axes[axis].transform(input[axis])
 				axis_x = x_scale(axis_index, @width, @axes)
-				dimension_range = @dimensions[@axes[axis_index]]
-				if (dimension_range != nil)
-					scale = @height.to_f / dimension_range.count
-					y = dimension_range.index(input[@axes[axis_index]]) * scale
-				else
-					y = @height - input[@axes[axis_index]] * @height.to_f / 56
-				end
-
 				lines << {:from => {:x => last_x, :y => last_y}, :to => {:x => axis_x, :y => y}}
 				last_x = axis_x
 				last_y = y
 			end
-			sample = Sample.new(lines, value*hue_scale, self)
+			sample = Sample.new(lines, self)
 			@all_samples << sample
 			sample.clear
 		end
@@ -83,9 +139,8 @@ class MySketch < Processing::App
 	end
 
 	class Sample
-		def initialize(lines, hue, parent)
+		def initialize(lines, parent)
 			@lines = lines
-			@hue = hue
 		end
 
 		def intersects(x,y)
@@ -117,8 +172,8 @@ class MySketch < Processing::App
 end
 
 
-h = 600
-w = 1000
+h = 800
+w = 1400
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
 
