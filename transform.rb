@@ -1,8 +1,7 @@
 class Transform
-	def initialize(scale, rotation, origin)
+	def initialize(scale, origin)
 		@origin = origin
 		@scale = scale
-		@rotation = sin(rotation * PI / 180.0)
 	end
 
 	def apply(component)

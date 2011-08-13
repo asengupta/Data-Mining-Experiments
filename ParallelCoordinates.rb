@@ -36,23 +36,37 @@ class MySketch < Processing::App
 		@dimensions[:area] = @dimensions[:area].to_a
 
 		@axes = [:language, :gender, :area, :before, :after]
-		@x_axis = Axis.new(@width, DiscreteRange.new({:values => @axes}), 20, 1, 0)
+		x_unit_vector = {:x => 1, :y => 0}
+		y_unit_vector = {:x => 0, :y => 1}
+
+		@x_axis = Axis.new(@width, DiscreteRange.new({:values => @axes}), 20, 1, x_unit_vector)
 		@y_axes =
 		{
-			:language => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:language]}), @height, -1, 90),
-			:gender => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:gender]}), @height, -1, 90),
-			:area => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:area]}), @height, -1, 90),
-			:before => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, 90),
-			:after => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, 90)
+			:language => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:language]}), @height, -1, y_unit_vector),
+			:gender => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:gender]}), @height, -1, y_unit_vector),
+			:area => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:area]}), @height, -1, y_unit_vector),
+			:before => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, y_unit_vector),
+			:after => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, y_unit_vector)
 		}
+
+		@systems =
+		{
+			:language => CoordinateSystem.new(@x_axis, @y_axes[:language]),
+			:gender => CoordinateSystem.new(@x_axis, @y_axes[:gender]),
+			:area => CoordinateSystem.new(@x_axis, @y_axes[:area]),
+			:before => CoordinateSystem.new(@x_axis, @y_axes[:before]),
+			:after => CoordinateSystem.new(@x_axis, @y_axes[:after])
+		}
+
 		@all_samples = []
 		@inputs.each do |input|
 			last_x = last_y = 0
 			lines = []
 			@axes.each_index do |axis_index|
 				axis = @axes[axis_index]
-				y = @y_axes[axis].transform(input[axis])
-				axis_x = @x_axis.transform(axis)
+				standard_point = @systems[axis].standard_basis({:x => @x_axis.index(axis), :y => @y_axes[axis].index(input[axis])})
+				y = standard_point[:y]
+				axis_x = standard_point[:x]
 				if axis_index == 0
 					last_x = axis_x
 					last_y = y
@@ -81,7 +95,7 @@ class MySketch < Processing::App
 	def draw_axes
 		stroke(1,1,1,1)
 		@axes.each do |axis|
-			x = @x_axis.transform(axis)
+			x = @x_axis.transform(@x_axis.index(axis))
 			line(x, 0, x, @height)
 		end
 	end
