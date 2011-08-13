@@ -1,64 +1,10 @@
 require 'schema'
 require 'set'
+require 'ranges'
+require 'axis'
 require 'ruby-processing'
 
 include Math
-
-class ContinuousRange
-	attr_accessor :minimum, :maximum
-
-	def initialize(range)
-		@minimum = range[:minimum]
-		@maximum = range[:maximum]
-	end
-
-	def interval
-		@maximum - @minimum
-	end
-
-	def index(element)
-		element.to_f
-	end
-end
-
-class DiscreteRange
-	attr_accessor :values
-	def initialize(v)
-		@values = v[:values]
-	end
-
-	def interval
-		@values.count
-	end
-
-	def index(element)
-		@values.index(element)
-	end
-end
-
-class Transform
-	def initialize(scale, rotation, origin)
-		@origin = origin
-		@scale = scale
-		@rotation = sin(rotation * PI / 180.0)
-	end
-
-	def apply(component)
-		@origin + component * @rotation * @scale
-	end
-end
-
-class Axis
-	def initialize(span, range, origin, sign, rotation)
-		@span = span
-		@range = range
-		@transform = Transform.new((sign<=>0.0) * @span / range.interval.to_f, rotation, origin)
-	end
-
-	def transform(component)
-		@transform.apply(@range.index(component))
-	end
-end
 
 class MySketch < Processing::App
 	app = self
@@ -90,7 +36,8 @@ class MySketch < Processing::App
 		@dimensions[:area] = @dimensions[:area].to_a
 
 		@axes = [:language, :gender, :area, :before, :after]
-		@real_axes =
+		@x_axis = Axis.new(@width, DiscreteRange.new({:values => @axes}), 0, 1, 0)
+		@y_axes =
 		{
 			:language => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:language]}), @height, -1, 90),
 			:gender => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:gender]}), @height, -1, 90),
@@ -104,8 +51,8 @@ class MySketch < Processing::App
 			lines = []
 			@axes.each_index do |axis_index|
 				axis = @axes[axis_index]
-				y = @real_axes[axis].transform(input[axis])
-				axis_x = x_scale(axis_index, @width, @axes)
+				y = @y_axes[axis].transform(input[axis])
+				axis_x = @x_axis.transform(axis)
 				lines << {:from => {:x => last_x, :y => last_y}, :to => {:x => axis_x, :y => y}}
 				last_x = axis_x
 				last_y = y
@@ -128,14 +75,11 @@ class MySketch < Processing::App
 	end
 
 	def draw_axes
-		@axes.each_index do |axis_index|
-			axis_x = x_scale(axis_index, @width, @axes)
-			line(axis_x, 0, axis_x, @height)
+		stroke(1,1,1,1)
+		@axes.each do |axis|
+			x = @x_axis.transform(axis)
+			line(x, 0, x, @height)
 		end
-	end
-
-	def x_scale(index, width, axes)
-		index * width.to_f / axes.count
 	end
 
 	class Sample
@@ -155,14 +99,14 @@ class MySketch < Processing::App
 			false
 		end
 
-		def draw()
+		def draw
 			stroke(1,1,1,1)
 			@lines.each do |l|
 				line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
 			end
 		end
 
-		def clear()
+		def clear
 			stroke(0.1,0.1,0.1,1)
 			@lines.each do |l|
 				line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
