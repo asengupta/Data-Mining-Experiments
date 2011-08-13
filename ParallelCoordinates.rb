@@ -36,7 +36,7 @@ class MySketch < Processing::App
 		@dimensions[:area] = @dimensions[:area].to_a
 
 		@axes = [:language, :gender, :area, :before, :after]
-		@x_axis = Axis.new(@width, DiscreteRange.new({:values => @axes}), 0, 1, 0)
+		@x_axis = Axis.new(@width, DiscreteRange.new({:values => @axes}), 20, 1, 0)
 		@y_axes =
 		{
 			:language => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:language]}), @height, -1, 90),
@@ -53,6 +53,10 @@ class MySketch < Processing::App
 				axis = @axes[axis_index]
 				y = @y_axes[axis].transform(input[axis])
 				axis_x = @x_axis.transform(axis)
+				if axis_index == 0
+					last_x = axis_x
+					last_y = y
+				end
 				lines << {:from => {:x => last_x, :y => last_y}, :to => {:x => axis_x, :y => y}}
 				last_x = axis_x
 				last_y = y
