@@ -39,23 +39,31 @@ class MySketch < Processing::App
 		x_unit_vector = {:x => 1, :y => 0}
 		y_unit_vector = {:x => 0, :y => 1}
 
-		@x_axis = Axis.new(@width, DiscreteRange.new({:values => @axes}), 20, 1, x_unit_vector)
-		@y_axes =
+		@x_range = DiscreteRange.new({:values => @axes})
+		@y_ranges =
 		{
-			:language => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:language]}), @height, -1, y_unit_vector),
-			:gender => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:gender]}), @height, -1, y_unit_vector),
-			:area => Axis.new(@height, DiscreteRange.new({:values => @dimensions[:area]}), @height, -1, y_unit_vector),
-			:before => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, y_unit_vector),
-			:after => Axis.new(@height, ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}), @height, -1, y_unit_vector)
+			:language => DiscreteRange.new({:values => @dimensions[:language]}),
+			:gender => DiscreteRange.new({:values => @dimensions[:gender]}),
+			:area => DiscreteRange.new({:values => @dimensions[:area]}),
+			:before => ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}),
+			:after => ContinuousRange.new({:minimum => 0.0, :maximum => 56.0})
+		}
+		@scales =
+		{
+			:language => @height / DiscreteRange.new({:values => @dimensions[:language]}).interval,
+			:gender => @height / DiscreteRange.new({:values => @dimensions[:gender]}).interval,
+			:area => @height / DiscreteRange.new({:values => @dimensions[:area]}).interval,
+			:before => @height / ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}).interval,
+			:after => @height / ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}).interval
 		}
 
 		@systems =
 		{
-			:language => CoordinateSystem.new(@x_axis, @y_axes[:language]),
-			:gender => CoordinateSystem.new(@x_axis, @y_axes[:gender]),
-			:area => CoordinateSystem.new(@x_axis, @y_axes[:area]),
-			:before => CoordinateSystem.new(@x_axis, @y_axes[:before]),
-			:after => CoordinateSystem.new(@x_axis, @y_axes[:after])
+			:language => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:language]]]),
+			:gender => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:gender]]]),
+			:area => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:area]]]),
+			:before => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:before]]]),
+			:after => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:after]]])
 		}
 
 		@all_samples = []
@@ -64,15 +72,15 @@ class MySketch < Processing::App
 			lines = []
 			@axes.each_index do |axis_index|
 				axis = @axes[axis_index]
-				standard_point = @systems[axis].standard_basis({:x => @x_axis.index(axis), :y => @y_axes[axis].index(input[axis])})
-				y = standard_point[:y]
-				axis_x = standard_point[:x]
+				standard_point = @systems[axis].standard_basis({:x => @x_range.index(axis), :y => @y_ranges[axis].index(input[axis])})
+				y = @height - standard_point[:y]
+				x = standard_point[:x]
 				if axis_index == 0
-					last_x = axis_x
+					last_x = x
 					last_y = y
 				end
-				lines << {:from => {:x => last_x, :y => last_y}, :to => {:x => axis_x, :y => y}}
-				last_x = axis_x
+				lines << {:from => {:x => last_x, :y => last_y}, :to => {:x => x, :y => y}}
+				last_x = x
 				last_y = y
 			end
 			sample = Sample.new(lines, self)
@@ -82,7 +90,7 @@ class MySketch < Processing::App
 	  end
 	  
 	def draw
-		draw_axes
+#		draw_axes
 		return if mouseX == 0 && mouseY == 0
 		@samples_to_highlight.each {|s| s.clear}
 		@samples_to_highlight = @all_samples.select do |s|
