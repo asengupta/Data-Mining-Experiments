@@ -39,12 +39,12 @@ class MySketch < Processing::App
 		x_scale = @width / x_range.interval
 		y_scale = @height / y_range.interval
 
-		c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[5,0],[0,0.1]])
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[5,0],[0,0.1]])
 		draw_axes
 		stroke(1,1,0,1)
 		fill(1,1,0)
 		pre_bins.each_index do |position|
-			standard_point = c.standard_basis({:x => position, :y => pre_bins[position]})
+			standard_point = @c.standard_basis({:x => position, :y => pre_bins[position]})
 			p = @screen_transform.apply(standard_point)
 			ellipse(p[:x], p[:y], 5, 5)
 		end
@@ -52,7 +52,7 @@ class MySketch < Processing::App
 		stroke(0,1,0,1)
 		fill(0,1,0)
 		post_bins.each_index do |position|
-			standard_point = c.standard_basis({:x => position, :y => post_bins[position]})
+			standard_point = @c.standard_basis({:x => position, :y => post_bins[position]})
 			p = @screen_transform.apply(standard_point)
 			ellipse(p[:x], p[:y], 5, 5)
 		end
@@ -67,13 +67,7 @@ class MySketch < Processing::App
 		y_basis_edge = screen_transform.apply(@y_unit_vector)
 		line(screen_origin[:x],screen_origin[:y],x_basis_edge[:x],x_basis_edge[:y])
 		line(screen_origin[:x],screen_origin[:y],y_basis_edge[:x],y_basis_edge[:y])
-		x_tick_vector = MatrixOperations::into2Dx1D(rotation(90),@x_unit_vector)
-		
-	end
-
-	def rotation(angle)
-		radians = angle * PI/180.0
-		[[cos(radians), -sin(radians)],[sin(radians),cos(radians)]]
+		tick_vectors = @c.tick_vectors
 	end
 
 	def draw
