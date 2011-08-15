@@ -1,7 +1,8 @@
 require 'schema'
 require 'set'
 require 'ranges'
-require 'axis'
+require 'transform'
+require 'coordinate_system'
 require 'ruby-processing'
 
 include Math
@@ -18,6 +19,7 @@ class MySketch < Processing::App
 		responses = responses[0..1500]
 		@height = height
 		@width = width
+		screen_transform = Transform.new({:x => 1, :y => -1}, {:x => 0, :y => @height})
 		@inputs = []
 		@dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
 		@samples_to_highlight = []
@@ -37,7 +39,7 @@ class MySketch < Processing::App
 
 		@axes = [:language, :gender, :area, :before, :after]
 		x_unit_vector = {:x => 1, :y => 0}
-		y_unit_vector = {:x => 0, :y => 1}
+		y_unit_vector = {:x => 0.2, :y => 1}
 
 		@x_range = DiscreteRange.new({:values => @axes})
 		@y_ranges =
@@ -73,13 +75,13 @@ class MySketch < Processing::App
 			@axes.each_index do |axis_index|
 				axis = @axes[axis_index]
 				standard_point = @systems[axis].standard_basis({:x => @x_range.index(axis), :y => @y_ranges[axis].index(input[axis])})
-				y = @height - standard_point[:y]
+				y = standard_point[:y]
 				x = standard_point[:x]
 				if axis_index == 0
 					last_x = x
 					last_y = y
 				end
-				lines << {:from => {:x => last_x, :y => last_y}, :to => {:x => x, :y => y}}
+				lines << {:from => screen_transform.apply({:x => last_x, :y => last_y}), :to => screen_transform.apply({:x => x, :y => y})}
 				last_x = x
 				last_y = y
 			end

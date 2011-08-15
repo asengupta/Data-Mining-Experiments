@@ -4,8 +4,8 @@ class Transform
 		@scale = scale
 	end
 
-	def apply(component)
-		@origin + component * @scale
+	def apply(p)
+		{ :x => @origin[:x] + p[:x] * @scale[:x], :y => @origin[:y] + p[:y] * @scale[:y]}
 	end
 end
 
