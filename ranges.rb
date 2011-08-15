@@ -17,7 +17,7 @@ class ContinuousRange
 	def run(interval)
 		current = @minimum
 		while(current <= @maximum)
-			yield(current)
+			yield(current,current)
 			current += interval
 		end
 	end
@@ -40,7 +40,7 @@ class DiscreteRange
 	def run(interval)
 		current = 0
 		while(current <= @values.count - 1)
-			yield(@values[current])
+			yield(current,@values[current])
 			current += interval
 		end
 	end

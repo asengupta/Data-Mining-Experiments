@@ -8,7 +8,7 @@ require 'ruby-processing'
 class MySketch < Processing::App
 	app = self
 	def setup
-		@screen_height = 800
+		@screen_height = 900
 		@width = width
 		@height = height
 		@screen_transform = Transform.new({:x => 1, :y => -1}, {:x => 300, :y => @screen_height})
@@ -32,15 +32,15 @@ class MySketch < Processing::App
 			post_bins[post_score] = responses.select {|r| r.post_total == post_score}.count
 		end
 
-		@x_unit_vector = {:x => 1.0, :y => 0.5}
-		@y_unit_vector = {:x => -0.5, :y => 1.0}
+		@x_unit_vector = {:x => 1.0, :y => 0.3}
+		@y_unit_vector = {:x => -0.3, :y => 1.0}
 
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 2000})
 		x_scale = @width / x_range.interval
 		y_scale = @height / y_range.interval
 
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,0.7]])
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,0.4]])
 		draw_axes
 		stroke(1,1,0,1)
 		fill(1,1,0)
@@ -60,6 +60,8 @@ class MySketch < Processing::App
 	end
 	  
 	def draw_axes
+		f = createFont("Georgia", 24, true);
+		text_font(f,16)
 		stroke(1,1,1,1)
 		screen_transform = Transform.new({:x => 800, :y => -800}, {:x => 300, :y => @screen_height})
 		origin = {:x => 0, :y => 0}
@@ -68,11 +70,19 @@ class MySketch < Processing::App
 		y_basis_edge = screen_transform.apply(@y_unit_vector)
 		line(screen_origin[:x],screen_origin[:y],x_basis_edge[:x],x_basis_edge[:y])
 		line(screen_origin[:x],screen_origin[:y],y_basis_edge[:x],y_basis_edge[:y])
-		@c.ticks(4,50).each do |l|
+		@c.x_ticks(4).each do |l|
 			from = @screen_transform.apply(l[:from])
 			to = @screen_transform.apply(l[:to])
-			line(from[:x].to_i,from[:y].to_i,to[:x].to_i,to[:y].to_i)
-			p from.inspect
+			line(from[:x],from[:y],to[:x],to[:y])
+			fill(1)
+			text(l[:label], to[:x], to[:y]+20)
+		end
+		@c.y_ticks(50).each do |l|
+			from = @screen_transform.apply(l[:from])
+			to = @screen_transform.apply(l[:to])
+			line(from[:x],from[:y],to[:x],to[:y])
+			fill(1)
+			text(l[:label], to[:x]-50, to[:y])
 		end
 	end
 
@@ -80,8 +90,8 @@ class MySketch < Processing::App
 	end
 end
 
-w = 1600
-h = 1200
+w = 1200
+h = 1000
 
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 

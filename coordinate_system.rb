@@ -68,16 +68,22 @@ class CoordinateSystem
 		{:x => v1[:x] + v2[:x], :y => v1[:y] + v2[:y]}
 	end
 
-	def ticks(x_basis_interval, y_basis_interval)
+	def x_ticks(x_basis_interval)
 		lines = []
 		t_vectors = tick_vectors
-		@x_axis.range.run(x_basis_interval) do |v|
-			tick_origin = standard_basis({:x => v, :y => 0})
-			lines << {:from => tick_origin, :to => sum(tick_origin, t_vectors[:x_tick_vector])}
+		@x_axis.range.run(x_basis_interval) do |i,v|
+			tick_origin = standard_basis({:x => i, :y => 0})
+			lines << {:label => v, :from => tick_origin, :to => sum(tick_origin, t_vectors[:x_tick_vector])}
 		end
-		@y_axis.range.run(y_basis_interval) do |v|
-			tick_origin = standard_basis({:x => 0, :y => v})
-			lines << {:from => tick_origin, :to => sum(tick_origin, t_vectors[:y_tick_vector])}
+		lines
+	end
+
+	def y_ticks(y_basis_interval)
+		lines = []
+		t_vectors = tick_vectors
+		@y_axis.range.run(y_basis_interval) do |i,v|
+			tick_origin = standard_basis({:x => 0, :y => i})
+			lines << {:label => v, :from => tick_origin, :to => sum(tick_origin, t_vectors[:y_tick_vector])}
 		end
 		lines
 	end
