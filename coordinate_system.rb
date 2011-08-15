@@ -1,3 +1,5 @@
+require 'ranges'
+
 include Math
 
 def into2Dx2D(first, second)
@@ -24,6 +26,8 @@ end
 
 class CoordinateSystem
 	def initialize(x_axis, y_axis, transform)
+		@x_axis = x_axis
+		@y_axis = y_axis
 		@x_basis_vector = x_axis.basis_vector
 		@y_basis_vector = y_axis.basis_vector
 		@basis_transform = transform
@@ -44,10 +48,38 @@ class CoordinateSystem
 	end
 
 	def tick_vectors
+		unnormalised_vectors =
 		{
-			:x_tick_vector => into2Dx1D(rotation(90),@x_basis_vector),
+			:x_tick_vector => into2Dx1D(rotation(-90),@x_basis_vector),
 			:y_tick_vector => into2Dx1D(rotation(90),@y_basis_vector)
 		}
+		{
+			:x_tick_vector => normal(unnormalised_vectors[:x_tick_vector]),
+			:y_tick_vector => normal(unnormalised_vectors[:y_tick_vector])
+		}
+	end
+
+	def normal(vector)
+		magnitude = sqrt(vector[:x]**2 + vector[:y]**2)
+		{:x => 5*vector[:x]/magnitude, :y => 5*vector[:y]/magnitude}
+	end
+
+	def sum(v1, v2)
+		{:x => v1[:x] + v2[:x], :y => v1[:y] + v2[:y]}
+	end
+
+	def ticks(x_basis_interval, y_basis_interval)
+		lines = []
+		t_vectors = tick_vectors
+		@x_axis.range.run(x_basis_interval) do |v|
+			tick_origin = standard_basis({:x => v, :y => 0})
+			lines << {:from => tick_origin, :to => sum(tick_origin, t_vectors[:x_tick_vector])}
+		end
+		@y_axis.range.run(y_basis_interval) do |v|
+			tick_origin = standard_basis({:x => 0, :y => v})
+			lines << {:from => tick_origin, :to => sum(tick_origin, t_vectors[:y_tick_vector])}
+		end
+		lines
 	end
 
 	def rotation(angle)

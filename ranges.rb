@@ -13,6 +13,14 @@ class ContinuousRange
 	def index(element)
 		element.to_f
 	end
+
+	def run(interval)
+		current = @minimum
+		while(current <= @maximum)
+			yield(current)
+			current += interval
+		end
+	end
 end
 
 class DiscreteRange
@@ -27,6 +35,14 @@ class DiscreteRange
 
 	def index(element)
 		@values.index(element)
+	end
+
+	def run(interval)
+		current = 0
+		while(current <= @values.count - 1)
+			yield(@values[current])
+			current += interval
+		end
 	end
 end
 

@@ -8,9 +8,10 @@ require 'ruby-processing'
 class MySketch < Processing::App
 	app = self
 	def setup
+		@screen_height = 800
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 1, :y => -1}, {:x => 100, :y => @height})
+		@screen_transform = Transform.new({:x => 1, :y => -1}, {:x => 300, :y => @screen_height})
 		frame_rate(30)
 		smooth
 		background(0,0,0)
@@ -39,7 +40,7 @@ class MySketch < Processing::App
 		x_scale = @width / x_range.interval
 		y_scale = @height / y_range.interval
 
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[5,0],[0,0.1]])
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,0.7]])
 		draw_axes
 		stroke(1,1,0,1)
 		fill(1,1,0)
@@ -60,14 +61,19 @@ class MySketch < Processing::App
 	  
 	def draw_axes
 		stroke(1,1,1,1)
-		screen_transform = Transform.new({:x => 800, :y => -800}, {:x => 100, :y => @height})
+		screen_transform = Transform.new({:x => 800, :y => -800}, {:x => 300, :y => @screen_height})
 		origin = {:x => 0, :y => 0}
 		screen_origin = screen_transform.apply(origin)
 		x_basis_edge = screen_transform.apply(@x_unit_vector)
 		y_basis_edge = screen_transform.apply(@y_unit_vector)
 		line(screen_origin[:x],screen_origin[:y],x_basis_edge[:x],x_basis_edge[:y])
 		line(screen_origin[:x],screen_origin[:y],y_basis_edge[:x],y_basis_edge[:y])
-		tick_vectors = @c.tick_vectors
+		@c.ticks(4,50).each do |l|
+			from = @screen_transform.apply(l[:from])
+			to = @screen_transform.apply(l[:to])
+			line(from[:x].to_i,from[:y].to_i,to[:x].to_i,to[:y].to_i)
+			p from.inspect
+		end
 	end
 
 	def draw
@@ -75,7 +81,7 @@ class MySketch < Processing::App
 end
 
 w = 1600
-h = 1000
+h = 1200
 
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
