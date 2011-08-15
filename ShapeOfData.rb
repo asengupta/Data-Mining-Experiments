@@ -34,11 +34,12 @@ class MySketch < Processing::App
 		@x_unit_vector = {:x => 1.0, :y => 0.5}
 		@y_unit_vector = {:x => -0.5, :y => 1.0}
 
-		
-		x_scale = @width / ContinuousRange.new({:minimum => 0, :maximum => 56}).interval
-		y_scale = @height / ContinuousRange.new({:minimum => 0, :maximum => 2000}).interval
+		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
+		y_range = ContinuousRange.new({:minimum => 0, :maximum => 2000})
+		x_scale = @width / x_range.interval
+		y_scale = @height / y_range.interval
 
-		c = CoordinateSystem.new(@x_unit_vector, @y_unit_vector, [[5,0],[0,0.1]])
+		c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[5,0],[0,0.1]])
 		draw_axes
 		stroke(1,1,0,1)
 		fill(1,1,0)
@@ -66,6 +67,13 @@ class MySketch < Processing::App
 		y_basis_edge = screen_transform.apply(@y_unit_vector)
 		line(screen_origin[:x],screen_origin[:y],x_basis_edge[:x],x_basis_edge[:y])
 		line(screen_origin[:x],screen_origin[:y],y_basis_edge[:x],y_basis_edge[:y])
+		x_tick_vector = MatrixOperations::into2Dx1D(rotation(90),@x_unit_vector)
+		
+	end
+
+	def rotation(angle)
+		radians = angle * PI/180.0
+		[[cos(radians), -sin(radians)],[sin(radians),cos(radians)]]
 	end
 
 	def draw

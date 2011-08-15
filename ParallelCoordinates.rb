@@ -42,30 +42,37 @@ class MySketch < Processing::App
 		y_unit_vector = {:x => 0.2, :y => 1}
 
 		@x_range = DiscreteRange.new({:values => @axes})
+		language_range = DiscreteRange.new({:values => @dimensions[:language]})
+		gender_range = DiscreteRange.new({:values => @dimensions[:gender]})
+		area_range = DiscreteRange.new({:values => @dimensions[:area]})
+		before_range = ContinuousRange.new({:minimum => 0.0, :maximum => 56.0})
+		after_range = ContinuousRange.new({:minimum => 0.0, :maximum => 56.0})
 		@y_ranges =
 		{
-			:language => DiscreteRange.new({:values => @dimensions[:language]}),
-			:gender => DiscreteRange.new({:values => @dimensions[:gender]}),
-			:area => DiscreteRange.new({:values => @dimensions[:area]}),
-			:before => ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}),
-			:after => ContinuousRange.new({:minimum => 0.0, :maximum => 56.0})
+			:language => language_range,
+			:gender => gender_range,
+			:area => area_range,
+			:before => before_range,
+			:after => after_range
 		}
 		@scales =
 		{
-			:language => @height / DiscreteRange.new({:values => @dimensions[:language]}).interval,
-			:gender => @height / DiscreteRange.new({:values => @dimensions[:gender]}).interval,
-			:area => @height / DiscreteRange.new({:values => @dimensions[:area]}).interval,
-			:before => @height / ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}).interval,
-			:after => @height / ContinuousRange.new({:minimum => 0.0, :maximum => 56.0}).interval
+			:language => @height / @y_ranges[:language].interval,
+			:gender => @height / @y_ranges[:gender].interval,
+			:area => @height / @y_ranges[:area].interval,
+			:before => @height / @y_ranges[:before].interval,
+			:after => @height / @y_ranges[:after].interval
 		}
+
+		x_axis = Axis.new(x_unit_vector,@x_range)
 
 		@systems =
 		{
-			:language => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:language]]]),
-			:gender => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:gender]]]),
-			:area => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:area]]]),
-			:before => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:before]]]),
-			:after => CoordinateSystem.new(x_unit_vector, y_unit_vector, [[@width/@axes.count, 0],[0, @scales[:after]]])
+			:language => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_range[:language]), [[@width/@axes.count, 0],[0, @scales[:language]]]),
+			:gender => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_range[:gender]), [[@width/@axes.count, 0],[0, @scales[:gender]]]),
+			:area => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_range[:area]), [[@width/@axes.count, 0],[0, @scales[:area]]]),
+			:before => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_range[:before]), [[@width/@axes.count, 0],[0, @scales[:before]]]),
+			:after => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_range[:after]), [[@width/@axes.count, 0],[0, @scales[:after]]])
 		}
 
 		@all_samples = []
