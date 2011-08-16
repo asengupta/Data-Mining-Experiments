@@ -14,6 +14,8 @@ end
 
 class CoordinateSystem
 	include MatrixOperations
+	attr_accessor :x_basis_vector, :y_basis_vector
+
 	def initialize(x_axis, y_axis, transform, artist)
 		@artist = artist
 		@x_axis = x_axis
@@ -83,31 +85,6 @@ class CoordinateSystem
 		[[cos(radians), -sin(radians)],[sin(radians),cos(radians)]]
 	end
 
-	def draw_axes(screen_transform)
-		f = @artist.createFont("Georgia", 24, true);
-		@artist.text_font(f,16)
-		@artist.stroke(1,1,1,1)
-		axis_screen_transform = Transform.new({:x => 800, :y => -800}, screen_transform.origin)
-		origin = {:x => 0, :y => 0}
-		screen_origin = screen_transform.apply(origin)
-		x_basis_edge = axis_screen_transform.apply(@x_basis_vector)
-		y_basis_edge = axis_screen_transform.apply(@y_basis_vector)
-		@artist.line(screen_origin[:x],screen_origin[:y],x_basis_edge[:x],x_basis_edge[:y])
-		@artist.line(screen_origin[:x],screen_origin[:y],y_basis_edge[:x],y_basis_edge[:y])
-		
-		draw_ticks(x_ticks(4), screen_transform, {:x => 0, :y => 20})
-		draw_ticks(y_ticks(50), screen_transform, {:x => -50, :y => 0})
-	end
-
-	def draw_ticks(ticks, screen_transform, displacement)
-		ticks.each do |l|
-			from = screen_transform.apply(l[:from])
-			to = screen_transform.apply(l[:to])
-			@artist.line(from[:x],from[:y],to[:x],to[:y])
-			@artist.fill(1)
-			@artist.text(l[:label], to[:x]+displacement[:x], to[:y]+displacement[:y])
-		end
-	end
 
 	def standard_basis(point)
 		standard_point =

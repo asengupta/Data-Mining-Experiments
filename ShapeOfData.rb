@@ -1,7 +1,7 @@
 require 'set'
 require 'schema'
 require 'ranges'
-require 'transform'
+require 'screen'
 require 'coordinate_system'
 
 class MySketch < Processing::App
@@ -11,6 +11,7 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 		@screen_transform = SignedTransform.new({:x => 15, :y => -3}, {:x => 300, :y => @screen_height})
+		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
 		background(0,0,0)
@@ -38,21 +39,17 @@ class MySketch < Processing::App
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 2000})
 
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,0.4]], self)
-		@c.draw_axes(@screen_transform)
+		@screen.draw_axes(@c,5,40)
 		stroke(1,1,0,1)
 		fill(1,1,0)
 		pre_bins.each_index do |position|
-			standard_point = @c.standard_basis({:x => position, :y => pre_bins[position]})
-			p = @screen_transform.apply(standard_point)
-			ellipse(p[:x], p[:y], 5, 5)
+			@screen.plot({:x => position, :y => pre_bins[position]}, @c)
 		end
 
 		stroke(0,1,0,1)
 		fill(0,1,0)
 		post_bins.each_index do |position|
-			standard_point = @c.standard_basis({:x => position, :y => post_bins[position]})
-			p = @screen_transform.apply(standard_point)
-			ellipse(p[:x], p[:y], 5, 5)
+			@screen.plot({:x => position, :y => post_bins[position]}, @c)
 		end
 	end
 

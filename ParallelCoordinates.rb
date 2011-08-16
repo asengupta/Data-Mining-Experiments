@@ -99,7 +99,6 @@ class MySketch < Processing::App
 	  end
 	  
 	def draw
-#		draw_axes
 		return if mouseX == 0 && mouseY == 0
 		@samples_to_highlight.each {|s| s.clear}
 		@samples_to_highlight = @all_samples.select do |s|
