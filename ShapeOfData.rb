@@ -36,8 +36,6 @@ class MySketch < Processing::App
 
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 2000})
-		x_scale = @width / x_range.interval
-		y_scale = @height / y_range.interval
 
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,0.4]], self)
 		@c.draw_axes(@screen_transform)
@@ -57,33 +55,6 @@ class MySketch < Processing::App
 			ellipse(p[:x], p[:y], 5, 5)
 		end
 	end
-	  
-#	def draw_axes(screen_transform)
-#		f = createFont("Georgia", 24, true);
-#		text_font(f,16)
-#		stroke(1,1,1,1)
-#		axis_screen_transform = Transform.new({:x => 800, :y => -800}, screen_transform.origin[:x])
-#		origin = {:x => 0, :y => 0}
-#		screen_origin = screen_transform.apply(origin)
-#		x_basis_edge = axis_screen_transform.apply(@x_unit_vector)
-#		y_basis_edge = axis_screen_transform.apply(@y_unit_vector)
-#		line(screen_origin[:x],screen_origin[:y],x_basis_edge[:x],x_basis_edge[:y])
-#		line(screen_origin[:x],screen_origin[:y],y_basis_edge[:x],y_basis_edge[:y])
-#		@c.x_ticks(4).each do |l|
-#			from = screen_transform.apply(l[:from])
-#			to = screen_transform.apply(l[:to])
-#			line(from[:x],from[:y],to[:x],to[:y])
-#			fill(1)
-#			text(l[:label], to[:x], to[:y]+20)
-#		end
-#		@c.y_ticks(50).each do |l|
-#			from = screen_transform.apply(l[:from])
-#			to = screen_transform.apply(l[:to])
-#			line(from[:x],from[:y],to[:x],to[:y])
-#			fill(1)
-#			text(l[:label], to[:x]-50, to[:y])
-#		end
-#	end
 
 	def draw
 	end
