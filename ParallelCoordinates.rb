@@ -39,7 +39,7 @@ class MySketch < Processing::App
 
 		@axes = [:language, :gender, :area, :before, :after]
 		x_unit_vector = {:x => 1, :y => 0}
-		y_unit_vector = {:x => 0.2, :y => 1}
+		y_unit_vector = {:x => 0, :y => 1}
 
 		@x_range = DiscreteRange.new({:values => @axes})
 		language_range = DiscreteRange.new({:values => @dimensions[:language]})
