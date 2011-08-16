@@ -1,22 +1,8 @@
 require 'ranges'
+require 'ruby-processing'
+require 'matrix_operations'
 
 include Math
-
-module MatrixOperations
-	def MatrixOperations.into2Dx2D(first, second)
-		[
-			[second[0][0]*first[0][0] + second[1][0]*first[0][1], second[0][1]*first[0][0] + second[1][1]*first[0][1]],
-			[second[0][0]*first[1][0] + second[1][0]*first[1][1], second[0][1]*first[1][0] + second[1][1]*first[1][1]]
-		]
-	end
-
-	def MatrixOperations.into2Dx1D(transform, point)
-		{
-			:x => transform[0][0]*point[:x] + transform[0][1]*point[:y], 
-			:y => transform[1][0]*point[:x] + transform[1][1]*point[:y]
-		}
-	end
-end
 
 class Axis
 	attr_accessor :basis_vector, :range
@@ -28,7 +14,8 @@ end
 
 class CoordinateSystem
 	include MatrixOperations
-	def initialize(x_axis, y_axis, transform)
+	def initialize(x_axis, y_axis, transform, artist)
+		@artist = artist
 		@x_axis = x_axis
 		@y_axis = y_axis
 		@x_basis_vector = x_axis.basis_vector
@@ -94,6 +81,32 @@ class CoordinateSystem
 	def rotation(angle)
 		radians = angle * PI/180.0
 		[[cos(radians), -sin(radians)],[sin(radians),cos(radians)]]
+	end
+
+	def draw_axes(screen_transform)
+		f = @artist.createFont("Georgia", 24, true);
+		@artist.text_font(f,16)
+		@artist.stroke(1,1,1,1)
+		axis_screen_transform = Transform.new({:x => 800, :y => -800}, screen_transform.origin)
+		origin = {:x => 0, :y => 0}
+		screen_origin = screen_transform.apply(origin)
+		x_basis_edge = axis_screen_transform.apply(@x_basis_vector)
+		y_basis_edge = axis_screen_transform.apply(@y_basis_vector)
+		@artist.line(screen_origin[:x],screen_origin[:y],x_basis_edge[:x],x_basis_edge[:y])
+		@artist.line(screen_origin[:x],screen_origin[:y],y_basis_edge[:x],y_basis_edge[:y])
+		
+		draw_ticks(x_ticks(4), screen_transform, {:x => 0, :y => 20})
+		draw_ticks(y_ticks(50), screen_transform, {:x => -50, :y => 0})
+	end
+
+	def draw_ticks(ticks, screen_transform, displacement)
+		ticks.each do |l|
+			from = screen_transform.apply(l[:from])
+			to = screen_transform.apply(l[:to])
+			@artist.line(from[:x],from[:y],to[:x],to[:y])
+			@artist.fill(1)
+			@artist.text(l[:label], to[:x]+displacement[:x], to[:y]+displacement[:y])
+		end
 	end
 
 	def standard_basis(point)

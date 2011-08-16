@@ -1,4 +1,5 @@
 class Transform
+	attr_accessor :scale, :origin
 	def initialize(scale, origin)
 		@origin = origin
 		@scale = scale
