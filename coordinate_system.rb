@@ -2,18 +2,20 @@ require 'ranges'
 
 include Math
 
-def into2Dx2D(first, second)
-	[
-		[second[0][0]*first[0][0] + second[1][0]*first[0][1], second[0][1]*first[0][0] + second[1][1]*first[0][1]],
-		[second[0][0]*first[1][0] + second[1][0]*first[1][1], second[0][1]*first[1][0] + second[1][1]*first[1][1]]
-	]
-end
+module MatrixOperations
+	def MatrixOperations.into2Dx2D(first, second)
+		[
+			[second[0][0]*first[0][0] + second[1][0]*first[0][1], second[0][1]*first[0][0] + second[1][1]*first[0][1]],
+			[second[0][0]*first[1][0] + second[1][0]*first[1][1], second[0][1]*first[1][0] + second[1][1]*first[1][1]]
+		]
+	end
 
-def into2Dx1D(transform, point)
-	{
-		:x => transform[0][0]*point[:x] + transform[0][1]*point[:y], 
-		:y => transform[1][0]*point[:x] + transform[1][1]*point[:y]
-	}
+	def MatrixOperations.into2Dx1D(transform, point)
+		{
+			:x => transform[0][0]*point[:x] + transform[0][1]*point[:y], 
+			:y => transform[1][0]*point[:x] + transform[1][1]*point[:y]
+		}
+	end
 end
 
 class Axis
@@ -25,6 +27,7 @@ class Axis
 end
 
 class CoordinateSystem
+	include MatrixOperations
 	def initialize(x_axis, y_axis, transform)
 		@x_axis = x_axis
 		@y_axis = y_axis
@@ -44,14 +47,14 @@ class CoordinateSystem
 					[-@basis_matrix[1][0]/d, @basis_matrix[0][0]/d]
 				]
 
-		@standard_transform = into2Dx2D(into2Dx2D(@basis_matrix, @basis_transform), @inverse_basis)
+		@standard_transform = MatrixOperations::into2Dx2D(MatrixOperations::into2Dx2D(@basis_matrix, @basis_transform), @inverse_basis)
 	end
 
 	def tick_vectors
 		unnormalised_vectors =
 		{
-			:x_tick_vector => into2Dx1D(rotation(-90),@x_basis_vector),
-			:y_tick_vector => into2Dx1D(rotation(90),@y_basis_vector)
+			:x_tick_vector => MatrixOperations::into2Dx1D(rotation(-90),@x_basis_vector),
+			:y_tick_vector => MatrixOperations::into2Dx1D(rotation(90),@y_basis_vector)
 		}
 		{
 			:x_tick_vector => normal(unnormalised_vectors[:x_tick_vector]),
@@ -100,7 +103,7 @@ class CoordinateSystem
 			:y => @x_basis_vector[:y]*point[:x] + @y_basis_vector[:y]*point[:y]
 		}
 
-		into2Dx1D(@standard_transform, standard_point)
+		MatrixOperations::into2Dx1D(@standard_transform, standard_point)
 	end
 end
 
