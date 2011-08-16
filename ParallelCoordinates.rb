@@ -19,7 +19,7 @@ class MySketch < Processing::App
 		responses = responses[0..1500]
 		@height = height
 		@width = width
-		screen_transform = Transform.new({:x => 1, :y => -1}, {:x => 0, :y => @height})
+		screen_transform = SignedTransform.new({:x => 10, :y => -1}, {:x => 0, :y => @height})
 		@inputs = []
 		@dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
 		@samples_to_highlight = []
@@ -68,11 +68,11 @@ class MySketch < Processing::App
 
 		@systems =
 		{
-			:language => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:language]), [[@width/@axes.count, 0],[0, @scales[:language]]]),
-			:gender => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:gender]), [[@width/@axes.count, 0],[0, @scales[:gender]]]),
-			:area => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:area]), [[@width/@axes.count, 0],[0, @scales[:area]]]),
-			:before => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:before]), [[@width/@axes.count, 0],[0, @scales[:before]]]),
-			:after => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:after]), [[@width/@axes.count, 0],[0, @scales[:after]]])
+			:language => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:language]), [[@width/@axes.count, 0],[0, @scales[:language]]], self),
+			:gender => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:gender]), [[@width/@axes.count, 0],[0, @scales[:gender]]], self),
+			:area => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:area]), [[@width/@axes.count, 0],[0, @scales[:area]]], self),
+			:before => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:before]), [[@width/@axes.count, 0],[0, @scales[:before]]], self),
+			:after => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:after]), [[@width/@axes.count, 0],[0, @scales[:after]]], self)
 		}
 
 		@all_samples = []
