@@ -10,7 +10,7 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 1, :y => -1}, {:x => 300, :y => @screen_height})
+		@screen_transform = SignedTransform.new({:x => 15, :y => -3}, {:x => 300, :y => @screen_height})
 		frame_rate(30)
 		smooth
 		background(0,0,0)
@@ -31,8 +31,8 @@ class MySketch < Processing::App
 			post_bins[post_score] = responses.select {|r| r.post_total == post_score}.count
 		end
 
-		@x_unit_vector = {:x => 1.0, :y => 0.0}
-		@y_unit_vector = {:x => 0.0, :y => 1.0}
+		@x_unit_vector = {:x => 1.0, :y => 1.0}
+		@y_unit_vector = {:x => -1.0, :y => 1.0}
 
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 2000})

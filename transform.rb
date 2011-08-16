@@ -10,3 +10,9 @@ class Transform
 	end
 end
 
+class SignedTransform < Transform
+	def apply(p)
+		{ :x => @origin[:x] + p[:x] * (@scale[:x]<=>0.0).to_i, :y => @origin[:y] + p[:y] * (@scale[:y]<=>0.0).to_i}
+	end
+end
+
