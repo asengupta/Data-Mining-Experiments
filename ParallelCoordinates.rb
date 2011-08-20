@@ -1,9 +1,7 @@
 require 'schema'
 require 'set'
-require 'ranges'
-require 'transform'
-require 'coordinate_system'
 require 'ruby-processing'
+require 'basis_processing'
 
 include Math
 

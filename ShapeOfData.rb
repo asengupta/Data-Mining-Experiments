@@ -1,8 +1,7 @@
-require 'set'
+require 'rubygems'
 require 'schema'
-require 'ranges'
-require 'screen'
-require 'coordinate_system'
+gem 'basis-processing'
+require 'basis_processing'
 
 class MySketch < Processing::App
 	app = self
