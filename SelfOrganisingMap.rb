@@ -1,7 +1,6 @@
 require 'schema'
 require 'set'
 require 'ruby-processing'
-require 'basis_processing'
 
 include Math
 class Blah < Processing::App
@@ -9,36 +8,44 @@ class Blah < Processing::App
 		frame_rate(30)
 		smooth
 		background(0,0,0)
-		color_mode(RGB, 1.0)
-		map = SelfOrganisingMap.new(200,200)
-		map.go
+		color_mode(RGB, 255)
+		responses = Response.find(:all)
+		responses = responses[0..200]
+		map = SelfOrganisingMap.new(responses, 200, 200, :radius_of_effect => 45)
+		map.go(20)
+		map.map.each_index do |row|
+			map.map[row].each_index do |column|
+				intensity = map.map[row][column] * 5
+				stroke(0,intensity,0)
+				point(column, row)
+			end
+		end
+		stroke(255,0,0)
+		map.markers.each_index do |row|
+			map.markers[row].each_index do |column|
+				point(column, row) if map.markers[row][column] == '0'
+			end
+		end
 	end
 
 end
 
 class SelfOrganisingMap
-	attr_accessor :map
-	def initialize(width, height)
-		@radius_of_effect = 10
+	attr_accessor :map, :markers
+	def initialize(inputs, width, height, options)
+		@radius_of_effect = options[:radius_of_effect]
 		@inputs = []
-		responses = Response.find(:all)
-		responses = responses[0..1500]
-		@height = height
-		@width = width
-		responses.each do |r|
+		inputs.each do |r|
 			@inputs << { :area => r[:area], :vector => r[:pre_total]}
 		end
-		@rows = 70
-		@columns = 70
-		@radius_of_effect = 20
+		@rows = height
+		@columns = width
 
 		@rings = circle_hash(@radius_of_effect)
 		@map = initialised_map(@rows, @columns)
 		@markers = points(@rows, @columns)
 		@data_points = []
 		puts "Done initialising map\n"
-
-		@iterations = 1
 	end
 
 	def discrete_circle(radius)
@@ -86,7 +93,7 @@ class SelfOrganisingMap
 		rows.times do |r|
 			row = []
 			columns.times.each do |c|
-				row<< rand(2**57 - 1)
+				row<< rand(rand(56))
 			end
 			map<< row
 		end
@@ -106,8 +113,8 @@ class SelfOrganisingMap
 		500 * Math.exp(- iteration / 2)
 	end
 
-	def go
-		@iterations.times do |iteration|
+	def go(iterations)
+		iterations.times do |iteration|
 			data_points = []
 			@inputs.each do |sample|
 				input = sample[:vector]
@@ -128,24 +135,19 @@ class SelfOrganisingMap
 						neighbor_y = closest[:row] + neighbor[:y]
 						next if (neighbor_y < 0 || neighbor_x < 0 || neighbor_y >= @rows || neighbor_x >= @columns)
 						distance = (map[neighbor_y][neighbor_x] - input).abs
-						path = (map[neighbor_y][neighbor_x] - input)
+						path = (input - map[neighbor_y][neighbor_x])
 						steps_to_adjust = path * Math.exp(- (radius**2)/eta(iteration))
 						@map[neighbor_y][neighbor_x] += steps_to_adjust
 					end
 				end
 
-				@markers[closest[:row]][closest[:column]] = '0' if iteration == @iterations - 1
+				@markers[closest[:row]][closest[:column]] = '0' if iteration == iterations - 1
 			end
 			p "Iteration #{iteration}"
-#			@map.each_index do |row|
-#				@map[row].each_index do |column|
-#					intensity = hamming_distance_64(@map[row][column], 0) * 4
-#				end
-#			end
 		end
 
 	end
 end
 
-Blah.new(:title => "My Sketch", :width => 100, :height => 100)
+Blah.new(:title => "My Sketch", :width => 500, :height => 500)
 
