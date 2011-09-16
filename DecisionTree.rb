@@ -1,8 +1,6 @@
 require 'set'
-require 'RMagick'
 
 include Math
-include Magick
 
 def improvement_category(r)
 	return "BETTER_THAN_NOTHING" if r[:before] == 0 && r[:after] > r[:before]
