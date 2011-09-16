@@ -31,8 +31,8 @@ class MySketch < Processing::App
 			post_bins[post_score] = responses.select {|r| r.post_total == post_score}.count
 		end
 
-		@x_unit_vector = {:x => 1.0, :y => 1.0}
-		@y_unit_vector = {:x => -1.0, :y => 1.0}
+		@x_unit_vector = {:x => 1.0, :y => 0.0}
+		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 2000})
