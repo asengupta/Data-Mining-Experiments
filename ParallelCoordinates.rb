@@ -114,7 +114,6 @@ class MySketch < Processing::App
 
 				queue.subscribe do |message|
 					evaluate(message)
-					puts "Received a message: #{message}. Good..."
 				end
 			end
 		end
