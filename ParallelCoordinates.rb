@@ -2,8 +2,7 @@ require 'schema'
 require 'set'
 require 'ruby-processing'
 require 'basis_processing'
-gem 'rabbitmq-jruby-client'
-require 'rabbitmq_client'
+require 'amqp'
 
 include Math
 
@@ -97,20 +96,7 @@ class MySketch < Processing::App
 			@all_samples << sample
 			sample.clear
 		end
-#		puts "I am in here 1"
-#		@client = RabbitMQClient.new
-#		puts "I am in here 2"
-#		@queue = @client.queue('lambda')
-#		puts "I am in here 3"
-#		begin
-#			@exchange = @client.exchange('lambda_exchange', 'direct')
-#		rescue => e
-#			puts e
-#		end
-#		puts "I am in here 4"
-#		@queue.bind(@exchange, 'lambda')
-#		puts @queue.inspect
-#		puts "I am in here 5"
+
 		Thread.new do
 			puts "Inside: #{Thread.current}"
 			EventMachine.run do
@@ -118,7 +104,7 @@ class MySketch < Processing::App
 			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
 			  	channel = AMQP::Channel.new(connection)
 			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
-				queue = channel.queue('lambda', :auto_delete => false, :passive => true)
+				queue = channel.queue('lambda', :auto_delete => false)
 			  	queue.bind(exchange, :routing_key => 'lambda')
 
 				queue.subscribe do |payload|
