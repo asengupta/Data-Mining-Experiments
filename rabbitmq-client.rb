@@ -1,25 +1,14 @@
 require 'rubygems'
-require 'amqp'
-#gem 'rabbitmq-jruby-client'
-#require 'rabbitmq_client'
+Gem.clear_paths
 
-#EventMachine.run do
-#  connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
-#  puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
-##begin
-#  channel = AMQP::Channel.new(connection)
-#  queue = channel.queue('lambda', :auto_delete => true)
-#  exchange = channel.direct('lambda_exchange')
-#  queue.subscribe do |p|
-#	puts "Lololo"
-#	puts p
-#  end
-#  exchange.publish "Hahahahaha", :routing_key => queue.name
-#rescue => e
-#	puts e
-#end
-#  connection.close { EventMachine.stop }
-#end
+#ENV['GEM_HOME'] = '/usr/lib/ruby/gems/1.8/gems/ruby-processing-1.0.9/lib/core/jruby-complete.jar!/META-INF/jruby.home/lib/ruby/gems/1.8'
+#ENV['GEM_PATH'] = '/usr/lib/ruby/gems/1.8/gems/ruby-processing-1.0.9/lib/core/jruby-complete.jar!/META-INF/jruby.home/lib/ruby/gems/1.8'
+ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
+ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
+puts ENV['GEM_HOME']
+puts ENV['GEM_PATH']
+require 'amqp'
+
 class MySketch < Processing::App
 	def setup
 		EventMachine.run do
@@ -27,9 +16,11 @@ class MySketch < Processing::App
 		  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
 		  	channel = AMQP::Channel.new(connection)
 		  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
-			queue = channel.queue('lambda', :auto_delete => false, :passive => true)
+			queue = channel.queue('lambda', :auto_delete => false, :passive => false)
 		  	queue.bind(exchange, :routing_key => 'lambda')
 			queue.subscribe do |payload|
+				l = eval(payload)
+				puts l.call([1,2,3,4,5,6,7,8])
 				puts "Received a message: #{payload}. Good..."
 			end
 		end
