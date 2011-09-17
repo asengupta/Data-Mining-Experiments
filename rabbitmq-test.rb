@@ -15,7 +15,7 @@ begin
     puts a
     puts b
   end
-  exchange.publish "Hello, world!", :routing_key => 'lambda'
+  exchange.publish "lambda {|all| all[0..3]}", :routing_key => 'lambda'
   queue.status do |a, b|
     puts a
     puts b

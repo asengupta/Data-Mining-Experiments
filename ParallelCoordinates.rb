@@ -107,8 +107,9 @@ class MySketch < Processing::App
 				queue = channel.queue('lambda', :auto_delete => false)
 			  	queue.bind(exchange, :routing_key => 'lambda')
 
-				queue.subscribe do |payload|
-					puts "Received a message: #{payload}. Good..."
+				queue.subscribe do |message|
+					evaluate(message)
+					puts "Received a message: #{message}. Good..."
 				end
 			end
 		end
@@ -123,9 +124,9 @@ class MySketch < Processing::App
 	end
 
 	def evaluate(message)
-		b = eval "lambda" +message
+		b = eval(message)
 		puts b
-		@samples_to_highlight = @all_samples
+		@samples_to_highlight = b.call(@all_samples)
 		redraw
 	end
 
