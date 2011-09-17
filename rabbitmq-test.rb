@@ -14,7 +14,7 @@ begin
     puts a
     puts b
   end
-	v = lambda {|all| all[0..3]}.to_source
+	v = lambda {|all| all[0..1000]}.to_source
 	puts v
   exchange.publish(v, :routing_key => 'lambda')
   queue.status do |a, b|
