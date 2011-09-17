@@ -136,8 +136,6 @@ class MySketch < Processing::App
 	end
 
 	def draw
-		puts "---------------------------------------------"
-		Thread.list.each {|t| puts "#{t} #{t.status} #{@old_highlighted_samples.size if @old_highlighted_samples != nil}"}
 		@old_highlighted_samples.each {|s| s.clear} if @old_highlighted_samples != nil
 		@samples_to_highlight.each {|s| s.draw}
 		@old_highlighted_samples = Array.new(@samples_to_highlight)
