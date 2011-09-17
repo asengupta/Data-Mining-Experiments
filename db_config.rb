@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'arjdbc'
 gem 'activerecord', "=3.0.9"
 require 'active_record'
 

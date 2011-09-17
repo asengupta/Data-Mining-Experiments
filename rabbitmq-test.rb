@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'amqp'
-#gem 'rabbitmq-jruby-client'
-#require 'rabbitmq_client'
+require 'sourcify'
 
 EventMachine.run do
   connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
@@ -15,7 +14,7 @@ begin
     puts a
     puts b
   end
-  exchange.publish "lambda {|all| all[0..3]}", :routing_key => 'lambda'
+  exchange.publish(lambda {|all| all[0..3]}.to_source, :routing_key => 'lambda')
   queue.status do |a, b|
     puts a
     puts b
