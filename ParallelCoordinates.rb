@@ -97,27 +97,58 @@ class MySketch < Processing::App
 			@all_samples << sample
 			sample.clear
 		end
-		@client = RabbitMQClient.new
-		@queue = @client.queue('lambda')
-		@exchange = @client.exchange('lambda_exchange')
-		@queue.bind(@exchange)
-	  end
+#		puts "I am in here 1"
+#		@client = RabbitMQClient.new
+#		puts "I am in here 2"
+#		@queue = @client.queue('lambda')
+#		puts "I am in here 3"
+#		begin
+#			@exchange = @client.exchange('lambda_exchange', 'direct')
+#		rescue => e
+#			puts e
+#		end
+#		puts "I am in here 4"
+#		@queue.bind(@exchange, 'lambda')
+#		puts @queue.inspect
+#		puts "I am in here 5"
+		Thread.new do
+			puts "Inside: #{Thread.current}"
+			EventMachine.run do
+				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
+			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
+			  	channel = AMQP::Channel.new(connection)
+			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
+				queue = channel.queue('lambda', :auto_delete => false, :passive => true)
+			  	queue.bind(exchange, :routing_key => 'lambda')
+
+				queue.subscribe do |payload|
+					puts "Received a message: #{payload}. Good..."
+				end
+			end
+		end
+	end
 	  
 	def mouseMoved
+		return if mouseX == 0 && mouseY == 0
+		@samples_to_highlight = @all_samples.select do |s|
+			s.intersects(mouseX, mouseY)
+		end
+		redraw
+	end
+
+	def evaluate(message)
+		b = eval "lambda" +message
+		puts b
+		@samples_to_highlight = @all_samples
 		redraw
 	end
 
 	def draw
-		p "Binding complete"
-#		message = @queue.retrieve
-#		p message
-		return if mouseX == 0 && mouseY == 0
-		@samples_to_highlight.each {|s| s.clear}
-		@samples_to_highlight = @all_samples.select do |s|
-			s.intersects(mouseX, mouseY)
-		end
-
+		puts "---------------------------------------------"
+		Thread.list.each {|t| puts "#{t} #{t.status} #{@old_highlighted_samples.size if @old_highlighted_samples != nil}"}
+		@old_highlighted_samples.each {|s| s.clear} if @old_highlighted_samples != nil
 		@samples_to_highlight.each {|s| s.draw}
+		@old_highlighted_samples = Array.new(@samples_to_highlight)
 	end
 
 	def draw_axes
