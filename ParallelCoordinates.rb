@@ -2,6 +2,8 @@ require 'schema'
 require 'set'
 require 'ruby-processing'
 require 'basis_processing'
+gem 'rabbitmq-jruby-client'
+require 'rabbitmq_client'
 
 include Math
 
@@ -9,6 +11,7 @@ class MySketch < Processing::App
 	app = self
 	def setup
 		frame_rate(30)
+		no_loop
 		smooth
 		background(0,0,0)
 		color_mode(RGB, 1.0)
@@ -94,9 +97,20 @@ class MySketch < Processing::App
 			@all_samples << sample
 			sample.clear
 		end
+		@client = RabbitMQClient.new
+		@queue = @client.queue('lambda')
+		@exchange = @client.exchange('lambda_exchange')
+		@queue.bind(@exchange)
 	  end
 	  
+	def mouseMoved
+		redraw
+	end
+
 	def draw
+		p "Binding complete"
+#		message = @queue.retrieve
+#		p message
 		return if mouseX == 0 && mouseY == 0
 		@samples_to_highlight.each {|s| s.clear}
 		@samples_to_highlight = @all_samples.select do |s|
