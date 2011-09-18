@@ -12,7 +12,7 @@ end
 means = Array.new(56)
 means.fill(0)
 
-handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', 'r')
+handle = File.open('/home/avishek/Code/DataMiningExperiments/csv/Ang2010TestsModified.csv', 'r')
 inputs = []
 handle.each_line do |line|
 	split_elements = line.split('|')
@@ -50,6 +50,7 @@ covariance_matrix = []
 	end
 	covariance_matrix << matrix_row
 end
+
 
 uplo = "U"
 a = NArray.to_na(covariance_matrix)
