@@ -9,7 +9,7 @@ class MySketch < Processing::App
 	def setup
 		no_loop
 		background(0,0,0)
-		color_mode(RGB, 1.0)
+		color_mode(HSB, 1.0)
 
 		means = Array.new(56)
 		means.fill(0)
@@ -27,6 +27,7 @@ class MySketch < Processing::App
 		end
 
 		samples = inputs.count
+#		samples = 20
 		inputs = inputs[1..samples]
 		inputs.each do |input|
 			56.times do |i|
@@ -54,16 +55,20 @@ class MySketch < Processing::App
 			end
 			@covariance_matrix << matrix_row
 		end
-		@color_scale = 1.0/max_positive_covariance
+		@size_scale = 15
+		@color_factor = 1.0/max_positive_covariance
+		@size_factor = @size_scale /max_positive_covariance
 	end
 
 	def draw
 		@covariance_matrix.each_index do |row|
 			@covariance_matrix[row].each_index do |column|
-				scale = @covariance_matrix[row][column].abs * @color_scale
-				fill(0,scale,0,1) if @covariance_matrix[row][column] >= 0
-				fill(scale,0,0,1) if @covariance_matrix[row][column] < 0
-				rect(column * 15, row * 15, 15, 15)
+				scaled_color = @covariance_matrix[row][column].abs * @color_factor
+				scaled_size = @covariance_matrix[row][column].abs * @size_factor
+				fill(0.5,1,scaled_color) if @covariance_matrix[row][column] >= 0
+				fill(0,1,0) if row == column
+				ellipse(column * @size_scale + @size_scale/2, row * @size_scale + @size_scale/2, @size_scale, @size_scale) if @covariance_matrix[row][column] < 0
+				rect(column * @size_scale, row * @size_scale, @size_scale, @size_scale) if @covariance_matrix[row][column] >= 0
 			end
 		end
 	end
