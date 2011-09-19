@@ -97,7 +97,7 @@ class MySketch < Processing::App
 				last_x = x
 				last_y = y
 			end
-			sample = Sample.new(lines, self)
+			sample = Sample.new(lines, self, input)
 			@all_samples << sample
 			sample.clear
 		end
@@ -128,10 +128,14 @@ class MySketch < Processing::App
 	end
 
 	def evaluate(message)
-		b = eval(message)
-		puts b
-		@samples_to_highlight = b.call(@all_samples)
-		redraw
+		begin
+			b = eval(message)
+			puts b
+			@samples_to_highlight = @all_samples.select {|sample| b.call(sample.data)}
+			redraw
+		rescue => e
+			puts e
+		end
 	end
 
 	def draw
@@ -149,8 +153,10 @@ class MySketch < Processing::App
 	end
 
 	class Sample
-		def initialize(lines, parent)
+		attr_accessor :data
+		def initialize(lines, parent, data)
 			@lines = lines
+			@data = data
 		end
 
 		def intersects(x,y)
