@@ -21,7 +21,7 @@ class MySketch < Processing::App
 		color_mode(RGB, 1.0)
 
 		responses = Response.find(:all)
-		responses = responses[0..1500]
+		responses = responses[0..15]
 		@height = height
 		@width = width
 		screen_transform = SignedTransform.new({:x => 10, :y => -1}, {:x => 0, :y => @height})
@@ -109,11 +109,15 @@ class MySketch < Processing::App
 			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
 			  	channel = AMQP::Channel.new(connection)
 			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
-				queue = channel.queue('lambda', :auto_delete => false)
+				queue = channel.queue('lambda', :auto_delete => true)
+				answer_queue = channel.queue('lambda_response', :auto_delete => true)
 			  	queue.bind(exchange, :routing_key => 'lambda')
+			  	answer_queue.bind(exchange, :routing_key => 'lambda_response')
 
 				queue.subscribe do |message|
 					evaluate(message)
+				  	exchange.publish("OK", :routing_key => 'lambda_response')
+					puts "Published."
 				end
 			end
 		end
