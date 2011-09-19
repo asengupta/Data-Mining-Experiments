@@ -116,7 +116,7 @@ class MySketch < Processing::App
 
 				queue.subscribe do |message|
 					evaluate(message)
-				  	exchange.publish("OK", :routing_key => 'lambda_response')
+				  	exchange.publish("OK - #{(@samples_to_highlight || []).count} samples.", :routing_key => 'lambda_response')
 					puts "Published."
 				end
 			end
