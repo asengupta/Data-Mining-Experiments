@@ -27,7 +27,7 @@ class MySketch < Processing::App
 		end
 
 		samples = inputs.count
-#		samples = 20
+		samples = 20
 		inputs = inputs[1..samples]
 		inputs.each do |input|
 			56.times do |i|
@@ -58,19 +58,39 @@ class MySketch < Processing::App
 		@size_scale = 15
 		@color_factor = 1.0/max_positive_covariance
 		@size_factor = @size_scale /max_positive_covariance
-	end
-
-	def draw
 		@covariance_matrix.each_index do |row|
 			@covariance_matrix[row].each_index do |column|
 				scaled_color = @covariance_matrix[row][column].abs * @color_factor
 				scaled_size = @covariance_matrix[row][column].abs * @size_factor
 				fill(0.5,1,scaled_color) if @covariance_matrix[row][column] >= 0
+				fill(0.0,1,scaled_color) if @covariance_matrix[row][column] < 0
 				fill(0,1,0) if row == column
-				ellipse(column * @size_scale + @size_scale/2, row * @size_scale + @size_scale/2, @size_scale, @size_scale) if @covariance_matrix[row][column] < 0
-				rect(column * @size_scale, row * @size_scale, @size_scale, @size_scale) if @covariance_matrix[row][column] >= 0
+#				ellipse(column * @size_scale + @size_scale/2, row * @size_scale + @size_scale/2, @size_scale, @size_scale) if @covariance_matrix[row][column] < 0
+				rect(column * @size_scale, row * @size_scale, @size_scale, @size_scale)
 			end
 		end
+	end
+
+	def draw
+		if (@old_rectangle != nil)
+			scaled_color = @covariance_matrix[@old_rectangle[:row]][@old_rectangle[:column]].abs * @color_factor
+			fill(0.5,1,scaled_color)
+			rect(@old_rectangle[:column] * @size_scale, @old_rectangle[:row] * @size_scale, @size_scale, @size_scale)
+		end
+		if (@rectangle_to_highlight != nil)
+			fill(0.1,1,1)
+			rect(@rectangle_to_highlight[:column] * @size_scale, @rectangle_to_highlight[:row] * @size_scale, @size_scale, @size_scale)
+			@old_rectangle = @rectangle_to_highlight
+		end
+	end
+
+	def mouseMoved
+		column = mouseX/@size_scale
+		row = mouseY/@size_scale
+
+		return if column > 55 || row > 55
+		@rectangle_to_highlight = {:row => row, :column => column}
+		redraw
 	end
 
 	def covariance(inputs, dimension_1, dimension_2)
