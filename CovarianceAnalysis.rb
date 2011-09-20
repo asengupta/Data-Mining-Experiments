@@ -4,9 +4,13 @@ Gem.clear_paths
 ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 
+require 'amqp'
+
 class MySketch < Processing::App
 	app = self
 	def setup
+		@old_rectangles = []
+		@rectangles_to_highlight = []
 		no_loop
 		background(0,0,0)
 		color_mode(HSB, 1.0)
@@ -69,19 +73,51 @@ class MySketch < Processing::App
 				rect(column * @size_scale, row * @size_scale, @size_scale, @size_scale)
 			end
 		end
+
+		Thread.new do
+			puts "Inside: #{Thread.current}"
+			EventMachine.run do
+				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
+			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
+			  	channel = AMQP::Channel.new(connection)
+			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
+				queue = channel.queue('lambda', :auto_delete => true)
+				answer_queue = channel.queue('lambda_response', :auto_delete => true)
+			  	queue.bind(exchange, :routing_key => 'lambda')
+			  	answer_queue.bind(exchange, :routing_key => 'lambda_response')
+
+				queue.subscribe do |message|
+					evaluate(message)
+				  	exchange.publish("OK - #{(@rectangles_to_highlight || []).count} samples.", :routing_key => 'lambda_response')
+					puts "Published."
+				end
+			end
+		end
+	end
+
+	def evaluate(message)
+		begin
+			b = eval(message)
+			puts b
+			@rectangles_to_highlight = []
+			@covariance_matrix.each_index {|r| @covariance_matrix[r].each_index {|c| @rectangles_to_highlight << {:row => r, :column => c} if b.call(@covariance_matrix[r][c])}}
+			redraw
+		rescue => e
+			puts e
+		end
 	end
 
 	def draw
-		if (@old_rectangle != nil)
-			scaled_color = @covariance_matrix[@old_rectangle[:row]][@old_rectangle[:column]].abs * @color_factor
+		@old_rectangles.each do |old|
+			scaled_color = @covariance_matrix[old[:row]][old[:column]].abs * @color_factor
 			fill(0.5,1,scaled_color)
-			rect(@old_rectangle[:column] * @size_scale, @old_rectangle[:row] * @size_scale, @size_scale, @size_scale)
+			rect(old[:column] * @size_scale, old[:row] * @size_scale, @size_scale, @size_scale)
 		end
-		if (@rectangle_to_highlight != nil)
+		@rectangles_to_highlight.each do |new_rectangle|
 			fill(0.1,1,1)
-			rect(@rectangle_to_highlight[:column] * @size_scale, @rectangle_to_highlight[:row] * @size_scale, @size_scale, @size_scale)
-			@old_rectangle = @rectangle_to_highlight
+			rect(new_rectangle[:column] * @size_scale, new_rectangle[:row] * @size_scale, @size_scale, @size_scale)
 		end
+		@old_rectangles = @rectangles_to_highlight
 	end
 
 	def mouseMoved
@@ -89,7 +125,7 @@ class MySketch < Processing::App
 		row = mouseY/@size_scale
 
 		return if column > 55 || row > 55
-		@rectangle_to_highlight = {:row => row, :column => column}
+		@rectangles_to_highlight = [{:row => row, :column => column}]
 		redraw
 	end
 
