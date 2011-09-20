@@ -5,6 +5,7 @@ ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 
 require 'amqp'
+require 'yaml'
 
 class MySketch < Processing::App
 	app = self
@@ -88,7 +89,7 @@ class MySketch < Processing::App
 
 				queue.subscribe do |message|
 					evaluate(message)
-				  	exchange.publish("OK - #{(@rectangles_to_highlight || []).count} samples.", :routing_key => 'lambda_response')
+				  	exchange.publish("#{YAML::dump(@rectangles_to_highlight || [])}", :routing_key => 'lambda_response')
 					puts "Published."
 				end
 			end
@@ -114,6 +115,7 @@ class MySketch < Processing::App
 			rect(old[:column] * @size_scale, old[:row] * @size_scale, @size_scale, @size_scale)
 		end
 		@rectangles_to_highlight.each do |new_rectangle|
+			next if new_rectangle[:row] == new_rectangle[:column]
 			fill(0.1,1,1)
 			rect(new_rectangle[:column] * @size_scale, new_rectangle[:row] * @size_scale, @size_scale, @size_scale)
 		end
