@@ -106,7 +106,6 @@ class MySketch < Processing::App
 				queue.subscribe do |message|
 					evaluate(message)
 				  	exchange.publish("#{YAML::dump(@points_to_highlight || [])}", :routing_key => 'lambda_response')
-					puts "Published."
 				end
 			end
 		end
@@ -115,7 +114,6 @@ class MySketch < Processing::App
 	def evaluate(message)
 		begin
 			b = eval(message)
-			puts b
 			@points_to_highlight = []
 			@covariance_matrix.each_index {|r| @covariance_matrix[r].each_index {|c| @points_to_highlight << {:y => r, :x => c} if r!= c && b.call(@covariance_matrix[r][c])}}
 			redraw
@@ -128,14 +126,21 @@ class MySketch < Processing::App
 		stroke(0,0,0)
 		@old_points.each do |old|
 			scaled_color = @covariance_matrix[old[:y]][old[:x]].abs * @color_factor
+			stroke(0,0,0)
 			fill(0.5,1,scaled_color)
 			@screen.plot(old, @basis) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
 		end
 		@points_to_highlight.each do |new_rectangle|
+			scaled_color = @covariance_matrix[new_rectangle[:y]][new_rectangle[:x]].abs * @color_factor
 			next if new_rectangle[:x] == new_rectangle[:y]
-			fill(0.1,1,1)
+			stroke(0.1,1,1)
+			fill(0.5,1,scaled_color)
 			@screen.plot(new_rectangle, @basis) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
 		end
+		text = ""
+		@old_points.each {|p| text << "(#{p[:x]}, #{p[:y]}) -> #{@covariance_matrix[p[:y]][p[:x]]}"}
+		$stdout.print "\r#{text}"
+		$stdout.flush
 		@old_points = @points_to_highlight
 		@screen.draw_axes(@basis,10,10)
 	end
@@ -143,7 +148,6 @@ class MySketch < Processing::App
 	def mouseMoved
 		original_point = @screen.original({:x => mouseX, :y => mouseY}, @basis)
 		original_point = {:x => original_point[:x].round, :y => original_point[:y].round}
-		puts original_point.inspect
 		return if original_point[:x] > 55 || original_point[:y] > 55 || original_point[:x] < 0 || original_point[:y] < 0
 		@points_to_highlight = [{:x => original_point[:x].round, :y => original_point[:y].round}]
 		redraw
