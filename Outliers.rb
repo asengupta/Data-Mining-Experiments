@@ -3,6 +3,7 @@ require 'rubygems'
 Gem.clear_paths
 ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
+
 require 'schema'
 require 'set'
 require 'ruby-processing'
@@ -45,18 +46,32 @@ class MySketch < Processing::App
 		end
 
 		@scale = 10
+
+		x_basis_vector = {:x => 1.0, :y => 0.0}
+		y_basis_vector = {:x => 0.0, :y => 1.0}
+
+		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
+		y_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
+
+		basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[12,0],[0,12]], self)
+		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
+
+		screen = Screen.new(screen_transform, self)
 		bins.each_index do |bin_index|
 			bins[bin_index].each_index do |answer_index|
 				scaled_color = bins[bin_index][answer_index]/1.0
 				fill(0.5,1,scaled_color) if bins[bin_index][answer_index] > 0
 				fill(1.0,1,0) if bins[bin_index][answer_index] == 0
-				rect(answer_index * @scale, bin_index * @scale, @scale, @scale)
+				stroke(0,0,0)
+				point = {:x => answer_index, :y => bin_index}
+				screen.plot(point, basis) {|point| rect(point[:x],point[:y],12,12)}
 			end
 		end
+		screen.draw_axes(basis,10,10)
 	end
 end
 
-h = 800
+h = 1000
 w = 1400
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
