@@ -70,22 +70,22 @@ class MySketch < Processing::App
 		x_basis_vector = {:x => 1.0, :y => 0.0}
 		y_basis_vector = {:x => 0.0, :y => 1.0}
 
-		x_range = ContinuousRange.new({:minimum => 1, :maximum => 56})
-		y_range = ContinuousRange.new({:minimum => 1, :maximum => 56})
+		x_range = ContinuousRange.new({:minimum => 0, :maximum => 55})
+		y_range = ContinuousRange.new({:minimum => 0, :maximum => 55})
 
 		basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@size_scale,0],[0,@size_scale]], self)
 		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
 
 		screen = Screen.new(screen_transform, self)
 		stroke(0,0,0)
-
+		rect_mode(CENTER)
 		@covariance_matrix.each_index do |row|
 			@covariance_matrix[row].each_index do |column|
 				scaled_color = @covariance_matrix[row][column].abs * @color_factor
 				scaled_size = @covariance_matrix[row][column].abs * @size_factor
 				fill(0.5,1,scaled_color) if @covariance_matrix[row][column] >= 0
 				fill(0.0,1,scaled_color) if @covariance_matrix[row][column] < 0
-				point = {:x => column + 1, :y => row + 1}
+				point = {:x => column, :y => row}
 				screen.plot(point, basis) {|point| rect(point[:x],point[:y],@size_scale,@size_scale)}
 			end
 		end
@@ -125,6 +125,7 @@ class MySketch < Processing::App
 	end
 
 	def draw
+		stroke(0,0,0)
 		@old_rectangles.each do |old|
 			scaled_color = @covariance_matrix[old[:row]][old[:column]].abs * @color_factor
 			fill(0.5,1,scaled_color)

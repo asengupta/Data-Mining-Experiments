@@ -58,6 +58,7 @@ class MySketch < Processing::App
 
 		screen = Screen.new(screen_transform, self)
 		stroke(0,0,0)
+		rect_mode(CENTER)
 		bins.each_index do |bin_index|
 			bins[bin_index].each_index do |answer_index|
 				scaled_color = bins[bin_index][answer_index]/1.0
