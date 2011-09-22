@@ -73,10 +73,10 @@ class MySketch < Processing::App
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 55})
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 55})
 
-		basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@size_scale,0],[0,@size_scale]], self)
+		@basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@size_scale,0],[0,@size_scale]], self)
 		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
 
-		screen = Screen.new(screen_transform, self)
+		@screen = Screen.new(screen_transform, self)
 		stroke(0,0,0)
 		rect_mode(CENTER)
 		@covariance_matrix.each_index do |row|
@@ -86,30 +86,30 @@ class MySketch < Processing::App
 				fill(0.5,1,scaled_color) if @covariance_matrix[row][column] >= 0
 				fill(0.0,1,scaled_color) if @covariance_matrix[row][column] < 0
 				point = {:x => column, :y => row}
-				screen.plot(point, basis) {|point| rect(point[:x],point[:y],@size_scale,@size_scale)}
+				@screen.plot(point, @basis) {|point| rect(point[:x],point[:y],@size_scale,@size_scale)}
 			end
 		end
-		screen.draw_axes(basis,10,10)
+		@screen.draw_axes(@basis,10,10)
 
-#		Thread.new do
-#			puts "Inside: #{Thread.current}"
-#			EventMachine.run do
-#				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
-#			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
-#			  	channel = AMQP::Channel.new(connection)
-#			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
-#				queue = channel.queue('lambda', :auto_delete => true)
-#				answer_queue = channel.queue('lambda_response', :auto_delete => true)
-#			  	queue.bind(exchange, :routing_key => 'lambda')
-#			  	answer_queue.bind(exchange, :routing_key => 'lambda_response')
+		Thread.new do
+			puts "Inside: #{Thread.current}"
+			EventMachine.run do
+				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
+			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
+			  	channel = AMQP::Channel.new(connection)
+			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
+				queue = channel.queue('lambda', :auto_delete => true)
+				answer_queue = channel.queue('lambda_response', :auto_delete => true)
+			  	queue.bind(exchange, :routing_key => 'lambda')
+			  	answer_queue.bind(exchange, :routing_key => 'lambda_response')
 
-#				queue.subscribe do |message|
-#					evaluate(message)
-#				  	exchange.publish("#{YAML::dump(@rectangles_to_highlight || [])}", :routing_key => 'lambda_response')
-#					puts "Published."
-#				end
-#			end
-#		end
+				queue.subscribe do |message|
+					evaluate(message)
+				  	exchange.publish("#{YAML::dump(@rectangles_to_highlight || [])}", :routing_key => 'lambda_response')
+					puts "Published."
+				end
+			end
+		end
 	end
 
 	def evaluate(message)
@@ -117,7 +117,7 @@ class MySketch < Processing::App
 			b = eval(message)
 			puts b
 			@rectangles_to_highlight = []
-			@covariance_matrix.each_index {|r| @covariance_matrix[r].each_index {|c| @rectangles_to_highlight << {:row => r, :column => c} if b.call(@covariance_matrix[r][c])}}
+			@covariance_matrix.each_index {|r| @covariance_matrix[r].each_index {|c| @rectangles_to_highlight << {:y => r, :x => c} if r!= c && b.call(@covariance_matrix[r][c])}}
 			redraw
 		rescue => e
 			puts e
@@ -127,24 +127,25 @@ class MySketch < Processing::App
 	def draw
 		stroke(0,0,0)
 		@old_rectangles.each do |old|
-			scaled_color = @covariance_matrix[old[:row]][old[:column]].abs * @color_factor
+			scaled_color = @covariance_matrix[old[:y]][old[:x]].abs * @color_factor
 			fill(0.5,1,scaled_color)
-			rect(old[:column] * @size_scale, old[:row] * @size_scale, @size_scale, @size_scale)
+			@screen.plot(old, @basis) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
 		end
 		@rectangles_to_highlight.each do |new_rectangle|
-			next if new_rectangle[:row] == new_rectangle[:column]
+			next if new_rectangle[:x] == new_rectangle[:y]
 			fill(0.1,1,1)
-			rect(new_rectangle[:column] * @size_scale, new_rectangle[:row] * @size_scale, @size_scale, @size_scale)
+			@screen.plot(new_rectangle, @basis) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
 		end
 		@old_rectangles = @rectangles_to_highlight
+		@screen.draw_axes(@basis,10,10)
 	end
 
 	def mouseMoved
-		column = mouseX/@size_scale
-		row = mouseY/@size_scale
-
-		return if column > 55 || row > 55
-		@rectangles_to_highlight = [{:row => row, :column => column}]
+		original_point = @screen.original({:x => mouseX, :y => mouseY}, @basis)
+		original_point = {:x => original_point[:x].round, :y => original_point[:y].round}
+		puts original_point.inspect
+		return if original_point[:x] > 55 || original_point[:y] > 55 || original_point[:x] < 0 || original_point[:y] < 0
+		@rectangles_to_highlight = [{:x => original_point[:x].round, :y => original_point[:y].round}]
 		redraw
 	end
 
