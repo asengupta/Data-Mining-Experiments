@@ -21,8 +21,8 @@ class MySketch < Processing::App
 		background(0,0,0)
 		color_mode(HSB, 1.0)
 
-		@old_rectangles = []
-		@rectangles_to_highlight = []
+		@old_points = []
+		@points_to_highlight = []
 		responses = Response.find(:all)
 		@bins = []
 		57.times do
@@ -75,16 +75,16 @@ class MySketch < Processing::App
 
 	def draw
 		stroke(0,0,0)
-		@old_rectangles.each do |old|
+		@old_points.each do |old|
 			scaled_color = @bins[old[:y]][old[:x]]
 			fill(0.5,1,scaled_color)
 			@screen.plot(old, @basis) {|p| rect(p[:x],p[:y],@scale,@scale)}
 		end
-		@rectangles_to_highlight.each do |new_rectangle|
+		@points_to_highlight.each do |new_rectangle|
 			fill(0.1,1,1)
 			@screen.plot(new_rectangle, @basis) {|p| rect(p[:x],p[:y],@scale,@scale)}
 		end
-		@old_rectangles = @rectangles_to_highlight
+		@old_points = @points_to_highlight
 		@screen.draw_axes(@basis,10,10)
 	end
 
@@ -92,7 +92,7 @@ class MySketch < Processing::App
 		original_point = @screen.original({:x => mouseX, :y => mouseY}, @basis)
 		original_point = {:x => original_point[:x].round, :y => original_point[:y].round}
 		return if original_point[:x] > 55 || original_point[:y] > 55 || original_point[:x] < 0 || original_point[:y] < 0
-		@rectangles_to_highlight = [{:x => original_point[:x].round, :y => original_point[:y].round}]
+		@points_to_highlight = [{:x => original_point[:x].round, :y => original_point[:y].round}]
 		redraw
 	end
 
