@@ -57,12 +57,12 @@ class MySketch < Processing::App
 		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
 
 		screen = Screen.new(screen_transform, self)
+		stroke(0,0,0)
 		bins.each_index do |bin_index|
 			bins[bin_index].each_index do |answer_index|
 				scaled_color = bins[bin_index][answer_index]/1.0
 				fill(0.5,1,scaled_color) if bins[bin_index][answer_index] > 0
 				fill(1.0,1,0) if bins[bin_index][answer_index] == 0
-				stroke(0,0,0)
 				point = {:x => answer_index, :y => bin_index}
 				screen.plot(point, basis) {|point| rect(point[:x],point[:y],12,12)}
 			end

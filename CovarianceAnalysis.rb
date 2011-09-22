@@ -4,6 +4,7 @@ Gem.clear_paths
 ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 
+require 'basis_processing'
 require 'amqp'
 require 'yaml'
 
@@ -63,37 +64,52 @@ class MySketch < Processing::App
 		@size_scale = 15
 		@color_factor = 1.0/max_positive_covariance
 		@size_factor = @size_scale /max_positive_covariance
+
+		@scale = 10
+
+		x_basis_vector = {:x => 1.0, :y => 0.0}
+		y_basis_vector = {:x => 0.0, :y => 1.0}
+
+		x_range = ContinuousRange.new({:minimum => 1, :maximum => 56})
+		y_range = ContinuousRange.new({:minimum => 1, :maximum => 56})
+
+		basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@size_scale,0],[0,@size_scale]], self)
+		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
+
+		screen = Screen.new(screen_transform, self)
+		stroke(0,0,0)
+
 		@covariance_matrix.each_index do |row|
 			@covariance_matrix[row].each_index do |column|
 				scaled_color = @covariance_matrix[row][column].abs * @color_factor
 				scaled_size = @covariance_matrix[row][column].abs * @size_factor
 				fill(0.5,1,scaled_color) if @covariance_matrix[row][column] >= 0
 				fill(0.0,1,scaled_color) if @covariance_matrix[row][column] < 0
-#				fill(0,1,0) if row == column
-#				ellipse(column * @size_scale + @size_scale/2, row * @size_scale + @size_scale/2, @size_scale, @size_scale) if @covariance_matrix[row][column] < 0
-				rect(column * @size_scale, row * @size_scale, @size_scale, @size_scale)
+				point = {:x => column + 1, :y => row + 1}
+				screen.plot(point, basis) {|point| rect(point[:x],point[:y],@size_scale,@size_scale)}
 			end
 		end
+		screen.draw_axes(basis,10,10)
 
-		Thread.new do
-			puts "Inside: #{Thread.current}"
-			EventMachine.run do
-				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
-			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
-			  	channel = AMQP::Channel.new(connection)
-			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
-				queue = channel.queue('lambda', :auto_delete => true)
-				answer_queue = channel.queue('lambda_response', :auto_delete => true)
-			  	queue.bind(exchange, :routing_key => 'lambda')
-			  	answer_queue.bind(exchange, :routing_key => 'lambda_response')
+#		Thread.new do
+#			puts "Inside: #{Thread.current}"
+#			EventMachine.run do
+#				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
+#			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
+#			  	channel = AMQP::Channel.new(connection)
+#			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
+#				queue = channel.queue('lambda', :auto_delete => true)
+#				answer_queue = channel.queue('lambda_response', :auto_delete => true)
+#			  	queue.bind(exchange, :routing_key => 'lambda')
+#			  	answer_queue.bind(exchange, :routing_key => 'lambda_response')
 
-				queue.subscribe do |message|
-					evaluate(message)
-				  	exchange.publish("#{YAML::dump(@rectangles_to_highlight || [])}", :routing_key => 'lambda_response')
-					puts "Published."
-				end
-			end
-		end
+#				queue.subscribe do |message|
+#					evaluate(message)
+#				  	exchange.publish("#{YAML::dump(@rectangles_to_highlight || [])}", :routing_key => 'lambda_response')
+#					puts "Published."
+#				end
+#			end
+#		end
 	end
 
 	def evaluate(message)
@@ -138,5 +154,5 @@ class MySketch < Processing::App
 	end
 end
 
-MySketch.new(:title => "Covariance Analysis", :width => 1000, :height => 1000)
+MySketch.new(:title => "Covariance Analysis", :width => 1400, :height => 1000)
 
