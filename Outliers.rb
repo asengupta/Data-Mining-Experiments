@@ -71,6 +71,35 @@ class MySketch < Processing::App
 			end
 		end
 		@screen.draw_axes(@basis,10,10)
+		Thread.new do
+			puts "Inside: #{Thread.current}"
+			EventMachine.run do
+				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
+			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
+			  	channel = AMQP::Channel.new(connection)
+			  	exchange = channel.direct('lambda_exchange', :auto_delete => true)
+				queue = channel.queue('lambda', :auto_delete => true)
+				answer_queue = channel.queue('lambda_response', :auto_delete => true)
+			  	queue.bind(exchange, :routing_key => 'lambda')
+			  	answer_queue.bind(exchange, :routing_key => 'lambda_response')
+
+				queue.subscribe do |message|
+					evaluate(message)
+				  	exchange.publish("#{YAML::dump(@points_to_highlight || [])}", :routing_key => 'lambda_response')
+				end
+			end
+		end
+	end
+
+	def evaluate(message)
+		begin
+			b = eval(message)
+			@points_to_highlight = []
+			@bins.each_index {|r| @bins[r].each_index {|c| @points_to_highlight << {:y => r, :x => c} if b.call(@bins[r][c])}}
+			redraw
+		rescue => e
+			puts e
+		end
 	end
 
 	def draw
