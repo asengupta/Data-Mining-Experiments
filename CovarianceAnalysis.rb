@@ -8,7 +8,7 @@ require 'basis_processing'
 require 'amqp'
 require 'yaml'
 
-class MySketch < Processing::App
+class CovarianceSketch < Processing::App
 	app = self
 	def setup
 		@old_points = []
@@ -160,5 +160,5 @@ class MySketch < Processing::App
 	end
 end
 
-MySketch.new(:title => "Covariance Analysis", :width => 1400, :height => 1000)
+CovarianceSketch.new(:title => "Covariance Analysis", :width => 1400, :height => 1000)
 

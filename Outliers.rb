@@ -12,7 +12,7 @@ require 'amqp'
 
 include Math
 
-class MySketch < Processing::App
+class OutliersSketch < Processing::App
 	app = self
 	def setup
 		frame_rate(30)
@@ -129,5 +129,5 @@ end
 
 h = 1000
 w = 1400
-MySketch.new(:title => "My Sketch", :width => w, :height => h)
+OutliersSketch.new(:title => "My Sketch", :width => w, :height => h)
 
