@@ -7,6 +7,8 @@ ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 require 'basis_processing'
 require 'amqp'
 require 'yaml'
+require 'schema'
+require 'set'
 
 class CovarianceSketch < Processing::App
 	app = self
@@ -20,14 +22,13 @@ class CovarianceSketch < Processing::App
 		means = Array.new(56)
 		means.fill(0)
 
-		handle = File.open('/home/avishek/Code/DataMiningExperiments/csv/Ang2010TestsModified.csv', 'r')
 		inputs = []
-		handle.each_line do |line|
-			split_elements = line.split('|')
-			pre_test_responses = split_elements[8..63].collect {|e| e.to_f}
+		responses = Response.find(:all)
+		responses.each do |r|
+			bit_string = r[:pre_performance].to_s(2).rjust(56, '0')
 			response_as_bits = []
-			pre_test_responses.each do |r|
-				response_as_bits << r
+			bit_string.each_char do |bit|
+				response_as_bits << (bit == '1'?1.0:0.0)
 			end
 			inputs << response_as_bits
 		end
