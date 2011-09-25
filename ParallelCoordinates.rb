@@ -21,10 +21,10 @@ class MySketch < Processing::App
 		color_mode(RGB, 1.0)
 
 		responses = Response.find(:all)
-		responses = responses[0..15]
+		responses = responses[0..15000]
 		@height = height
 		@width = width
-		screen_transform = SignedTransform.new({:x => 10, :y => -1}, {:x => 0, :y => @height})
+		@screen_transform = SignedTransform.new({:x => 10, :y => -1}, {:x => 0, :y => @height})
 		@inputs = []
 		@dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new}
 		@samples_to_highlight = []
@@ -62,11 +62,11 @@ class MySketch < Processing::App
 		}
 		@scales =
 		{
-			:language => @height / @y_ranges[:language].interval,
-			:gender => @height / @y_ranges[:gender].interval,
-			:area => @height / @y_ranges[:area].interval,
-			:before => @height / @y_ranges[:before].interval,
-			:after => @height / @y_ranges[:after].interval
+			:language => @height / @y_ranges[:language].interval.to_f,
+			:gender => @height / @y_ranges[:gender].interval.to_f,
+			:area => @height / @y_ranges[:area].interval.to_f,
+			:before => @height / @y_ranges[:before].interval.to_f,
+			:after => @height / @y_ranges[:after].interval.to_f
 		}
 
 		x_axis = Axis.new(x_unit_vector,@x_range)
@@ -93,7 +93,7 @@ class MySketch < Processing::App
 					last_x = x
 					last_y = y
 				end
-				lines << {:from => screen_transform.apply({:x => last_x, :y => last_y}), :to => screen_transform.apply({:x => x, :y => y})}
+				lines << {:from => @screen_transform.apply({:x => last_x, :y => last_y}), :to => @screen_transform.apply({:x => x, :y => y})}
 				last_x = x
 				last_y = y
 			end
@@ -146,13 +146,16 @@ class MySketch < Processing::App
 		@old_highlighted_samples.each {|s| s.clear} if @old_highlighted_samples != nil
 		@samples_to_highlight.each {|s| s.draw}
 		@old_highlighted_samples = Array.new(@samples_to_highlight)
+		draw_axes
 	end
 
 	def draw_axes
 		stroke(1,1,1,1)
-		@axes.each do |axis|
-			x = @x_axis.transform(@x_axis.index(axis))
-			line(x, 0, x, @height)
+		@axes.each_index do |axis_index|
+			axis = @axes[axis_index]
+			axis_top = @systems[axis].standard_basis({:x => @x_range.index(axis), :y => 0})
+			axis_bottom = @systems[axis].standard_basis({:x => @x_range.index(axis), :y => @height})
+			line(axis_top[:x], axis_top[:y], axis_bottom[:x], axis_bottom[:y])
 		end
 	end
 
@@ -183,7 +186,7 @@ class MySketch < Processing::App
 		end
 
 		def clear
-			stroke(0.1,0.1,0.1,1)
+			stroke(0.01,0.01,0.01,1)
 			@lines.each do |l|
 				line(l[:from][:x], l[:from][:y], l[:to][:x], l[:to][:y])
 			end
