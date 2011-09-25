@@ -21,7 +21,7 @@ class MySketch < Processing::App
 		color_mode(RGB, 1.0)
 
 		responses = Response.find(:all)
-		responses = responses[0..15000]
+		responses = responses[0..1500]
 		@height = height
 		@width = width
 		@screen_transform = SignedTransform.new({:x => 10, :y => -1}, {:x => 0, :y => @height})
@@ -103,7 +103,6 @@ class MySketch < Processing::App
 		end
 
 		Thread.new do
-			puts "Inside: #{Thread.current}"
 			EventMachine.run do
 				connection = AMQP.connect(:host => '127.0.0.1', :port => 5672)
 			  	puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
@@ -117,7 +116,6 @@ class MySketch < Processing::App
 				queue.subscribe do |message|
 					evaluate(message)
 				  	exchange.publish("OK - #{(@samples_to_highlight || []).count} samples.", :routing_key => 'lambda_response')
-					puts "Published."
 				end
 			end
 		end
@@ -134,7 +132,6 @@ class MySketch < Processing::App
 	def evaluate(message)
 		begin
 			b = eval(message)
-			puts b
 			@samples_to_highlight = @all_samples.select {|sample| b.call(sample.data)}
 			redraw
 		rescue => e
@@ -147,6 +144,8 @@ class MySketch < Processing::App
 		@samples_to_highlight.each {|s| s.draw}
 		@old_highlighted_samples = Array.new(@samples_to_highlight)
 		draw_axes
+		$stdout.print "\r#{@samples_to_highlight.count} samples selected OK."
+		$stdout.flush
 	end
 
 	def draw_axes
