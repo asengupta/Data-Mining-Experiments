@@ -1,33 +1,39 @@
+# Null hypothesis: Area and Improvement are NOT related.
 # For area vs. improvement
 # Chi-Square statistic = 56499.4692602837
 # X2 = 9652.9739
 # Degrees of freedom = 9426
 # Null hypothesis rejected
 
+# Null hypothesis: Area and Pre-Score are NOT related.
 # For area vs. pre-score
 # Chi-Square statistic = 58665.7089390644
 # X2 = 8062.2959
 # Degrees of freedom = 7855
 # Null hypothesis rejected
 
+# Null hypothesis: Area and Post-Score are NOT related.
 # For area vs. post-score
 # Chi-Square statistic = 38567.0016158761
 # X2 = 8062.2959
 # Degrees of freedom = 7855
 # Null hypothesis rejected
 
+# Null hypothesis: Language and Post-Score are NOT related.
 # For language vs. post-score
 # Chi-Square statistic = 280.234448946825
 # X2 = 96.2166
 # Degrees of freedom = 75
 # Null hypothesis rejected
 
+# Null hypothesis: Language and Improvement are NOT related.
 # For language vs. improvement
 # Chi-Square statistic = 232.464548410971
 # X2 = 113.1452
 # Degrees of freedom = 90
 # Null hypothesis rejected
 
+# Null hypothesis: Language and Pre-Score are NOT related.
 # For language vs. pre-score
 # Chi-Square statistic = 277.85501653079
 # X2 = 96.2166
