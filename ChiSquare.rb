@@ -1,3 +1,18 @@
+# For area vs. improvement
+# Chi-Square statistic = 56499.4692602837
+# Degrees of freedom = 9426
+# Null hypothesis rejected
+
+# For area vs. pre-score
+# Chi-Square statistic = 58665.7089390644
+# Degrees of freedom = 7855
+# Null hypothesis rejected
+
+# For area vs. post-score
+# Chi-Square statistic = 38567.0016158761
+# Degrees of freedom = 7855
+# Null hypothesis rejected
+
 require 'rubygems'
 require 'schema'
 
@@ -20,12 +35,11 @@ class Improvement
 	end
 
 	def does_fit(response)
-		@criterion.call(response[:post_total] - response[:pre_total])
+		@criterion.call(response[:post_total])
 	end
 end
 
 improvements =	[
-	Improvement.new('DECLINE') {|d| d < 0},
 	Improvement.new('NONE') {|d| d == 0},
 	Improvement.new('MARGINAL') {|d| d > 0 && d <= 10},
 	Improvement.new('REASONABLE') {|d| d > 10 && d <= 20},
