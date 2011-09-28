@@ -13,18 +13,32 @@
 # Degrees of freedom = 7855
 # Null hypothesis rejected
 
+# For language vs. post-score
+# Chi-Square statistic = 280.234448946825
+# Degrees of freedom = 75
+# Null hypothesis rejected
+
+# For language vs. improvement
+# Chi-Square statistic = 232.464548410971
+# Degrees of freedom = 90
+# Null hypothesis rejected
+
+# For language vs. pre-score
+# Chi-Square statistic = 277.85501653079
+# Degrees of freedom = 75
+# Null hypothesis rejected
+
 require 'rubygems'
 require 'schema'
 
-
 responses = Response.find(:all)
-responses_by_area = {}
+responses_by_language = {}
 
 responses.each do |r|
-	if (responses_by_area[r[:area]] == nil)
-		responses_by_area[r[:area]] = [r]
+	if (responses_by_language[r[:language]] == nil)
+		responses_by_language[r[:language]] = [r]
 	else
-		responses_by_area[r[:area]] << r;
+		responses_by_language[r[:language]] << r;
 	end
 end
 
@@ -35,7 +49,7 @@ class Improvement
 	end
 
 	def does_fit(response)
-		@criterion.call(response[:post_total])
+		@criterion.call(response[:pre_total])
 	end
 end
 
@@ -49,10 +63,10 @@ improvements =	[
 		]
 
 contingency_table = {}
-responses_by_area.each_key do |k|
+responses_by_language.each_key do |k|
 	contingency_table[k] = {}
 	improvements.each do |i|
-		selecteds = responses_by_area[k].select do |r|
+		selecteds = responses_by_language[k].select do |r|
 			i.does_fit(r)
 		end
 		contingency_table[k][i] = { :observed => selecteds.count }
@@ -63,31 +77,31 @@ end
 per_row_totals = {}
 per_column_totals = {}
 
-responses_by_area.each_key do |area|
+responses_by_language.each_key do |language|
 	per_row_total = 0
 	improvements.each do |i|
-		per_row_total += contingency_table[area][i][:observed]
+		per_row_total += contingency_table[language][i][:observed]
 	end
-	per_row_totals[area] = per_row_total
+	per_row_totals[language] = per_row_total
 end
 
 improvements.each do |i|
 	per_column_total = 0
-	responses_by_area.each_key do |area|
-		per_column_total += contingency_table[area][i][:observed]
+	responses_by_language.each_key do |language|
+		per_column_total += contingency_table[language][i][:observed]
 	end
 	per_column_totals[i] = per_column_total
 end
 
 chi_square_statistic = 0
-responses_by_area.each_key do |area|
+responses_by_language.each_key do |language|
 	improvements.each do |i|
-		expected = per_row_totals[area] * per_column_totals[i] / responses.count.to_f
-		chi_square_statistic += (((contingency_table[area][i][:observed] - expected).abs)**2).to_f/expected
+		expected = per_row_totals[language] * per_column_totals[i] / responses.count.to_f
+		chi_square_statistic += (((contingency_table[language][i][:observed] - expected).abs)**2).to_f/expected
 	end
 end
 
 puts "Chi-Square statistic = #{chi_square_statistic}"
-degrees_of_freedom  = (responses_by_area.keys.count - 1) * (improvements.count - 1)
+degrees_of_freedom  = (responses_by_language.keys.count - 1) * (improvements.count - 1)
 puts "Degrees of freedom = #{degrees_of_freedom}"
 
