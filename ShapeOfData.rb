@@ -12,7 +12,7 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 1.0, :y => -50}, {:x => 300.0, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 1.0, :y => -0.25}, {:x => 300.0, :y => @screen_height})
 		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
@@ -39,14 +39,14 @@ class MySketch < Processing::App
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 2000.0})
+		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 3500.0})
 
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,1]], self)
-		@screen.draw_axes(@c,5,5)
+		@screen.draw_axes(@c,5,50)
 		stroke(1,1,0,1)
 		fill(1,1,0)
 		pre_bins.each_index do |position|
-			@screen.plot({:x => position, :y => Math.log(pre_bins.max + 1 - pre_bins[position])}, @c)
+			@screen.plot({:x => position, :y => pre_bins[position]}, @c)
 		end
 
 		stroke(0,1,0,1)
@@ -54,7 +54,7 @@ class MySketch < Processing::App
 		tally = 0
 		post_bins.each_index do |position|
 			tally += post_bins[position]/responses.count.to_f
-			@screen.plot({:x => position, :y => Math.log(post_bins.max + 1 - post_bins[position])}, @c)
+			@screen.plot({:x => position, :y => post_bins[position]}, @c)
 		end
 	end
 

@@ -3,10 +3,10 @@ require 'mysql'
 
 include BitwiseOperations
 
-handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', 'r')
+handle = File.open('/home/avishek/Code/DataMiningExperiments/csv/Ang2010TestsModified.csv', 'r')
 my = Mysql::new("localhost", "root", "", "data_mining")
 
-my.query('CREATE TABLE responses (student_id int(11) DEFAULT NULL, area char(50) DEFAULT NULL, pre_performance bigint(20) DEFAULT NULL, post_performance bigint(20) DEFAULT NULL, language char(50) DEFAULT NULL, gender char(20) DEFAULT NULL, pre_total int, post_total int, id int(11) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`));')
+#my.query('CREATE TABLE responses (student_id int(11) DEFAULT NULL, area char(50) DEFAULT NULL, pre_performance bigint(20) DEFAULT NULL, post_performance bigint(20) DEFAULT NULL, language char(50) DEFAULT NULL, gender char(20) DEFAULT NULL, pre_total int, post_total int, id int(11) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`));')
 
 inputs = []
 handle.each_line do |line|
@@ -19,10 +19,12 @@ handle.each_line do |line|
 		pre_response_as_64+= 1 if r == 1
 		pre_response_as_64 <<= 1
 	end
+	pre_response_as_64 >>= 1
 	post_test_responses.each do |r|
 		post_response_as_64+= 1 if r == 1
 		post_response_as_64 <<= 1
 	end
+	post_response_as_64 >>= 1
 	input =   { 
 			:student_id => split_elements[3], 
 			:area => split_elements[1].gsub(/'/,''), 
