@@ -8,11 +8,16 @@ require 'basis_processing'
 
 class MySketch < Processing::App
 	app = self
+
+	def normal(mean, variance)
+		lambda {|x| 1.0/(Math.sqrt(2.0 * Math::PI * variance)) * Math.exp(-((x - mean)**2) / (2 * variance))}
+	end
+
 	def setup
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 0.8, :y => -0.25}, {:x => 500.0, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -15000.0}, {:x => 500.0, :y => @screen_height})
 		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
@@ -40,6 +45,10 @@ class MySketch < Processing::App
 			improvement_bins[improvement] = improvement_bins[improvement] == nil ? 1 : improvement_bins[improvement] + 1
 		end
 
+		improvement_bins.each_pair do |k, v|
+			improvement_bins[k] = v / responses.count.to_f
+		end
+
 		least_improvement = improvement_bins.keys.min
 		most_improvement = improvement_bins.keys.max
 
@@ -47,10 +56,10 @@ class MySketch < Processing::App
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
 		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 1500.0})
+		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 1.0})
 
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,1]], self)
-		@screen.draw_axes(@c,5,150)
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
+		@screen.draw_axes(@c,5,0.1)
 		stroke(1,1,0,1)
 		fill(1,1,0)
 #		pre_bins.each_index do |position|
@@ -62,13 +71,31 @@ class MySketch < Processing::App
 #		post_bins.each_index do |position|
 #			@screen.plot({:x => position, :y => post_bins[position]}, @c)
 #		end
-		
+
+		value_sum = 0
+		responses.each do |r|
+			value_sum += r[:post_total] - r[:pre_total]
+		end
+		mean = value_sum.to_f/responses.count
+		mean = 5.0
+		sum_of_squares = 0
+		responses.each do |r|
+			sum_of_squares += (r[:post_total] - r[:pre_total] - mean)**2
+		end
+		variance = sum_of_squares.to_f/responses.count
+		variance = 260.0
+		fitted_curve = normal(mean, variance)
+		p "Variance=#{variance}, Mean = #{mean}"
 		stroke(0,1,0,1)
 		fill(0.7,1,0)
 		improvement_bins.each_pair do|k,v|
+			@screen.plot({:x => k, :y => fitted_curve.call(k)}, @c, :bar => true)
+		end
+		stroke(1,1,0,1)
+		fill(1,0.5,0)
+		improvement_bins.each_pair do|k,v|
 			@screen.plot({:x => k, :y => v}, @c)
 		end
-
 	end
 
 	def draw
