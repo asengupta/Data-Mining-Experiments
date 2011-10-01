@@ -12,14 +12,14 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 1.0, :y => -300.0}, {:x => 500.0, :y => @screen_height/2})
+		@screen_transform = Transform.new({:x => 10.0, :y => -0.5}, {:x => 500.0, :y => @screen_height})
 		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
 		background(0,0,0)
 		color_mode(RGB, 1.0)
 
-		handle = File.open('/home/avishek/Code/DataMiningExperiments/data.txt', 'r')
+		handle = File.open('/home/avishek/Code/DataMiningExperiments/data-pre.txt', 'r')
 		inputs = []
 
 		responses = []
@@ -30,19 +30,29 @@ class MySketch < Processing::App
 #			samples += 1
 		end
 
+		bins = []
+
+		interval = (responses.max - responses.min)/56.0
+		current = responses.min
+		while (current <= responses.max)
+			bin_value = responses.select {|r| r >= current && r < current + interval}.count
+			bins << {:from => current, :to => current + interval, :value => bin_value}
+			current += interval
+		end
+
 		@x_unit_vector = {:x => 1.0, :y => 0.0}
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
-		x_range = ContinuousRange.new({:minimum => 0, :maximum => 0})
-		y_range = ContinuousRange.new({:minimum => -1.0, :maximum => 1.0})
+		x_range = ContinuousRange.new({:minimum => -5.0, :maximum => 5.0})
+		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 2000.0})
 
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,1]], self)
-		@screen.draw_axes(@c,10,0.1)
+		@screen.draw_axes(@c,0.5,100)
 		stroke(1,1,0,1)
-		no_fill()
-#		fill(1,1,0)
-		responses.each do |r|
-			@screen.plot({:x => 20, :y => r}, @c) {|p| point(p[:x],p[:y])}
+#		no_fill()
+		fill(1,1,0)
+		bins.each do |r|
+			@screen.plot({:x => r[:from], :y => r[:value]}, @c) {|p| ellipse(p[:x], p[:y], 10, 10)}
 		end
 	end
 
@@ -53,5 +63,5 @@ end
 w = 1200
 h = 1000
 
-MySketch.new(:title => "My Sketch", :width => w, :height => h)
+MySketch.new(:title => "ReducedDimensionDistribution", :width => w, :height => h)
 
