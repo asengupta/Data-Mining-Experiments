@@ -19,7 +19,35 @@ class MySketch < Processing::App
 		background(0,0,0)
 		color_mode(RGB, 1.0)
 
-		handle = File.open('/home/avishek/Code/DataMiningExperiments/data-pre.txt', 'r')
+		post_bins = bins_for('/home/avishek/Code/DataMiningExperiments/data-post.txt')
+		pre_bins = bins_for('/home/avishek/Code/DataMiningExperiments/data-pre.txt')
+
+		@x_unit_vector = {:x => 1.0, :y => 0.0}
+		@y_unit_vector = {:x => 0.0, :y => 1.0}
+
+		x_range = ContinuousRange.new({:minimum => -5.0, :maximum => 5.0})
+		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 2000.0})
+
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,1]], self)
+		stroke(1,1,0,1)
+#		no_fill()
+		fill(1,1,0)
+#		pre_bins.each do |r|
+#			@screen.plot({:x => r[:from], :y => r[:value]}, @c)
+#		end
+		stroke(0,1,0,1)
+		fill(0,1,0)
+		post_bins.each do |r|
+			@screen.plot({:x => r[:from], :y => r[:value]}, @c, :bar => true)
+		end
+		@screen.draw_axes(@c,0.5,100)
+	end
+
+	def draw
+	end
+
+	def bins_for(filename)
+		handle = File.open(filename, 'r')
 		inputs = []
 
 		responses = []
@@ -32,31 +60,14 @@ class MySketch < Processing::App
 
 		bins = []
 
-		interval = (responses.max - responses.min)/56.0
+		interval = (responses.max - responses.min)/100.0
 		current = responses.min
 		while (current <= responses.max)
 			bin_value = responses.select {|r| r >= current && r < current + interval}.count
 			bins << {:from => current, :to => current + interval, :value => bin_value}
 			current += interval
 		end
-
-		@x_unit_vector = {:x => 1.0, :y => 0.0}
-		@y_unit_vector = {:x => 0.0, :y => 1.0}
-
-		x_range = ContinuousRange.new({:minimum => -5.0, :maximum => 5.0})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 2000.0})
-
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,1]], self)
-		@screen.draw_axes(@c,0.5,100)
-		stroke(1,1,0,1)
-#		no_fill()
-		fill(1,1,0)
-		bins.each do |r|
-			@screen.plot({:x => r[:from], :y => r[:value]}, @c) {|p| ellipse(p[:x], p[:y], 10, 10)}
-		end
-	end
-
-	def draw
+		bins
 	end
 end
 

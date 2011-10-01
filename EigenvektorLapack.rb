@@ -43,7 +43,7 @@ means.fill(0)
 
 inputs = []
 responses.each do |r|
-	bit_string = r[:post_performance].to_s(2).rjust(56, '0')
+	bit_string = r[:pre_performance].to_s(2).rjust(56, '0')
 	response_as_bits = []
 #	p "#{r[:student_id]} = #{r[:pre_performance].to_s(2).rjust(56, '0')}" if r[:pre_performance].to_s(2).length > 56
 	bit_string.each_char do |bit|
@@ -94,9 +94,9 @@ a = NArray.to_na(covariance_matrix)
 #info, d, e, z = NumRu::Lapack.ssteqr('I', d, e, a)
 w, work, info, a = NumRu::Lapack.ssyev('V', 'L', a)
 
-eigenvalue =  w.to_a[-2]
+eigenvalue =  w.to_a.last
 
-vektor = a.to_a[-2]
+vektor = a.to_a.last
 
 [vektor].to_a.each do |vek|
 	vek_as_matrix = NVector.ref(NArray.to_na(vektor))
