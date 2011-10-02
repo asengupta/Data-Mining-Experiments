@@ -25,14 +25,12 @@ class MySketch < Processing::App
 
 		responses = Response.find(:all)
 		cumulative_improvement_bins = {}
-		improvement_bins = {}
 		data_bins = {}
 		normal_bins = {}
 		responses.each do |r|
 			cumulative_improvement_bins[metric.call(r)] = responses.select {|rsp| metric.call(rsp) <= metric.call(r)}.count/responses.count.to_f * 100.0 if cumulative_improvement_bins[metric.call(r)] == nil
 			improvement_bins[metric.call(r)] = improvement_bins[metric.call(r)] == nil ? 1 : improvement_bins[metric.call(r)] + 1
 		end
-		improvement_bins = improvement_bins.each_pair {|k,v| improvement_bins[k] = v/responses.count.to_f * 100.0}
 		
 		value_sum = 0
 		responses.each do |r|
@@ -70,25 +68,6 @@ class MySketch < Processing::App
 			no_fill()
 			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}, @c) { |p| rect(p[:x], p[:y], 4, 4)}
 		end
-		normal_distribution = Distributions.normal(mean, variance)
-		residual_hash = {}
-		improvement_bins.each_key do |improvement|
-			residual = - normal_distribution.call(improvement) * 100.0 + cumulative_improvement_bins[improvement]
-#			p "#{normal_distribution.call(improvement) * 100.0} == #{cumulative_improvement_bins[improvement]}"
-			residual_hash[improvement] = residual
-		end
-		p "Minimum = #{residual_hash.values.min}"
-		p "Maximum = #{residual_hash.values.max}"
-		x_range = ContinuousRange.new({:minimum => residual_hash.keys.min, :maximum => residual_hash.keys.max})
-		y_range = ContinuousRange.new({:minimum => residual_hash.values.min, :maximum => residual_hash.values.max})
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
-		@residual_screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => 300.0, :y => @screen_height})
-		@residuals_screen = Screen.new(@residual_screen_transform, self)
-
-		improvement_bins.each_pair do |improvement, residual|
-			@residuals_screen.plot({:x => improvement, :y => residual}, @c)
-		end
-		@residuals_screen.draw_axes(@c, 10, 2.0)
 	end
 
 	def draw
