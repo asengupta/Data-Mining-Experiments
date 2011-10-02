@@ -11,6 +11,7 @@ class MySketch < Processing::App
 	app = self
 	
 	def setup
+		metric = lambda {|r| r.improvement}
 		@screen_height = 900
 		@width = width
 		@height = height
@@ -26,10 +27,21 @@ class MySketch < Processing::App
 		data_bins = {}
 		normal_bins = {}
 		responses.each do |r|
-			improvement_bins[r.improvement] = responses.select {|rsp| rsp.improvement <= r.improvement}.count/responses.count.to_f * 100.0 if improvement_bins[r.improvement] == nil
+			improvement_bins[metric.call(r)] = responses.select {|rsp| metric.call(rsp) <= metric.call(r)}.count/responses.count.to_f * 100.0 if improvement_bins[metric.call(r)] == nil
 		end
 		
-		quantile_fn = Quantiles.quantile_normal(4, 260)
+		value_sum = 0
+		responses.each do |r|
+			value_sum += metric.call(r)
+		end
+		mean = value_sum.to_f/responses.count
+		sum_of_squares = 0
+		responses.each do |r|
+			sum_of_squares += (metric.call(r) - mean)**2
+		end
+		variance = sum_of_squares.to_f/responses.count
+
+		quantile_fn = Quantiles.quantile_normal(mean, variance)
 		improvement_bins.each_pair do |improvement, percentage|
 			normal_bins[percentage] = quantile_fn.call(percentage/100.0)
 			data_bins[percentage] = improvement
@@ -37,6 +49,8 @@ class MySketch < Processing::App
 		least_improvement = improvement_bins.keys.min
 		most_improvement = improvement_bins.keys.max
 
+		p least_improvement
+		p most_improvement
 		@x_unit_vector = {:x => 1.0, :y => 0.0}
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
