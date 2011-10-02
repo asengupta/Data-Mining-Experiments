@@ -12,5 +12,9 @@ module Quantiles
 	def self.quantile_normal(mean, variance)
 		lambda {|p| mean + Math.sqrt(2 * variance) * erf_inverse(2 * p - 1.0)}
 	end
+
+	def self.quantile_cauchy(location, scale)
+		lambda {|p| location + scale * Math.tan(Math::PI*(p - 0.5))}
+	end
 end
 

@@ -29,7 +29,6 @@ class MySketch < Processing::App
 		normal_bins = {}
 		responses.each do |r|
 			cumulative_improvement_bins[metric.call(r)] = responses.select {|rsp| metric.call(rsp) <= metric.call(r)}.count/responses.count.to_f * 100.0 if cumulative_improvement_bins[metric.call(r)] == nil
-			improvement_bins[metric.call(r)] = improvement_bins[metric.call(r)] == nil ? 1 : improvement_bins[metric.call(r)] + 1
 		end
 		
 		value_sum = 0
@@ -43,7 +42,7 @@ class MySketch < Processing::App
 		end
 		variance = sum_of_squares.to_f/responses.count
 
-		quantile_fn = Quantiles.quantile_normal(mean, variance)
+		quantile_fn = Quantiles.quantile_cauchy(mean, 20)
 		cumulative_improvement_bins.each_pair do |improvement, percentage|
 			normal_bins[percentage] = quantile_fn.call(percentage/100.0)
 			data_bins[percentage] = improvement
