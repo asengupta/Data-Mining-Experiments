@@ -5,14 +5,11 @@ ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
 
 require 'schema'
 require 'basis_processing'
+require 'distributions'
 
 class MySketch < Processing::App
 	app = self
-
-	def normal(mean, variance)
-		lambda {|x| 1.0/(Math.sqrt(2.0 * Math::PI * variance)) * Math.exp(-((x - mean)**2) / (2 * variance))}
-	end
-
+	
 	def setup
 		@screen_height = 900
 		@width = width
@@ -22,7 +19,7 @@ class MySketch < Processing::App
 		frame_rate(30)
 		smooth
 		background(0,0,0)
-		color_mode(RGB, 1.0)
+		color_mode(HSB, 1.0)
 
 		responses = Response.find(:all)
 
@@ -41,7 +38,7 @@ class MySketch < Processing::App
 		end
 
 		responses.each do |r|
-			improvement = r[:post_total] - r[:pre_total]
+			improvement = r.improvement
 			improvement_bins[improvement] = improvement_bins[improvement] == nil ? 1 : improvement_bins[improvement] + 1
 		end
 
@@ -59,7 +56,7 @@ class MySketch < Processing::App
 		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 1.0})
 
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
-		@screen.draw_axes(@c,5,0.1)
+		@screen.draw_axes(@c,5,0.01)
 		stroke(1,1,0,1)
 		fill(1,1,0)
 #		pre_bins.each_index do |position|
@@ -74,25 +71,30 @@ class MySketch < Processing::App
 
 		value_sum = 0
 		responses.each do |r|
-			value_sum += r[:post_total] - r[:pre_total]
+			value_sum += r.improvement
 		end
 		mean = value_sum.to_f/responses.count
-		mean = 5.0
 		sum_of_squares = 0
 		responses.each do |r|
-			sum_of_squares += (r[:post_total] - r[:pre_total] - mean)**2
+			sum_of_squares += (r.improvement - mean)**2
 		end
 		variance = sum_of_squares.to_f/responses.count
-		variance = 260.0
-		fitted_curve = normal(mean, variance)
+		fitted_curve = Distributions.normal(mean, variance)
+#		fitted_curve = cauchy(mean, 5)
 		p "Variance=#{variance}, Mean = #{mean}"
-		stroke(0,1,0,1)
-		fill(0.7,1,0)
+		stroke(1,0.5,1)
+		fill(1,0.5,1)
+
+		sum = 0.0
+		improvement_bins.values.each do |v|
+			sum += v
+			puts "#{sum} - "
+		end
 		improvement_bins.each_pair do|k,v|
 			@screen.plot({:x => k, :y => fitted_curve.call(k)}, @c, :bar => true)
 		end
-		stroke(1,1,0,1)
-		fill(1,0.5,0)
+		stroke(0.2,1,1)
+		fill(0.2,1,1)
 		improvement_bins.each_pair do|k,v|
 			@screen.plot({:x => k, :y => v}, @c)
 		end

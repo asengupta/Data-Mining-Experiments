@@ -9,6 +9,10 @@ require 'basis_processing'
 class MySketch < Processing::App
 	app = self
 	
+	def normal(mean, variance)
+		lambda {|x| 1.0/(Math.sqrt(2.0 * Math::PI * variance)) * Math.exp(-((x - mean)**2) / (2 * variance))}
+	end
+
 	def setup
 		@screen_height = 900
 		@width = width
@@ -24,6 +28,7 @@ class MySketch < Processing::App
 #		p responses.select {|r| r[:pre_total] == 0 && r[:post_total] > 50}
 #		exit
 
+		dis = normal(4, 245)
 		improvement_bins = {}
 		responses.each do |r|
 			improvement = r[:post_total] - r[:pre_total]
