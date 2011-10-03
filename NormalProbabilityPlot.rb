@@ -42,7 +42,7 @@ class MySketch < Processing::App
 		end
 		variance = sum_of_squares.to_f/responses.count
 
-		quantile_fn = Quantiles.quantile_cauchy(mean, 20)
+		quantile_fn = Quantiles.quantile_normal(mean, variance)
 		cumulative_improvement_bins.each_pair do |improvement, percentage|
 			normal_bins[percentage] = quantile_fn.call(percentage/100.0)
 			data_bins[percentage] = improvement
