@@ -18,7 +18,7 @@ class MySketch < Processing::App
 		@height = height
 		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => 1200.0, :y => @screen_height / 2})
 		@screen = Screen.new(@screen_transform, self)
-		frame_rate(30)
+		no_loop
 		smooth
 		background(0,0,0)
 		color_mode(RGB, 1.0)
