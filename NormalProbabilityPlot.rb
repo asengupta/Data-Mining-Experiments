@@ -16,8 +16,9 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => 1200.0, :y => @screen_height / 2})
+		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
 		@screen = Screen.new(@screen_transform, self)
+		@screen.join = true
 		no_loop
 		smooth
 		background(0,0,0)
@@ -59,12 +60,16 @@ class MySketch < Processing::App
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
 		@screen.draw_axes(@c,10,10)
 		rect_mode(CENTER)
-		normal_bins.each_key do |p|
-			stroke(1,1,0,1)
-			fill(1,1,0)
+		keys = normal_bins.keys.sort
+		no_fill()
+		stroke(1,1,0,1)
+		keys.each do |p|
 			@screen.plot({:x => normal_bins[p], :y => data_bins[p]}, @c)
-			stroke(0,1,0,1)
-			no_fill()
+		end
+		@screen.join=false
+		@screen.join=true
+		stroke(0,1,0,1)
+		keys.each do |p|
 			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}, @c) { |p| rect(p[:x], p[:y], 4, 4)}
 		end
 	end
@@ -73,7 +78,7 @@ class MySketch < Processing::App
 	end
 end
 
-w = 2000
+w = 1200
 h = 1000
 
 MySketch.new(:title => "Normal Probability Plot", :width => w, :height => h)
