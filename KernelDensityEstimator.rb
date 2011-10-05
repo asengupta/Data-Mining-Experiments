@@ -14,7 +14,7 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 10.0, :y => -15000.0}, {:x => 500.0, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -15000.0}, {:x => 600.0, :y => @screen_height})
 		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
@@ -56,7 +56,6 @@ class MySketch < Processing::App
 		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 1.0})
 
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
-		@screen.draw_axes(@c,5,0.01)
 		stroke(0.2,1,1)
 		fill(0.2,1,1)
 		improvement_bins.each_pair do|k,v|
@@ -67,8 +66,8 @@ class MySketch < Processing::App
 		improvement_bins.each_pair do |k,v|
 			kernels[k] = {:kernel => Distributions.normal(k, 0.5), :n => v * responses.count}
 		end
-		stroke(0.6,1,1)
-		fill(0.6,1,1)
+		stroke(0.3,1,1,0.4)
+		fill(0.3,1,1,0.4)
 		@screen.join = true
 		improvement_bins.keys.sort.each do|k|
 			v = estimate(kernels, k, responses.count)
@@ -76,8 +75,8 @@ class MySketch < Processing::App
 		end
 		@screen.join = false
 		rect_mode(CENTER)
-		stroke(0.9,1,1)
-		fill(0.9,1,1)
+		stroke(0.7,0.2,0.3)
+		fill(0.7,0.2,0.3)
 		kernels.each_value do |v|
 			x = least_improvement.to_f
 			while (x < most_improvement)
@@ -87,6 +86,10 @@ class MySketch < Processing::App
 			end
 			@screen.join = false
 		end
+		color_mode(HSB, 1.0)
+		stroke(0.9,0.0,1)
+		fill(0.9,0.0,1)
+		@screen.draw_axes(@c,5,0.01)
 	end
 	
 	def estimate(kernels, key, n)
