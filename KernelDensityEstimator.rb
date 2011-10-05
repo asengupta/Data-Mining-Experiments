@@ -14,7 +14,7 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 10.0, :y => -15000.0}, {:x => 600.0, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -7500.0}, {:x => 600.0, :y => @screen_height})
 		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
@@ -23,53 +23,48 @@ class MySketch < Processing::App
 
 		responses = Response.find(:all)
 
-		pre_bins = []
-		post_bins = []
-		improvement_bins = {}
+		bins = {}
 
-		57.times {pre_bins << 0}
-		57.times {post_bins << 0}
-
-		57.times do |pre_score|
-			pre_bins[pre_score] = responses.select {|r| r.pre_total == pre_score}.count
-		end
-		57.times do |post_score|
-			post_bins[post_score] = responses.select {|r| r.post_total == post_score}.count
-		end
+#		57.times do |pre_score|
+#			bins[pre_score] = responses.select {|r| r.pre_total == pre_score}.count
+#		end
+#		57.times do |post_score|
+#			bins[post_score] = responses.select {|r| r.post_total == post_score}.count
+#		end
 
 		responses.each do |r|
 			improvement = r.improvement
-			improvement_bins[improvement] = improvement_bins[improvement] == nil ? 1 : improvement_bins[improvement] + 1
+			bins[improvement] = bins[improvement] == nil ? 1 : bins[improvement] + 1
 		end
 
-		improvement_bins.each_pair do |k, v|
-			improvement_bins[k] = v / responses.count.to_f
+		bins.each_pair do |k, v|
+			bins[k] = v / responses.count.to_f
 		end
 
-		least_improvement = improvement_bins.keys.min
-		most_improvement = improvement_bins.keys.max
+		least_improvement = bins.keys.min
+		most_improvement = bins.keys.max
 
 		@x_unit_vector = {:x => 1.0, :y => 0.0}
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
 		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 1.0})
+		y_range = ContinuousRange.new({:minimum => bins.values.min, :maximum => bins.values.max})
 
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
 		stroke(0.2,1,1)
 		fill(0.2,1,1)
-		improvement_bins.each_pair do|k,v|
+		bins.each_pair do|k,v|
 			@screen.plot({:x => k, :y => v}, @c)
 		end
 		
 		kernels = {}
-		improvement_bins.each_pair do |k,v|
+		bins.each_pair do |k,v|
 			kernels[k] = {:kernel => Distributions.normal(k, 0.5), :n => v * responses.count}
 		end
 		stroke(0.3,1,1,0.4)
 		fill(0.3,1,1,0.4)
 		@screen.join = true
-		improvement_bins.keys.sort.each do|k|
+		bins.keys.sort.each do|k|
 			v = estimate(kernels, k, responses.count)
 			@screen.plot({:x => k, :y => v}, @c)
 		end
