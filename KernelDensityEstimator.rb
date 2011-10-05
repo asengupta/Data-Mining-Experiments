@@ -59,7 +59,7 @@ class MySketch < Processing::App
 		
 		kernels = {}
 		bins.each_pair do |k,v|
-			kernels[k] = {:kernel => Distributions.normal(k, 0.5), :n => v * responses.count}
+			kernels[k] = {:kernel => Distributions.normal(k, 2.0), :n => v * responses.count}
 		end
 		stroke(0.3,1,1,0.4)
 		fill(0.3,1,1,0.4)
