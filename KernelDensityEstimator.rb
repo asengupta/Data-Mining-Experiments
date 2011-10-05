@@ -9,8 +9,23 @@ require 'distributions'
 
 class MySketch < Processing::App
 	app = self
-	
+	include Interactive
 	def setup
+		color_mode(HSB, 1.0)
+		@highlight_block = lambda do |p|
+					rect_mode(CENTER)
+					stroke(0.3,1,1)
+					fill(0.3,1,1)
+					rect(p[:x], p[:y], 5, 5)
+				   end
+
+		@passive_block = lambda do |p|
+					rect_mode(CENTER)
+					stroke(0.7,1,1)
+					fill(0.7,1,1)
+					rect(p[:x], p[:y], 5, 5)
+				   end
+
 		@screen_height = 900
 		@width = width
 		@height = height
@@ -18,7 +33,6 @@ class MySketch < Processing::App
 		frame_rate(30)
 		smooth
 		background(0,0,0)
-		color_mode(HSB, 1.0)
 
 		responses = Response.find(:all)
 
@@ -66,7 +80,7 @@ class MySketch < Processing::App
 		@screen.join = true
 		bins.keys.sort.each do|k|
 			v = estimate(kernels, k, responses.count)
-			@screen.plot({:x => k, :y => v})
+			@screen.plot({:x => k, :y => v}, :track => true)
 		end
 		@screen.join = false
 		rect_mode(CENTER)
@@ -93,9 +107,6 @@ class MySketch < Processing::App
 			sum += v[:kernel].call(key) * v[:n]
 		end
 		sum / n
-	end
-
-	def draw
 	end
 end
 
