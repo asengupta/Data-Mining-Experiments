@@ -15,7 +15,6 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 		@screen_transform = Transform.new({:x => 10.0, :y => -15000.0}, {:x => 500.0, :y => @screen_height})
-		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
 		background(0,0,0)
@@ -54,19 +53,20 @@ class MySketch < Processing::App
 
 		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
 		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 1.0})
-
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
-		@screen.draw_axes(@c,5,0.01)
+		@screen = Screen.new(@screen_transform, self, @c)
+
+		@screen.draw_axes(5,0.01)
 		stroke(1,1,0,1)
 		fill(1,1,0)
 #		pre_bins.each_index do |position|
-#			@screen.plot({:x => position, :y => pre_bins[position]}, @c)
+#			@screen.plot({:x => position, :y => pre_bins[position]})
 #		end
 
 		stroke(0,1,0,1)
 		fill(0,1,0)
 #		post_bins.each_index do |position|
-#			@screen.plot({:x => position, :y => post_bins[position]}, @c)
+#			@screen.plot({:x => position, :y => post_bins[position]})
 #		end
 
 		value_sum = 0
@@ -88,15 +88,14 @@ class MySketch < Processing::App
 		sum = 0.0
 		improvement_bins.values.each do |v|
 			sum += v
-			puts "#{sum} - "
 		end
 		improvement_bins.each_pair do|k,v|
-			@screen.plot({:x => k, :y => fitted_curve.call(k)}, @c, :bar => true)
+			@screen.plot({:x => k, :y => fitted_curve.call(k)}, :bar => true)
 		end
 		stroke(0.2,1,1)
 		fill(0.2,1,1)
 		improvement_bins.each_pair do|k,v|
-			@screen.plot({:x => k, :y => v}, @c)
+			@screen.plot({:x => k, :y => v})
 		end
 	end
 

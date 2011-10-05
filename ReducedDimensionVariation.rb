@@ -13,7 +13,13 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 		@screen_transform = Transform.new({:x => 10.0, :y => -0.5}, {:x => 500.0, :y => @screen_height})
-		@screen = Screen.new(@screen_transform, self)
+		@x_unit_vector = {:x => 1.0, :y => 0.0}
+		@y_unit_vector = {:x => 0.0, :y => 1.0}
+		x_range = ContinuousRange.new({:minimum => -5.0, :maximum => 5.0})
+		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 2000.0})
+
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,1]], self)
+		@screen = Screen.new(@screen_transform, self, @c)
 		frame_rate(30)
 		smooth
 		background(0,0,0)
@@ -22,25 +28,19 @@ class MySketch < Processing::App
 		post_bins = bins_for('/home/avishek/Code/DataMiningExperiments/data-post.txt')
 		pre_bins = bins_for('/home/avishek/Code/DataMiningExperiments/data-pre.txt')
 
-		@x_unit_vector = {:x => 1.0, :y => 0.0}
-		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
-		x_range = ContinuousRange.new({:minimum => -5.0, :maximum => 5.0})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 2000.0})
-
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[10,0],[0,1]], self)
 		stroke(1,1,0,1)
 #		no_fill()
 		fill(1,1,0)
 #		pre_bins.each do |r|
-#			@screen.plot({:x => r[:from], :y => r[:value]}, @c)
+#			@screen.plot({:x => r[:from], :y => r[:value]})
 #		end
 		stroke(0,1,0,1)
 		fill(0,1,0)
 		post_bins.each do |r|
-			@screen.plot({:x => r[:from], :y => r[:value]}, @c, :bar => true)
+			@screen.plot({:x => r[:from], :y => r[:value]}, :bar => true)
 		end
-		@screen.draw_axes(@c,0.5,100)
+		@screen.draw_axes(0.5,100)
 	end
 
 	def draw

@@ -15,7 +15,6 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 		@screen_transform = Transform.new({:x => 10.0, :y => -7500.0}, {:x => 600.0, :y => @screen_height})
-		@screen = Screen.new(@screen_transform, self)
 		frame_rate(30)
 		smooth
 		background(0,0,0)
@@ -49,12 +48,13 @@ class MySketch < Processing::App
 
 		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
 		y_range = ContinuousRange.new({:minimum => bins.values.min, :maximum => bins.values.max})
-
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
+		@screen = Screen.new(@screen_transform, self, @c)
+
 		stroke(0.2,1,1)
 		fill(0.2,1,1)
 		bins.each_pair do|k,v|
-			@screen.plot({:x => k, :y => v}, @c)
+			@screen.plot({:x => k, :y => v})
 		end
 		
 		kernels = {}
@@ -66,7 +66,7 @@ class MySketch < Processing::App
 		@screen.join = true
 		bins.keys.sort.each do|k|
 			v = estimate(kernels, k, responses.count)
-			@screen.plot({:x => k, :y => v}, @c)
+			@screen.plot({:x => k, :y => v})
 		end
 		@screen.join = false
 		rect_mode(CENTER)
@@ -76,7 +76,7 @@ class MySketch < Processing::App
 			x = least_improvement.to_f
 			while (x < most_improvement)
 				@screen.join = true
-				@screen.plot({:x => x, :y => v[:kernel].call(x) * v[:n] / responses.count}, @c) {|p| point(p[:x], p[:y])}
+				@screen.plot({:x => x, :y => v[:kernel].call(x) * v[:n] / responses.count}) {|p| point(p[:x], p[:y])}
 				x += 0.1
 			end
 			@screen.join = false
@@ -84,7 +84,7 @@ class MySketch < Processing::App
 		color_mode(HSB, 1.0)
 		stroke(0.9,0.0,1)
 		fill(0.9,0.0,1)
-		@screen.draw_axes(@c,5,0.01)
+		@screen.draw_axes(5,0.01)
 	end
 	
 	def estimate(kernels, key, n)

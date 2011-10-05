@@ -17,7 +17,10 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
-		@screen = Screen.new(@screen_transform, self)
+		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
+		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
+		@screen = Screen.new(@screen_transform, self, @c)
 		@screen.join = true
 		no_loop
 		smooth
@@ -54,23 +57,19 @@ class MySketch < Processing::App
 		@x_unit_vector = {:x => 1.0, :y => 0.0}
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
 
-		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
-		@screen.draw_axes(@c,10,10)
+		@screen.draw_axes(10,10)
 		rect_mode(CENTER)
 		keys = normal_bins.keys.sort
 		no_fill()
 		stroke(1,1,0,1)
 		keys.each do |p|
-			@screen.plot({:x => normal_bins[p], :y => data_bins[p]}, @c)
+			@screen.plot({:x => normal_bins[p], :y => data_bins[p]})
 		end
 		@screen.join=false
 		@screen.join=true
 		stroke(0,1,0,1)
 		keys.each do |p|
-			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}, @c) { |p| rect(p[:x], p[:y], 4, 4)}
+			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}) { |p| rect(p[:x], p[:y], 4, 4)}
 		end
 	end
 

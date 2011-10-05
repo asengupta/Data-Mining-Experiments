@@ -58,7 +58,7 @@ class OutliersSketch < Processing::App
 		@basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@scale,0],[0,@scale]], self)
 		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
 
-		@screen = Screen.new(screen_transform, self)
+		@screen = Screen.new(screen_transform, self, @basis)
 		stroke(0,0,0)
 		rect_mode(CENTER)
 		@bins.each_index do |bin_index|
@@ -67,10 +67,10 @@ class OutliersSketch < Processing::App
 				fill(0.5,1,scaled_color) if @bins[bin_index][answer_index] > 0
 				fill(1.0,1,0) if @bins[bin_index][answer_index] == 0
 				point = {:x => answer_index, :y => bin_index}
-				@screen.plot(point, @basis) {|point| rect(point[:x],point[:y],@scale,@scale)}
+				@screen.plot(point) {|point| rect(point[:x],point[:y],@scale,@scale)}
 			end
 		end
-		@screen.draw_axes(@basis,10,10)
+		@screen.draw_axes(10,10)
 		Thread.new do
 			puts "Inside: #{Thread.current}"
 			EventMachine.run do
@@ -107,18 +107,18 @@ class OutliersSketch < Processing::App
 		@old_points.each do |old|
 			scaled_color = @bins[old[:y]][old[:x]]
 			fill(0.5,1,scaled_color)
-			@screen.plot(old, @basis) {|p| rect(p[:x],p[:y],@scale,@scale)}
+			@screen.plot(old) {|p| rect(p[:x],p[:y],@scale,@scale)}
 		end
 		@points_to_highlight.each do |new_rectangle|
 			fill(0.1,1,1)
-			@screen.plot(new_rectangle, @basis) {|p| rect(p[:x],p[:y],@scale,@scale)}
+			@screen.plot(new_rectangle) {|p| rect(p[:x],p[:y],@scale,@scale)}
 		end
 		@old_points = @points_to_highlight
-		@screen.draw_axes(@basis,10,10)
+		@screen.draw_axes(10,10)
 	end
 
 	def mouseMoved
-		original_point = @screen.original({:x => mouseX, :y => mouseY}, @basis)
+		original_point = @screen.original({:x => mouseX, :y => mouseY})
 		original_point = {:x => original_point[:x].round, :y => original_point[:y].round}
 		return if original_point[:x] > 55 || original_point[:y] > 55 || original_point[:x] < 0 || original_point[:y] < 0
 		@points_to_highlight = [{:x => original_point[:x].round, :y => original_point[:y].round}]

@@ -77,7 +77,7 @@ class CovarianceSketch < Processing::App
 		@basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@size_scale,0],[0,@size_scale]], self)
 		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
 
-		@screen = Screen.new(screen_transform, self)
+		@screen = Screen.new(screen_transform, self, @basis)
 		stroke(0,0,0)
 		rect_mode(CENTER)
 		@covariance_matrix.each_index do |row|
@@ -87,10 +87,10 @@ class CovarianceSketch < Processing::App
 				fill(0.5,1,scaled_color) if @covariance_matrix[row][column] >= 0
 				fill(0.0,1,scaled_color) if @covariance_matrix[row][column] < 0
 				point = {:x => column, :y => row}
-				@screen.plot(point, @basis) {|point| rect(point[:x],point[:y],@size_scale,@size_scale)}
+				@screen.plot(point) {|point| rect(point[:x],point[:y],@size_scale,@size_scale)}
 			end
 		end
-		@screen.draw_axes(@basis,10,10)
+		@screen.draw_axes(10,10)
 
 		Thread.new do
 			puts "Inside: #{Thread.current}"
@@ -129,25 +129,25 @@ class CovarianceSketch < Processing::App
 			scaled_color = @covariance_matrix[old[:y]][old[:x]].abs * @color_factor
 			stroke(0,0,0)
 			fill(0.5,1,scaled_color)
-			@screen.plot(old, @basis) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
+			@screen.plot(old) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
 		end
 		@points_to_highlight.each do |new_rectangle|
 			scaled_color = @covariance_matrix[new_rectangle[:y]][new_rectangle[:x]].abs * @color_factor
 			next if new_rectangle[:x] == new_rectangle[:y]
 			stroke(0.1,1,1)
 			fill(0.5,1,scaled_color)
-			@screen.plot(new_rectangle, @basis) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
+			@screen.plot(new_rectangle) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
 		end
 		text = ""
 		@old_points.each {|p| text << "(#{p[:x]}, #{p[:y]}) -> #{@covariance_matrix[p[:y]][p[:x]]}"}
 		$stdout.print "\r#{text}"
 		$stdout.flush
 		@old_points = @points_to_highlight
-		@screen.draw_axes(@basis,10,10)
+		@screen.draw_axes(10,10)
 	end
 
 	def mouseMoved
-		original_point = @screen.original({:x => mouseX, :y => mouseY}, @basis)
+		original_point = @screen.original({:x => mouseX, :y => mouseY})
 		original_point = {:x => original_point[:x].round, :y => original_point[:y].round}
 		return if original_point[:x] > 55 || original_point[:y] > 55 || original_point[:x] < 0 || original_point[:y] < 0
 		@points_to_highlight = [{:x => original_point[:x].round, :y => original_point[:y].round}]
