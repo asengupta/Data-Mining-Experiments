@@ -1,8 +1,3 @@
-require 'rubygems'
-Gem.clear_paths
-ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
-ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
-
 require 'schema'
 require 'basis_processing'
 require 'distributions'
@@ -99,6 +94,7 @@ class MySketch < Processing::App
 		stroke(0.9,0.0,1)
 		fill(0.9,0.0,1)
 		@screen.draw_axes(5,0.01)
+		@index = @screen.build
 	end
 	
 	def estimate(kernels, key, n)
