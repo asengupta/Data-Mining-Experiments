@@ -3,8 +3,8 @@ require 'basis_processing'
 require 'distributions'
 
 class MySketch < Processing::App
-	app = self
 	include Interactive
+	app = self
 	def setup
 		color_mode(HSB, 1.0)
 		@highlight_block = lambda do |p|
