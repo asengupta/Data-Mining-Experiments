@@ -12,16 +12,17 @@ class MySketch < Processing::App
 	app = self
 	
 	def setup
-		metric = lambda {|r| r.improvement}
+		@highlight_block = lambda do |p|
+					rect_mode(CENTER)
+					stroke(1,0,0)
+					fill(1,0,0)
+					rect(p[:x], p[:y], 5, 5)
+				   end
+
+		metric = lambda {|r| r[:post_total]}
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
-		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
-		@screen = Screen.new(@screen_transform, self, @c)
-		@screen.join = true
 		no_loop
 		smooth
 		background(0,0,0)
@@ -56,21 +57,28 @@ class MySketch < Processing::App
 
 		@x_unit_vector = {:x => 1.0, :y => 0.0}
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
+		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
+		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
+		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
+		@screen = Screen.new(@screen_transform, self, @c)
+		@screen.join = true
 
-		@screen.draw_axes(10,10)
 		rect_mode(CENTER)
 		keys = normal_bins.keys.sort
-		no_fill()
+#		no_fill()
 		stroke(1,1,0,1)
 		keys.each do |p|
-			@screen.plot({:x => normal_bins[p], :y => data_bins[p]})
+			@screen.plot({:x => normal_bins[p], :y => data_bins[p]}, :track => true)
 		end
 		@screen.join=false
 		@screen.join=true
 		stroke(0,1,0,1)
 		keys.each do |p|
-			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}) { |p| rect(p[:x], p[:y], 4, 4)}
+			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}, :track => true) { |p| rect(p[:x], p[:y], 4, 4)}
 		end
+		stroke(1,1,1,1)
+		@screen.draw_axes(10,10)
 	end
 
 	def draw
@@ -80,6 +88,7 @@ end
 w = 1200
 h = 1000
 
+MySketch.send :include, Interactive
 MySketch.new(:title => "Normal Probability Plot", :width => w, :height => h)
 
 
