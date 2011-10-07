@@ -3,7 +3,6 @@ require 'basis_processing'
 require 'distributions'
 
 class MySketch < Processing::App
-	include Interactive
 	app = self
 	def setup
 		color_mode(HSB, 1.0)
@@ -25,7 +24,7 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 		@screen_transform = Transform.new({:x => 10.0, :y => -7500.0}, {:x => 600.0, :y => @screen_height})
-		frame_rate(30)
+		no_loop
 		smooth
 		background(0,0,0)
 
@@ -109,6 +108,6 @@ end
 w = 1200
 h = 1000
 
+MySketch.send :include, Interactive
 MySketch.new(:title => "Kernel Density Estimation", :width => w, :height => h)
-
 
