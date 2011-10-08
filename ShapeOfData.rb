@@ -48,9 +48,7 @@ class MySketch < Processing::App
 		least_improvement = improvement_bins.keys.min
 		most_improvement = improvement_bins.keys.max
 
-		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 1.0})
-		@c = CoordinateSystem.standard(x_range, y_range, self)
+		@c = CoordinateSystem.standard({:minimum => least_improvement, :maximum => most_improvement}, {:minimum => 0.0, :maximum => 1.0}, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		@screen.draw_axes(5,0.01)
