@@ -53,7 +53,6 @@ class MySketch < Processing::App
 		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
 		@c = CoordinateSystem.standard(x_range, y_range, self)
 		@screen = Screen.new(@screen_transform, self, @c)
-
 	end
 	
 	def quartile(n)

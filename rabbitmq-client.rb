@@ -1,10 +1,8 @@
 require 'rubygems'
 Gem.clear_paths
 
-#ENV['GEM_HOME'] = '/usr/lib/ruby/gems/1.8/gems/ruby-processing-1.0.9/lib/core/jruby-complete.jar!/META-INF/jruby.home/lib/ruby/gems/1.8'
-#ENV['GEM_PATH'] = '/usr/lib/ruby/gems/1.8/gems/ruby-processing-1.0.9/lib/core/jruby-complete.jar!/META-INF/jruby.home/lib/ruby/gems/1.8'
-ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
-ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
+ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.4/lib/ruby/gems/1.8'
+ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.4/lib/ruby/gems/1.8'
 puts ENV['GEM_HOME']
 puts ENV['GEM_PATH']
 require 'amqp'
