@@ -1,7 +1,7 @@
 require 'rubygems'
 Gem.clear_paths
-ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
-ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.3/lib/ruby/gems/1.8'
+ENV['GEM_HOME'] = '/home/avishek/jruby/jruby-1.6.4/lib/ruby/gems/1.8'
+ENV['GEM_PATH'] = '/home/avishek/jruby/jruby-1.6.4/lib/ruby/gems/1.8'
 
 require 'schema'
 require 'basis_processing'
@@ -55,12 +55,10 @@ class MySketch < Processing::App
 		least_improvement = cumulative_improvement_bins.keys.min
 		most_improvement = cumulative_improvement_bins.keys.max
 
-		@x_unit_vector = {:x => 1.0, :y => 0.0}
-		@y_unit_vector = {:x => 0.0, :y => 1.0}
 		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
 		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
 		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), [[1,0],[0,1]], self)
+		@c = CoordinateSystem.standard(x_range, y_range, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 		@screen.join = true
 

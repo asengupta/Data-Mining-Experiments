@@ -73,11 +73,11 @@ class MySketch < Processing::App
 
 		@systems =
 		{
-			:language => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:language]), [[@width/@axes.count, 0],[0, @scales[:language]]], self),
-			:gender => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:gender]), [[@width/@axes.count, 0],[0, @scales[:gender]]], self),
-			:area => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:area]), [[@width/@axes.count, 0],[0, @scales[:area]]], self),
-			:before => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:before]), [[@width/@axes.count, 0],[0, @scales[:before]]], self),
-			:after => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:after]), [[@width/@axes.count, 0],[0, @scales[:after]]], self)
+			:language => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:language]), self, [[@width/@axes.count, 0],[0, @scales[:language]]]),
+			:gender => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:gender]), self, [[@width/@axes.count, 0],[0, @scales[:gender]]]),
+			:area => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:area]), self, [[@width/@axes.count, 0],[0, @scales[:area]]]),
+			:before => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:before]), self, [[@width/@axes.count, 0],[0, @scales[:before]]]),
+			:after => CoordinateSystem.new(x_axis, Axis.new(y_unit_vector,@y_ranges[:after]), self, [[@width/@axes.count, 0],[0, @scales[:after]]])
 		}
 
 		@all_samples = []

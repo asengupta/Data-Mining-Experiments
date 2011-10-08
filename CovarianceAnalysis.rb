@@ -74,7 +74,7 @@ class CovarianceSketch < Processing::App
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 55})
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 55})
 
-		@basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@size_scale,0],[0,@size_scale]], self)
+		@basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), self, [[@size_scale,0],[0,@size_scale]])
 		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
 
 		@screen = Screen.new(screen_transform, self, @basis)
