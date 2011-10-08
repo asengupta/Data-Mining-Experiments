@@ -55,7 +55,7 @@ class OutliersSketch < Processing::App
 		x_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
 		y_range = ContinuousRange.new({:minimum => 0, :maximum => 56})
 
-		@basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), [[@scale,0],[0,@scale]], self)
+		@basis = CoordinateSystem.new(Axis.new(x_basis_vector,x_range), Axis.new(y_basis_vector,y_range), self, [[@scale,0],[0,@scale]])
 		screen_transform = SignedTransform.new({:x => 1, :y => -1}, {:x => 300, :y => 900})
 
 		@screen = Screen.new(screen_transform, self, @basis)
