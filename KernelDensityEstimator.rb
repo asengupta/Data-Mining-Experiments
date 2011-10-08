@@ -100,6 +100,9 @@ class MySketch < Processing::App
 		end
 		sum / n
 	end
+	
+	def draw
+	end
 end
 
 w = 1200
