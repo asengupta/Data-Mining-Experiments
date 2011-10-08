@@ -56,8 +56,8 @@ class MySketch < Processing::App
 		most_improvement = cumulative_improvement_bins.keys.max
 
 		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
-		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
+		x_range = {:minimum => least_improvement, :maximum => most_improvement}
+		y_range = {:minimum => least_improvement, :maximum => most_improvement}
 		@c = CoordinateSystem.standard(x_range, y_range, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 		@screen.join = true
