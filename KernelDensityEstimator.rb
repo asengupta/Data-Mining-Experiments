@@ -51,8 +51,8 @@ class MySketch < Processing::App
 		least_improvement = bins.keys.min
 		most_improvement = bins.keys.max
 
-		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => bins.values.min, :maximum => bins.values.max})
+		x_range = {:minimum => least_improvement, :maximum => most_improvement}
+		y_range = {:minimum => bins.values.min, :maximum => bins.values.max}
 		@c = CoordinateSystem.standard(x_range, y_range, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
