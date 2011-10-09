@@ -8,21 +8,81 @@ require 'basis_processing'
 
 class MySketch < Processing::App
 	app = self
-	load_libraries :opengl
-	include_package "processing.opengl"	
 	def setup
-		size(width, height, OPENGL)
-		raise "Is done"
 		@screen_height = 900
 		@width = width
 		@height = height
 		no_loop
 		smooth
 		background(0,0,0)
-		color_mode(RGB, 1.0)
-		metric = lambda {|r| r[:pre_total]}
+		color_mode(HSB, 1.0)
+		metric = lambda {|r| r.improvement}
 
 		responses = Response.find(:all)
+		bins = {}
+		responses.each do |r|
+			bins[r[:language]] = [] if bins[r[:language]].nil?
+			bins[r[:language]] << r
+		end
+		
+		p bins.keys.inspect
+		bins.each_pair do |k,v|
+			begin
+				bins[k] = box(k, v, metric)
+			rescue => e
+				puts "Deleting #{k}...statistically insignificant"
+				bins.delete(k)
+			end
+		end
+
+#		box = {:minimum => 20, :maximum => 70, :q1 => 30, :q2 => 40, :q3 => 50}
+
+		@x_unit_vector = {:x => 1.0, :y => 0.0}
+		@y_unit_vector = {:x => 0.0, :y => 1.0}
+		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => 50, :y => @screen_height / 2})
+		x_range = ContinuousRange.new({:minimum => -100.0, :maximum => 100.0})
+		y_range = ContinuousRange.new({:minimum => -100.0, :maximum => 100.0})
+		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), self, [[1,0],[0,1]])
+		@screen = Screen.new(@screen_transform, self, @c)
+		stroke(0.3,1,1)
+		no_fill
+		position = 10
+		box_width = 20
+		whisker_width = 10
+		f = createFont("Georgia", 24, true)
+		text_font(f,16)
+		
+		bins.each_pair do |k,v|
+#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {rect(position - box_width/2, o[:q1], box_width, o[:q2] - o[:q1])}}
+#			@screen.plot({:x => position, :y => v[:q2]}) do |o,m,s| {s.in_basis {rect(position - box_width/2, o[:q2], box_width, o[:q3] - o[:q2])}}
+#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position, o[:q3], position, o[:maximum])}}
+#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position, o[:q1], position, o[:minimum])}}
+#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position - whisker_width/2, o[:minimum], position + whisker_width/2, o[:minimum])}}
+#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position - whisker_width/2, o[:maximum], position + whisker_width/2, o[:maximum])}}
+			
+			@screen.at(v) do |o,s|
+				s.in_basis do
+					rect(position - box_width/2, o[:q1], box_width, o[:q2] - o[:q1])
+					rect(position - box_width/2, o[:q2], box_width, o[:q3] - o[:q2])
+					line(position, o[:q3], position, o[:maximum])
+					line(position, o[:q1], position, o[:minimum])
+					line(position - whisker_width/2, o[:minimum], position + whisker_width/2, o[:minimum])
+					line(position - whisker_width/2, o[:maximum], position + whisker_width/2, o[:maximum])
+				end
+			end
+
+			@screen.at({:x => position, :y => v[:minimum]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] - 14)}
+			@screen.at({:x => position, :y => v[:maximum]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] + 14)}
+			@screen.at({:x => position, :y => v[:q1]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] + 14)}
+			@screen.at({:x => position, :y => v[:q2]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] + 14)}
+			@screen.at({:x => position, :y => v[:q3]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] - 14)}
+			
+			position += 25
+		end
+		@screen.draw_axes(10, 4)
+	end
+	
+	def box(k, responses, metric)
 		cumulative_distribution = {}
 		responses.each do |r|
 			key = metric.call(r)
@@ -45,17 +105,10 @@ class MySketch < Processing::App
 		q1 = quartile(1).call(cumulative_distribution)
 		q2 = quartile(2).call(cumulative_distribution)
 		q3 = quartile(3).call(cumulative_distribution)
-		p "Q1 = #{q1}"
-		p "Q2 = #{q2}"
-		p "Q3 = #{q3}"
+		maximum = keys.max
+		minimum = keys.min
 		
-		@x_unit_vector = {:x => 1.0, :y => 0.0}
-		@y_unit_vector = {:x => 0.0, :y => 1.0}
-		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
-		x_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		y_range = ContinuousRange.new({:minimum => least_improvement, :maximum => most_improvement})
-		@c = CoordinateSystem.standard(x_range, y_range, self)
-		@screen = Screen.new(@screen_transform, self, @c)
+		box = {:minimum => minimum, :maximum => maximum, :q1 => q1, :q2 => q2, :q3 => q3}
 	end
 	
 	def quartile(n)
@@ -63,7 +116,7 @@ class MySketch < Processing::App
 	end
 	
 	def nth_quartile(n, cdf)
-		cdf.keys[cdf.keys.index {|k| (cdf[k] - (n/4.0)).abs < 0.05 }]
+			cdf.keys[cdf.keys.index {|k| (cdf[k] - (n/4.0)).abs < 0.09 }]
 	end
 end
 
