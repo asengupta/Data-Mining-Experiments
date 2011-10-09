@@ -87,7 +87,7 @@ class CovarianceSketch < Processing::App
 				fill(0.5,1,scaled_color) if @covariance_matrix[row][column] >= 0
 				fill(0.0,1,scaled_color) if @covariance_matrix[row][column] < 0
 				point = {:x => column, :y => row}
-				@screen.plot(point) {|point| rect(point[:x],point[:y],@size_scale,@size_scale)}
+				@screen.plot(point) {|o,m,s| rect(m[:x],m[:y],@size_scale,@size_scale)}
 			end
 		end
 		@screen.draw_axes(10,10)
@@ -129,14 +129,14 @@ class CovarianceSketch < Processing::App
 			scaled_color = @covariance_matrix[old[:y]][old[:x]].abs * @color_factor
 			stroke(0,0,0)
 			fill(0.5,1,scaled_color)
-			@screen.plot(old) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
+			@screen.plot(old) {|o,m,s| rect(m[:x],m[:y],@size_scale,@size_scale)}
 		end
 		@points_to_highlight.each do |new_rectangle|
 			scaled_color = @covariance_matrix[new_rectangle[:y]][new_rectangle[:x]].abs * @color_factor
 			next if new_rectangle[:x] == new_rectangle[:y]
 			stroke(0.1,1,1)
 			fill(0.5,1,scaled_color)
-			@screen.plot(new_rectangle) {|p| rect(p[:x],p[:y],@size_scale,@size_scale)}
+			@screen.plot(new_rectangle) {|o,m,s| rect(m[:x],m[:y],@size_scale,@size_scale)}
 		end
 		text = ""
 		@old_points.each {|p| text << "(#{p[:x]}, #{p[:y]}) -> #{@covariance_matrix[p[:y]][p[:x]]}"}

@@ -6,18 +6,11 @@ class MySketch < Processing::App
 	app = self
 	def setup
 		color_mode(HSB, 1.0)
-		@highlight_block = lambda do |p|
+		@highlight_block = lambda do |o,m,s|
 					rect_mode(CENTER)
 					stroke(0.3,1,1)
 					fill(0.3,1,1)
-					rect(p[:x], p[:y], 5, 5)
-				   end
-
-		@passive_block = lambda do |p|
-					rect_mode(CENTER)
-					stroke(0.7,1,1)
-					fill(0.7,1,1)
-					rect(p[:x], p[:y], 5, 5)
+					rect(m[:x], m[:y], 5, 5)
 				   end
 
 		@screen_height = 900
@@ -81,7 +74,7 @@ class MySketch < Processing::App
 			x = least_improvement.to_f
 			while (x < most_improvement)
 				@screen.join = true
-				@screen.plot({:x => x, :y => v[:kernel].call(x) * v[:n] / responses.count}) {|p| point(p[:x], p[:y])}
+				@screen.plot({:x => x, :y => v[:kernel].call(x) * v[:n] / responses.count}) {|o,m,s| point(m[:x], m[:y])}
 				x += 0.1
 			end
 			@screen.join = false

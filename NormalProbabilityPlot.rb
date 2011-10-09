@@ -12,11 +12,11 @@ class MySketch < Processing::App
 	app = self
 	
 	def setup
-		@highlight_block = lambda do |p|
+		@highlight_block = lambda do |o,m,s|
 					rect_mode(CENTER)
 					stroke(1,0,0)
 					fill(1,0,0)
-					rect(p[:x], p[:y], 5, 5)
+					rect(m[:x], m[:y], 5, 5)
 				   end
 
 		metric = lambda {|r| r[:post_total]}
@@ -73,7 +73,7 @@ class MySketch < Processing::App
 		@screen.join=true
 		stroke(0,1,0,1)
 		keys.each do |p|
-			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}, :track => true) { |p| rect(p[:x], p[:y], 4, 4)}
+			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}, :track => true) { |o,m,s| rect(m[:x], m[:y], 4, 4)}
 		end
 		stroke(1,1,1,1)
 		@screen.draw_axes(10,10)

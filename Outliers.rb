@@ -67,7 +67,7 @@ class OutliersSketch < Processing::App
 				fill(0.5,1,scaled_color) if @bins[bin_index][answer_index] > 0
 				fill(1.0,1,0) if @bins[bin_index][answer_index] == 0
 				point = {:x => answer_index, :y => bin_index}
-				@screen.plot(point) {|point| rect(point[:x],point[:y],@scale,@scale)}
+				@screen.plot(point) {|o,m,s| rect(m[:x],m[:y],@scale,@scale)}
 			end
 		end
 		@screen.draw_axes(10,10)
@@ -107,11 +107,11 @@ class OutliersSketch < Processing::App
 		@old_points.each do |old|
 			scaled_color = @bins[old[:y]][old[:x]]
 			fill(0.5,1,scaled_color)
-			@screen.plot(old) {|p| rect(p[:x],p[:y],@scale,@scale)}
+			@screen.plot(old) {|o,m,s| rect(m[:x],m[:y],@scale,@scale)}
 		end
 		@points_to_highlight.each do |new_rectangle|
 			fill(0.1,1,1)
-			@screen.plot(new_rectangle) {|p| rect(p[:x],p[:y],@scale,@scale)}
+			@screen.plot(new_rectangle) {|o,m,s| rect(m[:x],m[:y],@scale,@scale)}
 		end
 		@old_points = @points_to_highlight
 		@screen.draw_axes(10,10)

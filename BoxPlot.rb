@@ -8,8 +8,11 @@ require 'basis_processing'
 
 class MySketch < Processing::App
 	app = self
-	
+	load_libraries :opengl
+	include_package "processing.opengl"	
 	def setup
+		size(width, height, OPENGL)
+		raise "Is done"
 		@screen_height = 900
 		@width = width
 		@height = height
@@ -63,4 +66,8 @@ class MySketch < Processing::App
 		cdf.keys[cdf.keys.index {|k| (cdf[k] - (n/4.0)).abs < 0.05 }]
 	end
 end
+
+h = 1000
+w = 1400
+MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
