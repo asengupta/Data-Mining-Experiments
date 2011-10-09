@@ -53,13 +53,6 @@ class MySketch < Processing::App
 		text_font(f,16)
 		
 		bins.each_pair do |k,v|
-#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {rect(position - box_width/2, o[:q1], box_width, o[:q2] - o[:q1])}}
-#			@screen.plot({:x => position, :y => v[:q2]}) do |o,m,s| {s.in_basis {rect(position - box_width/2, o[:q2], box_width, o[:q3] - o[:q2])}}
-#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position, o[:q3], position, o[:maximum])}}
-#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position, o[:q1], position, o[:minimum])}}
-#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position - whisker_width/2, o[:minimum], position + whisker_width/2, o[:minimum])}}
-#			@screen.plot({:x => position, :y => v[:q1]}) do |o,m,s| {s.in_basis {line(position - whisker_width/2, o[:maximum], position + whisker_width/2, o[:maximum])}}
-			
 			@screen.at(v) do |o,s|
 				s.in_basis do
 					rect(position - box_width/2, o[:q1], box_width, o[:q2] - o[:q1])
