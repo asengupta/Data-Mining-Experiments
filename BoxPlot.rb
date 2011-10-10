@@ -57,7 +57,8 @@ class MySketch < Processing::App
 
 		stroke(0.7,0.3,1)
 		no_fill
-		bins.each_pair do |k,v|
+		bins.keys.sort.each do |k|
+			v = bins[k]
 			@screen.at(v) do |o,s|
 				s.in_basis do
 					stroke_weight(0.2)
