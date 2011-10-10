@@ -16,7 +16,7 @@ class MySketch < Processing::App
 		smooth
 		background(0,0,0)
 		color_mode(HSB, 1.0)
-		metric = lambda {|r| r.improvement}
+		metric = lambda {|r| r[:post_total]}
 
 		responses = Response.find(:all)
 		bins = {}
@@ -25,6 +25,7 @@ class MySketch < Processing::App
 			bins[r[:language]] << r
 		end
 		
+		bins["ALL"] = responses
 		p bins.keys.inspect
 		bins.each_pair do |k,v|
 			begin
@@ -39,22 +40,27 @@ class MySketch < Processing::App
 
 		@x_unit_vector = {:x => 1.0, :y => 0.0}
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
-		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => 50, :y => @screen_height / 2})
-		x_range = ContinuousRange.new({:minimum => -100.0, :maximum => 100.0})
-		y_range = ContinuousRange.new({:minimum => -100.0, :maximum => 100.0})
+		@screen_transform = Transform.new({:x => 5.0, :y => -10.0}, {:x => 100, :y => @screen_height})
+		x_range = ContinuousRange.new({:minimum => 0.0, :maximum => 360.0})
+		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 100.0})
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), self, [[1,0],[0,1]])
 		@screen = Screen.new(@screen_transform, self, @c)
-		stroke(0.3,1,1)
-		no_fill
 		position = 10
 		box_width = 20
 		whisker_width = 10
 		f = createFont("Georgia", 24, true)
 		text_font(f,16)
 		
+		stroke_weight(1)
+		stroke(0.7,0,0)
+		@screen.draw_axes(10, 10, {:x => lambda {|p| ''}, :y => lambda {|p| p.to_i}})
+
+		stroke(0.7,0.3,1)
+		no_fill
 		bins.each_pair do |k,v|
 			@screen.at(v) do |o,s|
 				s.in_basis do
+					stroke_weight(0.2)
 					rect(position - box_width/2, o[:q1], box_width, o[:q2] - o[:q1])
 					rect(position - box_width/2, o[:q2], box_width, o[:q3] - o[:q2])
 					line(position, o[:q3], position, o[:maximum])
@@ -64,15 +70,15 @@ class MySketch < Processing::App
 				end
 			end
 
-			@screen.at({:x => position, :y => v[:minimum]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] - 14)}
-			@screen.at({:x => position, :y => v[:maximum]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] + 14)}
+			@screen.at({:x => position, :y => v[:minimum]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] + 14)}
+			@screen.at({:x => position, :y => v[:maximum]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] - 14)}
 			@screen.at({:x => position, :y => v[:q1]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] + 14)}
 			@screen.at({:x => position, :y => v[:q2]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] + 14)}
 			@screen.at({:x => position, :y => v[:q3]}) {|o,m,s| text(o[:y], m[:x] + 5, m[:y] - 14)}
+			@screen.at({:x => position, :y => -5}) {|o,m,s| text(k, m[:x] - 15, m[:y])}
 			
 			position += 25
 		end
-		@screen.draw_axes(10, 4)
 	end
 	
 	def box(k, responses, metric)
@@ -114,6 +120,6 @@ class MySketch < Processing::App
 end
 
 h = 1000
-w = 1400
+w = 1800
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
