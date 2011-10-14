@@ -18,14 +18,19 @@ class MySketch < Processing::App
 		color_mode(HSB, 1.0)
 		metric = lambda {|r| r[:post_total]}
 
-		responses = Response.find(:all)
+		@responses = Response.find(:all)
+		plot(@screen_height) {|r| r[:post_total]}
+		plot(@screen_height/2) {|r| r[:pre_total]}
+	end
+	
+	def plot(y, &metric)
 		bins = {}
-		responses.each do |r|
+		@responses.each do |r|
 			bins[r[:language]] = [] if bins[r[:language]].nil?
 			bins[r[:language]] << r
 		end
 		
-		bins["ALL"] = responses
+		bins["ALL"] = @responses
 
 		bins.each_pair do |k,v|
 			begin
@@ -35,15 +40,12 @@ class MySketch < Processing::App
 				bins[k] = nil
 			end
 		end
-		p bins.inspect
-
-#		box = {:minimum => 20, :maximum => 70, :q1 => 30, :q2 => 40, :q3 => 50}
 
 		@x_unit_vector = {:x => 1.0, :y => 0.0}
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
-		@screen_transform = Transform.new({:x => 4.0, :y => -6.0}, {:x => 100, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 4.0, :y => -6.0}, {:x => 100, :y => y})
 		x_range = ContinuousRange.new({:minimum => 0.0, :maximum => 500.0})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 100.0})
+		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 60.0})
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), self, [[1,0],[0,1]])
 		@screen = Screen.new(@screen_transform, self, @c)
 		position = 10

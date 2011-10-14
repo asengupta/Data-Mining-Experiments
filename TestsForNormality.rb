@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'numru/lapack'
-require 'activerecord'
-require 'lambda-queuer'
+require 'active_record'
 
 include NumRu
 
@@ -32,22 +31,23 @@ class Response < ActiveRecord::Base
 	end
 end
 
-def mu(samples, mean, order)
+def mu(samples, mean, order, met)
 	sum = 0.0
-	samples.each {|s| sum += (s.improvement - mean)**order}
+	samples.each {|s| sum += (met.call(s) - mean)**order}
 	sum/samples.count
 end
 
+metric = lambda {|r| r.improvement}
 responses = Response.find(:all)
 
 n = responses.count.to_f
 mean = 0.0
-responses.each {|r| mean += r.improvement}
+responses.each {|r| mean += metric.call(r)}
 mean /= responses.count
 
-mu4 = mu(responses, mean, 4)
-mu3 = mu(responses, mean, 3)
-variance = mu(responses, mean, 2)
+mu4 = mu(responses, mean, 4, metric)
+mu3 = mu(responses, mean, 3, metric)
+variance = mu(responses, mean, 2, metric)
 alpha3 = Math.sqrt(variance)**3
 alpha4 = variance**2
 

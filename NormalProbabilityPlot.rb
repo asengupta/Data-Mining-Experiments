@@ -19,8 +19,8 @@ class MySketch < Processing::App
 					rect(m[:x], m[:y], 5, 5)
 				   end
 
-		metric = lambda {|r| r[:post_total]}
-		@screen_height = 900
+		metric = lambda {|r| Math.log(r.improvement + 58)}
+		@screen_height = 700
 		@width = width
 		@height = height
 		no_loop
@@ -47,7 +47,7 @@ class MySketch < Processing::App
 		end
 		variance = sum_of_squares.to_f/responses.count
 
-		quantile_fn = Quantiles.quantile_normal(mean, variance)
+		quantile_fn = Quantiles.quantile_cauchy(mean - 0.01, 0.14)
 		cumulative_improvement_bins.each_pair do |improvement, percentage|
 			normal_bins[percentage] = quantile_fn.call(percentage/100.0)
 			data_bins[percentage] = improvement
@@ -55,7 +55,7 @@ class MySketch < Processing::App
 		least_improvement = cumulative_improvement_bins.keys.min
 		most_improvement = cumulative_improvement_bins.keys.max
 
-		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => @width/2, :y => @screen_height/2})
+		@screen_transform = Transform.new({:x => 8.0, :y => -8.0}, {:x => @width / 2, :y => 500})
 		x_range = {:minimum => least_improvement, :maximum => most_improvement}
 		y_range = {:minimum => least_improvement, :maximum => most_improvement}
 		@c = CoordinateSystem.standard(x_range, y_range, self)
@@ -83,8 +83,8 @@ class MySketch < Processing::App
 	end
 end
 
-w = 1200
-h = 1000
+w = 1400
+h = 900
 
 MySketch.send :include, Interactive
 MySketch.new(:title => "Normal Probability Plot", :width => w, :height => h)
