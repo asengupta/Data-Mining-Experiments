@@ -10,16 +10,13 @@ handle.each_line do |line|
 	split_elements[8..63].each do |s|
 		s = s.chomp
 		is_bad = true if s == '' || !(s == '0' || s == '1')
-		puts "Lol it is '#{s}''" if !(s == '0' || s == '1')
 	end
 	split_elements[65..120].each do |s|
 		s = s.chomp
 		is_bad = true if s == '' || !(s == '0' || s == '1')
-		puts "Lol it is '#{s}'" if !(s == '0' || s == '1')
 	end
 	
 	total_bad_data += 1 if is_bad
-	next
 	pre_test_responses = split_elements[8..63].collect {|e| e.to_i}
 	post_test_responses = split_elements[65..120].collect {|e| e.to_i}
 
@@ -32,7 +29,7 @@ handle.each_line do |line|
 		post_total += 1 if r == 1
 	end
 	
-	puts line if post_total < pre_total || post_total == 0 || pre_total == 0
+	puts line if (post_total - pre_total) < 0 || post_total == 0 || pre_total == 0
 end
 
 puts total_bad_data

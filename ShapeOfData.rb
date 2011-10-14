@@ -15,7 +15,7 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 #		@screen_transform = Transform.new({:x => 18.0, :y => -7500.0}, {:x => 100.0, :y => @screen_height})
-		@screen_transform = Transform.new({:x => 10.0, :y => -7500.0}, {:x => @width/2, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -7500.0}, {:x => 500, :y => @screen_height})
 		smooth
 		no_loop
 		background(0,0,0)
@@ -26,17 +26,30 @@ class MySketch < Processing::App
 		@c = CoordinateSystem.standard({:minimum => -60, :maximum => 60}, {:minimum => 0.0, :maximum => 1.0}, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
-		stroke(0.2,1,1)
-		fill(0.2,1,1)
-		color_mode(RGB, 1.0)
+		stroke(0.1,0.5,1)
+		fill(0.1,0.5,1)
 		plot_distribution(responses, ->(r) {r.improvement})
-		stroke(1,1,0,1)
-		fill(1,1,0)
-		plot_distribution(responses, ->(r) {r[:pre_total]})
-		stroke(0,1,0,1)
-		fill(0,1,0)
-		plot_distribution(responses, ->(r) {r[:post_total]})
-		@screen.draw_axes(5,0.01)
+		stroke(0.2,0.5,1)
+		fill(0.2,0.5,1)
+		plot_distribution(responses.select {|r| r[:pre_total] <= 20}, ->(r) {r.improvement})
+		stroke(0.4,0.5,1)
+		fill(0.4,0.5,1)
+		plot_distribution(responses.select {|r| r[:pre_total] <= 30 && r[:pre_total] > 20}, ->(r) {r.improvement})
+		stroke(0.6,0.5,1)
+		fill(0.6,0.5,1)
+		plot_distribution(responses.select {|r| r[:pre_total] <= 45 && r[:pre_total] > 30}, ->(r) {r.improvement})
+		stroke(0.8,0.5,1)
+		fill(0.8,0.5,1)
+		plot_distribution(responses.select {|r| r[:pre_total] > 45}, ->(r) {r.improvement})
+
+		color_mode(RGB, 1.0)
+#		stroke(1,1,0,1)
+#		fill(1,1,0)
+#		plot_distribution(responses, ->(r) {1.0 / Math.sqrt(r[:pre_total])})
+#		stroke(0,1,0,1)
+#		fill(0,1,0)
+#		plot_distribution(responses, ->(r) {1.0 / Math.sqrt(r[:post_total])})
+		@screen.draw_axes(5, 0.01)
 
 #		value_sum = 0
 #		responses.each do |r|
@@ -84,10 +97,12 @@ class MySketch < Processing::App
 		least_improvement = improvement_bins.keys.min
 		most_improvement = improvement_bins.keys.max
 
-#		@c = CoordinateSystem.standard({:minimum => least_improvement, :maximum => most_improvement}, {:minimum => 0.0, :maximum => 1.0}, self)
+		@screen.join = true
 		improvement_bins.keys.sort.each do|k|
+#			puts "#{k} = #{improvement_bins[k]}"
 			@screen.plot({:x => k, :y => improvement_bins[k]}, :track => true)
 		end
+		@screen.join = false
 	end
 	
 	def draw
