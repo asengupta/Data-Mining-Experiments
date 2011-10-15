@@ -18,22 +18,31 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 10.0, :y => -10.0}, {:x => 500, :y => @screen_height})
 		smooth
 		no_loop
 		background(0,0,0)
 		color_mode(HSB, 1.0)
 
 		responses = Response.find(:all)
+		bins = {}
+		responses.each do |r|
+			bins[r[:language]] = [] if bins[r[:language]].nil?
+			bins[r[:language]] << r
+		end
 
+#		@c = CoordinateSystem.standard({:minimum => 0.0, :maximum => 3.0}, {:minimum => 0.0, :maximum => 3.0}, self)
 		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => 0, :maximum => 60}, self)
+		@screen_transform = Transform.new({:x => 10.0, :y => -10.0}, {:x => 500, :y => @screen_height})
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
-		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r[:post_total]})
-
 		@screen.draw_axes(5, 5)
+		bins.each_pair do |k,v|
+			plot_distribution(v, ->(r) {r[:pre_total]}, ->(r) {r[:post_total]})
+			save(k + ".jpg")
+		end
+		
 	end
 
 	def plot_distribution(responses, x_metric, y_metric)
@@ -54,6 +63,9 @@ class MySketch < Processing::App
 				@screen.plot({:x => c, :y => r}, :track => true)
 			end
 		end
+#		responses.each do |r|
+#			@screen.plot({:x => x_metric.call(r), :y => y_metric.call(r)})
+#		end
 end
 	
 	def draw
