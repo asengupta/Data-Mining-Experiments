@@ -31,32 +31,29 @@ class MySketch < Processing::App
 		end
 
 #		@c = CoordinateSystem.standard({:minimum => 0.0, :maximum => 3.0}, {:minimum => 0.0, :maximum => 3.0}, self)
-		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => 0, :maximum => 60}, self)
-		@screen_transform = Transform.new({:x => 10.0, :y => -10.0}, {:x => 500, :y => @screen_height})
+		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => -60, :maximum => 60}, self)
+		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => 500, :y => @screen_height/2})
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
-		@screen.draw_axes(5, 5)
-		bins.each_pair do |k,v|
-			plot_distribution(v, ->(r) {r[:pre_total]}, ->(r) {r[:post_total]})
-			save(k + ".jpg")
-		end
 		
+		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r.improvement})
+		@screen.draw_axes(5, 5)
 	end
 
 	def plot_distribution(responses, x_metric, y_metric)
-		array = []
-		57.times do |r|
-			row = Array.new(57)
-			row.fill(0)
-			array << row
-		end
+		array = {}
 		responses.each do |r|
-			array[y_metric.call(r)][x_metric.call(r)] += 1
+			y = y_metric.call(r)
+			x = x_metric.call(r)
+			
+			array[y] = {} if array[y].nil?
+			array[y][x] = 0 if array[y][x].nil?
+			array[y][x] += 1
 		end
-		array.each_index do |r|
-			array[r].each_index do |c|
+		array.each_key do |r|
+			array[r].each_key do |c|
 				b = 500 * array[r][c]/28000.0
 				stroke(0.1,0.5,b)
 				fill(0.1,0.5,b)
