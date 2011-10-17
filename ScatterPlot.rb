@@ -39,7 +39,7 @@ class MySketch < Processing::App
 		fill(0.1,0.5,1)
 		
 		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r.improvement})
-		@screen.draw_axes(5, 5)
+		@screen.draw_axes(5, 5, :gridlines => false)
 	end
 
 	def plot_distribution(responses, x_metric, y_metric)
@@ -57,7 +57,9 @@ class MySketch < Processing::App
 				b = 500 * array[r][c]/28000.0
 				stroke(0.1,0.5,b)
 				fill(0.1,0.5,b)
-				@screen.plot({:x => c, :y => r}, :track => true)
+				@screen.plot({:x => c, :y => r}, :track => true) do |o,m,s|
+					rect(m[:x], m[:y], 2, 2)
+				end
 			end
 		end
 #		responses.each do |r|
