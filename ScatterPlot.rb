@@ -13,7 +13,8 @@ class MySketch < Processing::App
 	def setup
 		@highlight_block = ->(o,m,s) do
 			rect_mode(CENTER)
-			rect(m[:x], m[:y], 10, 10)
+			rect(m[:x], m[:y], 8, 8)
+			text("(#{o[:x]}, #{o[:y]}) -> #{o[:value]}", m[:x] + 5, m[:y] + 5)
 		end
 		@screen_height = 900
 		@width = width
@@ -32,13 +33,13 @@ class MySketch < Processing::App
 
 #		@c = CoordinateSystem.standard({:minimum => 0.0, :maximum => 3.0}, {:minimum => 0.0, :maximum => 3.0}, self)
 		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => -60, :maximum => 60}, self)
-		@screen_transform = Transform.new({:x => 5.0, :y => -5.0}, {:x => 500, :y => @screen_height/2})
+		@screen_transform = Transform.new({:x => 8.0, :y => -8.0}, {:x => 500, :y => @screen_height/2 + 50})
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
 		
-		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r.improvement})
+		plot_distribution(responses, ->(r) {Math.log(r[:pre_total])}, ->(r) {r.improvement})
 		@screen.draw_axes(5, 5, :gridlines => false)
 	end
 
@@ -55,10 +56,11 @@ class MySketch < Processing::App
 		array.each_key do |r|
 			array[r].each_key do |c|
 				b = 500 * array[r][c]/28000.0
-				stroke(0.1,0.5,b)
+				stroke(0.5,0.5,0.07)
 				fill(0.1,0.5,b)
-				@screen.plot({:x => c, :y => r}, :track => true) do |o,m,s|
-					rect(m[:x], m[:y], 2, 2)
+				@screen.plot({:x => c, :y => r, :value => array[r][c]}) do |o,m,s|
+					rect_mode(CENTER)
+					rect(m[:x], m[:y], 8, 8)
 				end
 			end
 		end

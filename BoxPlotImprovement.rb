@@ -18,8 +18,7 @@ class MySketch < Processing::App
 		color_mode(HSB, 1.0)
 
 		@responses = Response.find(:all)
-		plot(@screen_height) {|r| r[:post_total]}
-		plot(@screen_height/2) {|r| r[:pre_total]}
+		plot(@screen_height/2) {|r| r.improvement}
 	end
 	
 	def plot(y, &metric)
@@ -44,7 +43,7 @@ class MySketch < Processing::App
 		@y_unit_vector = {:x => 0.0, :y => 1.0}
 		@screen_transform = Transform.new({:x => 4.0, :y => -6.0}, {:x => 100, :y => y})
 		x_range = ContinuousRange.new({:minimum => 0.0, :maximum => 500.0})
-		y_range = ContinuousRange.new({:minimum => 0.0, :maximum => 60.0})
+		y_range = ContinuousRange.new({:minimum => -60.0, :maximum => 60.0})
 		@c = CoordinateSystem.new(Axis.new(@x_unit_vector,x_range), Axis.new(@y_unit_vector,y_range), self, [[1,0],[0,1]])
 		@screen = Screen.new(@screen_transform, self, @c)
 		position = 10
