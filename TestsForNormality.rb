@@ -55,6 +55,9 @@ class MySketch < Processing::App
 		@screen.draw_axes(0.2, 400)
 	end
 	
+	def draw
+	end
+	
 	def jb_stats(transform)
 		metric = lambda {|r| transform.call(r.improvement + 57)}
 
