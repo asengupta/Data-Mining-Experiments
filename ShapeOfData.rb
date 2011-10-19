@@ -28,19 +28,20 @@ class MySketch < Processing::App
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
-		plot_distribution(responses, ->(r) {r.improvement})
-		stroke(0.2,0.5,1)
-		fill(0.2,0.5,1)
-		plot_distribution(responses.select {|r| r[:pre_total] <= 20}, ->(r) {r.improvement})
-		stroke(0.4,0.5,1)
-		fill(0.4,0.5,1)
-		plot_distribution(responses.select {|r| r[:pre_total] <= 30 && r[:pre_total] > 20}, ->(r) {r.improvement})
-		stroke(0.6,0.5,1)
-		fill(0.6,0.5,1)
-		plot_distribution(responses.select {|r| r[:pre_total] <= 45 && r[:pre_total] > 30}, ->(r) {r.improvement})
-		stroke(0.8,0.5,1)
-		fill(0.8,0.5,1)
-		plot_distribution(responses.select {|r| r[:pre_total] > 45}, ->(r) {r.improvement})
+		transform = box_cox(0.5)
+		plot_distribution(responses, ->(r) {transform.call(r.improvement + 56)})
+#		stroke(0.2,0.5,1)
+#		fill(0.2,0.5,1)
+#		plot_distribution(responses.select {|r| r[:pre_total] <= 20}, ->(r) {r.improvement})
+#		stroke(0.4,0.5,1)
+#		fill(0.4,0.5,1)
+#		plot_distribution(responses.select {|r| r[:pre_total] <= 30 && r[:pre_total] > 20}, ->(r) {r.improvement})
+#		stroke(0.6,0.5,1)
+#		fill(0.6,0.5,1)
+#		plot_distribution(responses.select {|r| r[:pre_total] <= 45 && r[:pre_total] > 30}, ->(r) {r.improvement})
+#		stroke(0.8,0.5,1)
+#		fill(0.8,0.5,1)
+#		plot_distribution(responses.select {|r| r[:pre_total] > 45}, ->(r) {r.improvement})
 
 		color_mode(RGB, 1.0)
 #		stroke(1,1,0,1)
@@ -83,6 +84,10 @@ class MySketch < Processing::App
 #		end
 	end
 
+	def box_cox(l)
+		->(x) {(x**l - 1)/l}
+	end
+	
 	def plot_distribution(responses, metric)
 		improvement_bins = {}
 		responses.each do |r|

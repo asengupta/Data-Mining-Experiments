@@ -33,14 +33,16 @@ class MySketch < Processing::App
 
 #		@c = CoordinateSystem.standard({:minimum => 0.0, :maximum => 3.0}, {:minimum => 0.0, :maximum => 3.0}, self)
 		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => -60, :maximum => 60}, self)
-		@screen_transform = Transform.new({:x => 8.0, :y => -8.0}, {:x => 500, :y => @screen_height/2 + 50})
+		@screen_transform = Transform.new({:x => 10.0, :y => -10.0}, {:x => 500, :y => @screen_height/2 + 50})
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
+		@screen.draw_axes(10, 0.5)
 		
-		plot_distribution(responses, ->(r) {Math.log(r[:pre_total])}, ->(r) {r.improvement})
-		@screen.draw_axes(5, 5, :gridlines => false)
+		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r.improvement})
+		@screen.draw_axes(10, 0.5)
+		
 	end
 
 	def plot_distribution(responses, x_metric, y_metric)
@@ -58,12 +60,39 @@ class MySketch < Processing::App
 				b = 500 * array[r][c]/28000.0
 				stroke(0.5,0.5,0.07)
 				fill(0.1,0.5,b)
-				@screen.plot({:x => c, :y => r, :value => array[r][c]}) do |o,m,s|
-					rect_mode(CENTER)
-					rect(m[:x], m[:y], 8, 8)
-				end
+				@screen.plot({:x => c, :y => r, :value => array[r][c]}, :track => true)
 			end
 		end
+		
+		sigma_x = 0.0
+		sigma_y = 0.0
+		sigma_x2 = 0.0
+		sigma_xy = 0.0
+		
+		puts "sigma_x=#{sigma_x}, sigma_y=#{sigma_y}, sigma_x2=#{sigma_x2}, sigma_xy=#{sigma_xy}"
+		responses.each do |r|
+			y = y_metric.call(r)
+			x = x_metric.call(r)
+			sigma_xy += x*y
+			sigma_x += x
+			sigma_y += y
+			sigma_x2 += x**2
+		end
+
+		puts "sigma_x=#{sigma_x}, sigma_y=#{sigma_y}, sigma_x2=#{sigma_x2}, sigma_xy=#{sigma_xy}"
+		n = responses.count
+		m = (n*sigma_xy - sigma_x*sigma_y)/(n*(sigma_x2 - sigma_x**2))
+		c = (sigma_y - m*sigma_x)/n
+
+		puts "m=#{m}, c=#{c}"
+		x = 0.0
+
+		fill(0.1,1,1)
+		while (x <= 56)
+			@screen.plot({:x => x, :y => m*x + c})
+			x += 0.1
+		end
+		
 #		responses.each do |r|
 #			@screen.plot({:x => x_metric.call(r), :y => y_metric.call(r)})
 #		end
