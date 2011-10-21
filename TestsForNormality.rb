@@ -33,23 +33,39 @@ class MySketch < Processing::App
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
 		
-		l = 0.1
-		@screen.join = true
-		while (l < 1.5)
-			transform = box_cox(l)
-			jb_statistic = jb_stats(transform)
-			@screen.plot({:x => l, :y => jb_statistic}, :track => true)
-			if (l >= 0.4 && l <= 0.5)
-				l+= 0.00625
-			else
-				l += 0.025
-			end
+#		l = 0.1
+#		@screen.join = true
+#		while (l < 1.5)
+#			transform = box_cox(l)
+#			jb_statistic = jb_stats(transform)
+#			@screen.plot({:x => l, :y => jb_statistic}, :track => true)
+#			if (l >= 0.4 && l <= 0.5)
+#				l+= 0.00625
+#			else
+#				l += 0.025
+#			end
+#		end
+#		transform = ->(x) {Math.log(x)}
+#		jb_statistic = jb_stats(transform)
+
+		transform = ->(x) {x}
+		bins = {}
+		@responses.each do |r|
+			bins[r[:area]] = [] if bins[r[:area]].nil?
+			bins[r[:area]] << r
 		end
-		transform = ->(x) {Math.log(x)}
-		jb_statistic = jb_stats(transform)
-		@screen.join = false
-		@screen.plot({:x => l, :y => jb_statistic}, :track => true)
 		
+		puts bins.keys.count
+		aberrations = []
+		bins.each_pair do |k,v|
+			jb_statistic = jb_stats(transform, v)
+			puts "#{k}=#{jb_statistic}" if jb_statistic > 9.2103
+			aberrations << v if jb_statistic > 9.2103
+		end
+		@screen.join = false
+		aberrations.each do |a|
+			@screen.plot({:x => l, :y => jb_statistic}, :track => true)
+		end
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
 		@screen.draw_axes(0.2, 400)
@@ -58,17 +74,17 @@ class MySketch < Processing::App
 	def draw
 	end
 	
-	def jb_stats(transform)
+	def jb_stats(transform, responses)
 		metric = lambda {|r| transform.call(r.improvement + 57)}
 
-		n = @responses.count.to_f
+		n = responses.count.to_f
 		mean = 0.0
-		@responses.each {|r| mean += metric.call(r)}
-		mean /= @responses.count
+		responses.each {|r| mean += metric.call(r)}
+		mean /= responses.count
 
-		mu4 = mu(@responses, mean, 4, metric)
-		mu3 = mu(@responses, mean, 3, metric)
-		variance = mu(@responses, mean, 2, metric)
+		mu4 = mu(responses, mean, 4, metric)
+		mu3 = mu(responses, mean, 3, metric)
+		variance = mu(responses, mean, 2, metric)
 		alpha3 = Math.sqrt(variance)**3
 		alpha4 = variance**2
 
@@ -76,7 +92,7 @@ class MySketch < Processing::App
 		k = mu4.to_f/alpha4 - 3
 
 		jb = n/6 * (s**2 + 0.25 * (k-3)**2)
-		puts "JB statistic = #{jb}"
+#		puts "JB statistic = #{jb}"
 		jb
 #		puts "n = #{n}"
 #		puts "Skewness = #{s}"
@@ -98,7 +114,7 @@ end
 w = 1200
 h = 1000
 
-MySketch.send :include, Interactive
+#MySketch.send :include, Interactive
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
 
