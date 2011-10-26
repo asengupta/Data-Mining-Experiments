@@ -11,11 +11,16 @@ class MySketch < Processing::App
 	app = self
 	
 	def setup
+		@highlight_block = ->(o,m,s) do
+			rect_mode(CENTER)
+			rect(m[:x], m[:y], 8, 8)
+			text("(#{o[:x]}, #{o[:y]}) -> #{o[:value]}", m[:x] + 5, m[:y] + 5)
+		end
 		@screen_height = 900
 		@width = width
 		@height = height
 #		@screen_transform = Transform.new({:x => 18.0, :y => -7500.0}, {:x => 100.0, :y => @screen_height})
-		@screen_transform = Transform.new({:x => 10.0, :y => -750.0}, {:x => 500, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -7500.0}, {:x => 500, :y => @screen_height})
 		smooth
 		no_loop
 		background(0,0,0)
@@ -23,22 +28,15 @@ class MySketch < Processing::App
 
 		responses = Response.find(:all)
 
-		bins = {}
-		responses.each do |r|
-			bins[r[:area]] = [] if bins[r[:area]].nil?
-			bins[r[:area]] << r
-		end
-
-		
 		@c = CoordinateSystem.standard({:minimum => -60, :maximum => 60}, {:minimum => 0.0, :maximum => 1.0}, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
+		plot_distribution(responses, ->(r) {r.improvement})
+		plot_distribution(responses, ->(r) {r[:pre_total]})
+		plot_distribution(responses, ->(r) {r[:post_total]})
 #		transform = box_cox(0.5)
-		bins.each_pair do |k,v|
-			plot_distribution(v, ->(r) {(r[:pre_total])})
-		end
 #		stroke(0.2,0.5,1)
 #		fill(0.2,0.5,1)
 #		plot_distribution(responses.select {|r| r[:pre_total] <= 20}, ->(r) {r.improvement})
@@ -114,7 +112,7 @@ class MySketch < Processing::App
 		@screen.join = true
 		improvement_bins.keys.sort.each do|k|
 #			puts "#{k} = #{improvement_bins[k]}"
-			@screen.plot({:x => k, :y => improvement_bins[k]})
+			@screen.plot({:x => k, :y => improvement_bins[k]}, :track => true)
 		end
 		@screen.join = false
 	end
@@ -126,7 +124,7 @@ end
 w = 1200
 h = 1000
 
-#MySketch.send :include, Interactive
+MySketch.send :include, Interactive
 MySketch.new(:title => "My Sketch", :width => w, :height => h)
 
 

@@ -22,80 +22,92 @@ class MySketch < Processing::App
 		background(0,0,0)
 
 		responses = Response.find(:all)
-
-		bins = {}
-
-#		57.times do |pre_score|
-#			bins[pre_score] = responses.select {|r| r.pre_total == pre_score}.count
-#		end
-#		57.times do |post_score|
-#			bins[post_score] = responses.select {|r| r.post_total == post_score}.count
-#		end
-
+		predictor_metric = ->(r) {r[:pre_total]}
+		predicted_metric = ->(r) {r[:language]}
+		
 		responses.each do |r|
-			improvement = r.improvement
-			bins[improvement] = bins[improvement] == nil ? 1 : bins[improvement] + 1
+			bin = predicted_metric.call(r)
+			bins[bin] = [] if bins[bin].nil?
+			bins[bin] << r
 		end
 
-		bins.each_pair do |k, v|
-			bins[k] = v / responses.count.to_f
-		end
 
-		least_improvement = bins.keys.min
-		most_improvement = bins.keys.max
+		kde = KernelDensityEstimator.new(bins, predictor_metric)
+		overall_density = BucketwiseDensity.new(responses, predictor_metric)
 
-		x_range = {:minimum => least_improvement, :maximum => most_improvement}
-		y_range = {:minimum => bins.values.min, :maximum => bins.values.max}
+		x_range = {:minimum => -60, :maximum => 60}
+		y_range = {:minimum => 0, :maximum => 1}
 		@c = CoordinateSystem.standard(x_range, y_range, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
-		stroke(0.2,1,1)
-		fill(0.2,1,1)
-		bins.each_pair do|k,v|
-			@screen.plot({:x => k, :y => v})
-		end
-		
-		kernels = {}
-		bins.each_pair do |k,v|
-			kernels[k] = {:kernel => Distributions.normal(k, 2.0), :n => v * responses.count}
-		end
 		stroke(0.3,1,1,0.4)
 		fill(0.3,1,1,0.4)
 		@screen.join = true
+		
+		rect_mode(CENTER)
+		kde.each_distribution do |bucket,d|
+			x = 0
+			while x <= 57
+				@screen.plot({:x => x, :y => d.estimate(x)})
+				x += 1
+			end
+		end
 		bins.keys.sort.each do|k|
 			v = estimate(kernels, k, responses.count)
 			@screen.plot({:x => k, :y => v}, :track => true)
 		end
 		@screen.join = false
-		rect_mode(CENTER)
-		stroke(0.7,0.2,0.3)
-		fill(0.7,0.2,0.3)
-		kernels.each_value do |v|
-			x = least_improvement.to_f
-			while (x < most_improvement)
-				@screen.join = true
-				@screen.plot({:x => x, :y => v[:kernel].call(x) * v[:n] / responses.count}) {|o,m,s| point(m[:x], m[:y])}
-				x += 0.1
-			end
-			@screen.join = false
-		end
-		color_mode(HSB, 1.0)
 		stroke(0.9,0.0,1)
 		fill(0.9,0.0,1)
 		@screen.draw_axes(5,0.01)
-		@index = @screen.build
-	end
-	
-	def estimate(kernels, key, n)
-		sum = 0.0
-		kernels.each_pair do |k,v|
-			sum += v[:kernel].call(key) * v[:n]
-		end
-		sum / n
 	end
 	
 	def draw
 	end
+end
+
+class KernelDensityEstimator
+	def initialize(responses, predictor_metric, predicted_metric_buckets)
+		@distributions = {}
+		predicted_metric_buckets.each_pair do |predicted_metric_value, responses|
+			bucketed_density = BucketwiseDensity.new(responses, predictor_metric)
+			@distributions[predicted_metric_value] = bucketed_density
+		end
+	end
+	
+	def each_distribution(&block)
+		@distributions.each_pair |k,v|
+			yield(k,v)
+		end
+	end
+end
+
+class BucketwiseDensity
+	def initialize(responses, predictor_metric)
+		bins = {}
+		@count = responses.count
+		responses.each do |r|
+			bin = predictor_metric.call(r)
+			bins[bin] = bins[bin] == nil ? 1 : bins[bin] + 1
+		end
+
+		bins.each_pair do |k, v|
+			bins[k] = v / responses.count.to_f
+		end
+		@kernels = {}
+		bins.each_pair do |k,v|
+			@kernels[k] = {:kernel => Distributions.normal(k, 3.0), :n => v * responses.count}
+		end
+	end
+	
+	def estimate(x)
+		sum = 0.0
+		@kernels.each_value do |v|
+			sum += v[:kernel].call(key) * v[:n]
+		end
+		sum / n
+	end
+
 end
 
 w = 1200

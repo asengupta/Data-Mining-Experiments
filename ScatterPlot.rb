@@ -33,16 +33,14 @@ class MySketch < Processing::App
 
 #		@c = CoordinateSystem.standard({:minimum => 0.0, :maximum => 3.0}, {:minimum => 0.0, :maximum => 3.0}, self)
 		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => -60, :maximum => 60}, self)
-		@screen_transform = Transform.new({:x => 10.0, :y => -10.0}, {:x => 500, :y => @screen_height/2 + 50})
+		@screen_transform = Transform.new({:x => 8, :y => -8}, {:x => 500, :y => @screen_height/2 + 50})
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
-		@screen.draw_axes(10, 0.5)
+		@screen.draw_axes(10, 10)
 		
 		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r.improvement})
-		@screen.draw_axes(10, 0.5)
-		
 	end
 
 	def plot_distribution(responses, x_metric, y_metric)
@@ -55,14 +53,14 @@ class MySketch < Processing::App
 			array[y][x] = 0 if array[y][x].nil?
 			array[y][x] += 1
 		end
-		array.each_key do |r|
-			array[r].each_key do |c|
-				b = 500 * array[r][c]/28000.0
-				stroke(0.5,0.5,0.07)
-				fill(0.1,0.5,b)
-				@screen.plot({:x => c, :y => r, :value => array[r][c]}, :track => true)
-			end
-		end
+#		array.each_key do |r|
+#			array[r].each_key do |c|
+#				b = 500 * array[r][c]/28000.0
+#				stroke(0.5,0.5,0.07)
+#				fill(0.1,0.5,b)
+#				@screen.plot({:x => c, :y => r, :value => array[r][c]}, :track => true)
+#			end
+#		end
 		
 		sigma_x = 0.0
 		sigma_y = 0.0
@@ -80,8 +78,8 @@ class MySketch < Processing::App
 		end
 
 		puts "sigma_x=#{sigma_x}, sigma_y=#{sigma_y}, sigma_x2=#{sigma_x2}, sigma_xy=#{sigma_xy}"
-		n = responses.count
-		m = (n*sigma_xy - sigma_x*sigma_y)/(n*(sigma_x2 - sigma_x**2))
+		n = responses.count.to_f
+		m = (n*sigma_xy - sigma_x*sigma_y)/(n*sigma_x2 - sigma_x**2)
 		c = (sigma_y - m*sigma_x)/n
 
 		puts "m=#{m}, c=#{c}"
@@ -92,7 +90,14 @@ class MySketch < Processing::App
 			@screen.plot({:x => x, :y => m*x + c})
 			x += 0.1
 		end
+
+		residuals = []
+		responses.each do |r|
+			fitted = m * r[:pre_total] + c
+			residuals << {:x => fitted, :y => r.improvement - fitted}
+		end
 		
+		residuals.each {|r| @screen.plot(r)}
 #		responses.each do |r|
 #			@screen.plot({:x => x_metric.call(r), :y => y_metric.call(r)})
 #		end
