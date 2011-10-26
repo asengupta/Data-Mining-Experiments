@@ -33,9 +33,13 @@ class MySketch < Processing::App
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
-		plot_distribution(responses, ->(r) {r.improvement})
-		plot_distribution(responses, ->(r) {r[:pre_total]})
-		plot_distribution(responses, ->(r) {r[:post_total]})
+		plot_distribution(responses, ->(r) {r.improvement}, "Improvement")
+		stroke(0.2,0.5,1)
+		fill(0.2,0.5,1)
+		plot_distribution(responses, ->(r) {r[:pre_total]}, "Pre-Total")
+		stroke(0.4,0.5,1)
+		fill(0.4,0.5,1)
+		plot_distribution(responses, ->(r) {r[:post_total]}, "Post-Total")
 #		transform = box_cox(0.5)
 #		stroke(0.2,0.5,1)
 #		fill(0.2,0.5,1)
@@ -95,7 +99,7 @@ class MySketch < Processing::App
 		->(x) {(x**l - 1)/l}
 	end
 	
-	def plot_distribution(responses, metric)
+	def plot_distribution(responses, metric, legend)
 		improvement_bins = {}
 		responses.each do |r|
 			improvement = metric.call(r)
@@ -109,11 +113,12 @@ class MySketch < Processing::App
 		least_improvement = improvement_bins.keys.min
 		most_improvement = improvement_bins.keys.max
 
-		@screen.join = true
+		points = []
 		improvement_bins.keys.sort.each do|k|
-#			puts "#{k} = #{improvement_bins[k]}"
-			@screen.plot({:x => k, :y => improvement_bins[k]}, :track => true)
+			points << {:x => k, :y => improvement_bins[k]}
 		end
+		@screen.join = true
+		@screen.plot(points, :track => true, :legend => legend)
 		@screen.join = false
 	end
 	
@@ -125,6 +130,6 @@ w = 1200
 h = 1000
 
 MySketch.send :include, Interactive
-MySketch.new(:title => "My Sketch", :width => w, :height => h)
+MySketch.new(:title => "Shape of Score Data", :width => w, :height => h)
 
 

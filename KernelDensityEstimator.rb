@@ -11,12 +11,13 @@ class MySketch < Processing::App
 					stroke(0.3,1,1)
 					fill(0.3,1,1)
 					rect(m[:x], m[:y], 5, 5)
+					text(o[:category].strip == '' ? '[Unknown]' : o[:category], m[:x], m[:y] - 15)
 				   end
 
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 10.0, :y => -3000.0}, {:x => 600.0, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -1000.0}, {:x => 600.0, :y => @screen_height})
 		no_loop
 		smooth
 		background(0,0,0)
@@ -49,6 +50,14 @@ class MySketch < Processing::App
 		classifier = Classifier.new(kde, priors)
 		hue = 0.0
 		rect_mode(CENTER)
+#		points = []
+#		x = -60
+#		while x <= 57
+#			very_likely = classifier.most_probable(x)
+#			points << {:x => x, :y => very_likely[:probability], :category => very_likely[:category]}
+#			x += 1
+#		end
+#		@screen.plot(points, :track => true)
 		priors.each_key do |k|
 			x = -60
 			points = []
@@ -56,10 +65,10 @@ class MySketch < Processing::App
 			fill(hue,1,1)
 			@screen.join = true
 			while x <= 57
-				points << {:x => x, :y => classifier.probability(:category => k, :given => x)[:probability]}
-				x += 0.1
+				points << {:x => x, :y => classifier.probability(:category => k, :given => x)[:probability], :category => k}
+				x += 1
 			end
-			@screen.plot(points, :legend => k){|o,m,s|}
+			@screen.plot(points, :legend => k, :track => true)
 			@screen.join = false
 			hue += 0.05
 		end
@@ -82,7 +91,7 @@ class MySketch < Processing::App
 #		0..57.times {|x| @screen.plot({:x => x, :y => kde.overall_density.estimate(x)}){|o,m,s|}}
 		stroke(0.9,0.0,1)
 		fill(0.9,0.0,1)
-		@screen.draw_axes(5,0.01)
+		@screen.draw_axes(5,0.1)
 	end
 	
 	def draw
@@ -100,6 +109,19 @@ class Classifier
 		x = posterior_question[:given]
 		probability_of_posterior = @estimator[y].estimate(x) * @priors[y] / @estimator.overall_density.estimate(x)
 		{ :probability_of => y, :given => x, :probability => probability_of_posterior}
+	end
+	
+	def most_probable(given)
+		max = 0
+		most_likely_category = 'NONE'
+		@priors.each_key do |key|
+			p = probability({:category => key, :given => given})[:probability]
+			if p > max
+				max = p
+				most_likely_category = key
+			end
+		end
+		{:category => most_likely_category, :probability => max}
 	end
 end
 
@@ -157,6 +179,6 @@ end
 w = 1500
 h = 1000
 
-#MySketch.send :include, Interactive
+MySketch.send :include, Interactive
 MySketch.new(:title => "Kernel Density Estimation", :width => w, :height => h)
 

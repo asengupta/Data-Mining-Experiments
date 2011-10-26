@@ -1,0 +1,30 @@
+Data Sanitisation
+Shape of the Data
+	- Kernel density estimation
+	- Box plot
+	- 2D histogram
+Tests for Univariate Normality
+	- Jarque-Bera test
+	- Normal Probability plot
+Tests for variable independence
+	- Chi-square test
+Data exploration
+	- Parallel Coordinates
+	- Covariance plot
+	- Answer distribution
+Prediction
+	- Decision Trees
+Classification
+	- Bayes classifier using kernel density estimation
+Dimension reduction/Factor analysis
+	- Principal Component Analysis
+
+Sampling bias - heavily in favor of Kannada
+
+CRISP
+Business Understanding
+Data Understanding
+Data Preparation
+Modeling
+Deployment
+
