@@ -23,7 +23,7 @@ class MySketch < Processing::App
 
 		responses = Response.find(:all)
 		predictor_metric = ->(r) {r.improvement}
-		predicted_metric = ->(r) {r[:area]}
+		predicted_metric = ->(r) {r[:language]}
 		
 		bins = {}
 		priors = {}
@@ -44,22 +44,24 @@ class MySketch < Processing::App
 		x_range = {:minimum => -60, :maximum => 60}
 		y_range = {:minimum => 0, :maximum => 1}
 		@c = CoordinateSystem.standard(x_range, y_range, self)
-		@screen = Screen.new(@screen_transform, self, @c)
+		@screen = Screen.new(@screen_transform, self, @c, LegendBox.new(self, {:x => 1300, :y => 30}))
 
 		classifier = Classifier.new(kde, priors)
 		hue = 0.0
 		rect_mode(CENTER)
 		priors.each_key do |k|
 			x = -60
+			points = []
 			stroke(hue,1,1)
 			fill(hue,1,1)
 			@screen.join = true
 			while x <= 57
-				@screen.plot({:x => x, :y => classifier.probability(:category => k, :given => x)[:probability]}){|o,m,s|}
+				points << {:x => x, :y => classifier.probability(:category => k, :given => x)[:probability]}
 				x += 0.1
 			end
+			@screen.plot(points, :legend => k){|o,m,s|}
 			@screen.join = false
-			hue += 0.1
+			hue += 0.05
 		end
 #		hue = 0.0
 #		rect_mode(CENTER)
@@ -152,7 +154,7 @@ class BucketwiseDensity
 
 end
 
-w = 1200
+w = 1500
 h = 1000
 
 #MySketch.send :include, Interactive
