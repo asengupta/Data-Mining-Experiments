@@ -16,14 +16,14 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 10.0, :y => -3750.0}, {:x => 600.0, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -3000.0}, {:x => 600.0, :y => @screen_height})
 		no_loop
 		smooth
 		background(0,0,0)
 
 		responses = Response.find(:all)
 		predictor_metric = ->(r) {r.improvement}
-		predicted_metric = ->(r) {r[:language]}
+		predicted_metric = ->(r) {r[:area]}
 		
 		bins = {}
 		priors = {}
@@ -46,23 +46,38 @@ class MySketch < Processing::App
 		@c = CoordinateSystem.standard(x_range, y_range, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
+		classifier = Classifier.new(kde, priors)
 		hue = 0.0
 		rect_mode(CENTER)
-		kde.each_distribution do |bucket,d|
+		priors.each_key do |k|
 			x = -60
 			stroke(hue,1,1)
 			fill(hue,1,1)
 			@screen.join = true
 			while x <= 57
-				@screen.plot({:x => x, :y => d.estimate(x)}){|o,m,s|}
+				@screen.plot({:x => x, :y => classifier.probability(:category => k, :given => x)[:probability]}){|o,m,s|}
 				x += 0.1
 			end
 			@screen.join = false
 			hue += 0.1
 		end
+#		hue = 0.0
+#		rect_mode(CENTER)
+#		kde.each_distribution do |bucket,d|
+#			x = -60
+#			stroke(hue,1,1)
+#			fill(hue,1,1)
+#			@screen.join = true
+#			while x <= 57
+#				@screen.plot({:x => x, :y => d.estimate(x)}){|o,m,s|}
+#				x += 0.1
+#			end
+#			@screen.join = false
+#			hue += 0.1
+#		end
 
-		@screen.join = true
-		0..57.times {|x| @screen.plot({:x => x, :y => kde.overall_density.estimate(x)}){|o,m,s|}}
+#		@screen.join = true
+#		0..57.times {|x| @screen.plot({:x => x, :y => kde.overall_density.estimate(x)}){|o,m,s|}}
 		stroke(0.9,0.0,1)
 		fill(0.9,0.0,1)
 		@screen.draw_axes(5,0.01)
@@ -71,6 +86,21 @@ class MySketch < Processing::App
 	def draw
 	end
 end
+
+class Classifier
+	def initialize(estimator, priors)
+		@estimator = estimator
+		@priors = priors
+	end
+	
+	def probability(posterior_question)
+		y = posterior_question[:category]
+		x = posterior_question[:given]
+		probability_of_posterior = @estimator[y].estimate(x) * @priors[y] / @estimator.overall_density.estimate(x)
+		{ :probability_of => y, :given => x, :probability => probability_of_posterior}
+	end
+end
+
 
 class KernelDensityEstimator
 	attr_accessor :overall_density
@@ -81,6 +111,10 @@ class KernelDensityEstimator
 			@distributions[predicted_metric_value] = bucketed_density
 		end
 		@overall_density = BucketwiseDensity.new(all_responses, predictor_metric)
+	end
+	
+	def [](key)
+		@distributions[key]
 	end
 	
 	def each_distribution(&block)
