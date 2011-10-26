@@ -16,47 +16,53 @@ class MySketch < Processing::App
 		@screen_height = 900
 		@width = width
 		@height = height
-		@screen_transform = Transform.new({:x => 10.0, :y => -7500.0}, {:x => 600.0, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 10.0, :y => -3750.0}, {:x => 600.0, :y => @screen_height})
 		no_loop
 		smooth
 		background(0,0,0)
 
 		responses = Response.find(:all)
-		predictor_metric = ->(r) {r[:pre_total]}
+		predictor_metric = ->(r) {r.improvement}
 		predicted_metric = ->(r) {r[:language]}
 		
+		bins = {}
+		priors = {}
 		responses.each do |r|
 			bin = predicted_metric.call(r)
 			bins[bin] = [] if bins[bin].nil?
 			bins[bin] << r
+			priors[bin] = 0 if priors[bin].nil?
+			priors[bin] += 1
 		end
 
-
-		kde = KernelDensityEstimator.new(bins, predictor_metric)
-		overall_density = BucketwiseDensity.new(responses, predictor_metric)
+		priors.each_pair do |k,v|
+			priors[k] = v/responses.count.to_f
+		end
+		
+		kde = KernelDensityEstimator.new(predictor_metric, bins, responses)
 
 		x_range = {:minimum => -60, :maximum => 60}
 		y_range = {:minimum => 0, :maximum => 1}
 		@c = CoordinateSystem.standard(x_range, y_range, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
-		stroke(0.3,1,1,0.4)
-		fill(0.3,1,1,0.4)
-		@screen.join = true
-		
+		hue = 0.0
 		rect_mode(CENTER)
 		kde.each_distribution do |bucket,d|
-			x = 0
+			x = -60
+			stroke(hue,1,1)
+			fill(hue,1,1)
+			@screen.join = true
 			while x <= 57
-				@screen.plot({:x => x, :y => d.estimate(x)})
-				x += 1
+				@screen.plot({:x => x, :y => d.estimate(x)}){|o,m,s|}
+				x += 0.1
 			end
+			@screen.join = false
+			hue += 0.1
 		end
-		bins.keys.sort.each do|k|
-			v = estimate(kernels, k, responses.count)
-			@screen.plot({:x => k, :y => v}, :track => true)
-		end
-		@screen.join = false
+
+		@screen.join = true
+		0..57.times {|x| @screen.plot({:x => x, :y => kde.overall_density.estimate(x)}){|o,m,s|}}
 		stroke(0.9,0.0,1)
 		fill(0.9,0.0,1)
 		@screen.draw_axes(5,0.01)
@@ -67,16 +73,18 @@ class MySketch < Processing::App
 end
 
 class KernelDensityEstimator
-	def initialize(responses, predictor_metric, predicted_metric_buckets)
+	attr_accessor :overall_density
+	def initialize(predictor_metric, predicted_metric_buckets, all_responses)
 		@distributions = {}
 		predicted_metric_buckets.each_pair do |predicted_metric_value, responses|
 			bucketed_density = BucketwiseDensity.new(responses, predictor_metric)
 			@distributions[predicted_metric_value] = bucketed_density
 		end
+		@overall_density = BucketwiseDensity.new(all_responses, predictor_metric)
 	end
 	
 	def each_distribution(&block)
-		@distributions.each_pair |k,v|
+		@distributions.each_pair do |k,v|
 			yield(k,v)
 		end
 	end
@@ -103,9 +111,9 @@ class BucketwiseDensity
 	def estimate(x)
 		sum = 0.0
 		@kernels.each_value do |v|
-			sum += v[:kernel].call(key) * v[:n]
+			sum += v[:kernel].call(x) * v[:n]
 		end
-		sum / n
+		sum / @count
 	end
 
 end
@@ -113,6 +121,6 @@ end
 w = 1200
 h = 1000
 
-MySketch.send :include, Interactive
+#MySketch.send :include, Interactive
 MySketch.new(:title => "Kernel Density Estimation", :width => w, :height => h)
 
