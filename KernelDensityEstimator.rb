@@ -68,7 +68,7 @@ class MySketch < Processing::App
 				points << {:x => x, :y => classifier.probability(:category => k, :given => x)[:probability], :category => k}
 				x += 1
 			end
-			@screen.plot(points, :legend => k, :track => true)
+			@screen.plot(points, :legend => k, :track => true) {|o,m,s|}
 			@screen.join = false
 			hue += 0.05
 		end
