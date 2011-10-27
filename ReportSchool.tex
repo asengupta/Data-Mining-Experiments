@@ -1,24 +1,81 @@
-\documentclass[12pt]{article} 
+\documentclass[10pt]{article} 
+\usepackage[T1]{fontenc}
 \begin{document}
-\title{Report on analysis of the Anganwadi dataset 2010} 
+\title{Initial report on analysis of the Anganwadi dataset 2010} 
 \author{Avishek Sen Gupta\\ThoughtWorks}
 \maketitle
 \newpage
+
 \section{Abstract}
-This will have the abstract.
-\section{CRISP and its phases}
+This report summarises the results of exploration of the Anganwadi dataset provided by the Akshara Foundation. The analysis aims to characterise the structure of the data, and reveal trends (which would otherwise be obscured by the format of the source data) which may inform strategy through subsequent prediction and/or classification procedures.
+
+\newpage
+\section{Methodology}
+\subsection{CRISP-DM}
+\textbf{CRISP-DM} is a process model distilled from the most common approaches used in data mining procedures. It stands for Cross Industry Standard Process for Data Mining. Not so much a prescription as a collection of 'good practices' follwed by data mining professionals, \textbf{CRISP-DM} has the following characteristics.
+
+\begin{itemize}
+\item Domain-neutral
+\item Tool-neutral
+\item Provides a structural approach to the data mining process
+\end{itemize}
+
+\textbf{CRISP-DM} segregates data mining endeavours into the following phases.
+
 \begin{itemize}
 \item Business Understanding
 \item Data Understanding
 \item Data Preparation
 \item Modeling
+\item Evaluation
 \item Deployment
 \end{itemize}
+
+\subsection{Relevance of CRISP-DM to this report}
+As far as this report is concerned, the relevant or most significant phases we focus on are:
+\begin{itemize}
+\item Data Understanding
+\item Data Preparation
+\item Modeling
+\end{itemize}
+
+Work on the Evaluation step is still preliminary, and will probably be the subject of another report. In a full-fledged project, the rest of the activities upstream and downstream to the above list will assume more importance, and require corresponding investment.
 
 \newpage
 \section{Data Preparation}
 \subsection{Nature of the source data}
+The dataset comes from the education domain. The source data is a file, with each line corresponding to a single student evaluation record. Roughly, there are 29000 records, prior to any data sanitisation. Each line is pipe(|)-delimited into multiple fields. The fields salient to this analysis are listed below:
+
+\begin{itemize}
+\item Location of the student's school
+\item Language of the student
+\item Student's score before intervention
+\item Student's score after intervention
+\end{itemize}
+
+The score is not a single number, it is a set of 56 responses marked as 0/1. Generally, a 1 may be treated as a favourable answer, therefore, adding them up to get a single aggregate score has natural ordering: a sense of who did better. We reproduce two such records below, with the original formatting.
+\\
+{\tt 30915|YALLAMMANADODDI|KANNADA|1231468|Girl||1NoSection|Aug 2010 Assessment|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|Anganwadi Post Test|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|}
+\linebreak
+\linebreak
+{\tt 29607|BADAMAKAAN I|KANNADA|1445172|Girl|URDU|1NoSection|Aug 2010 Assessment|1|0|1|1|0|1|0|1|1|1|1|1|1|1|1|0|1|1|1|1|1|0|1|1|1|1|1|0|1|1|1|0|1|1|1|1|1|1|0|1|1|0|1|1|1|1|1|1|1|1|1|1|1|1|1|0|Anganwadi Post Test|1|0|1|1|1|0|1|1|0|1|1|0|1|1|1|1|0|1|1|1|0|0|1|1|0|1|0|0|1|1|1|0|1|1|0|0|1|1|1|0|0|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|
+...
+}
+
+Looking at the second row, we see that the location of the Anganwadi is BADAMAKAAN I, the student is female and speaks Urdu. The first contiguous set of 0s and 1s is the pre-intervention score, and the next set is the post-intervention one.
+
 \subsection{Data representation}
+Before any sort of sanitisation or analysis may be performed, it is important to ensure that the source data is stored in a format/datastore which makes querying and modifying the data relatively painless. This decision is largely driven by technological considerations, like:
+
+\begin{itemize}
+\item Scale of data (centralised/distributed store?)
+\item Sophistication of queries (OLAP/OLTP?)
+\item Structure of data, or lack thereof (SQL/NoSQL?)
+\end{itemize}
+
+We were dealing with only about 29000 records, and most of the analysis would probably be performed outside the database. Thus, we opted to use MySQL as our datastore.
+
+
 \subsection{Identifying invalid data}
 
 \newpage
@@ -60,5 +117,8 @@ This will have the abstract.
 \newpage
 \section{Dimension reduction/Factor analysis}
 \subsection{Principal Component Analysis}
+
+\newpage
+\section{Technical notes}
 
 \end{document} 
