@@ -44,7 +44,7 @@ class MySketch < Processing::App
 
 		x_range = {:minimum => -60, :maximum => 60}
 		y_range = {:minimum => 0, :maximum => 1}
-		@c = CoordinateSystem.standard(x_range, y_range, self)
+		@c = CoordinateSystem.standard(x_range, y_range, self, {:x => 'Score', :y => 'Probability P(score)'})
 		@screen = Screen.new(@screen_transform, self, @c, LegendBox.new(self, {:x => 1300, :y => 30}))
 
 		classifier = Classifier.new(kde, priors)
