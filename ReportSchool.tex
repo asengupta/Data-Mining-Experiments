@@ -1,4 +1,5 @@
 \documentclass[10pt]{article} 
+\usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \begin{document}
 \title{Initial report on analysis of the Anganwadi dataset 2010} 
@@ -55,9 +56,9 @@ The dataset comes from the education domain. The source data is a file, with eac
 
 The score is not a single number, it is a set of 56 responses marked as 0/1. Generally, a 1 may be treated as a favourable answer, therefore, adding them up to get a single aggregate score has natural ordering: a sense of who did better. We reproduce two such records below, with the original formatting.\\
 
-{\tt 30915|YALLAMMANADODDI|KANNADA|1231468|Girl||1NoSection|Aug 2010 Assessment|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|Anganwadi Post Test|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|}\\
+{\footnotesize 30915|YALLAMMANADODDI|KANNADA|1231468|Girl||1NoSection|Aug 2010 Assessment|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|Anganwadi Post Test|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|}\\
 
-{\tt 29607|BADAMAKAAN I|KANNADA|1445172|Girl|URDU|1NoSection|Aug 2010 Assessment|1|0|1|1|0|1|0|1|1|1|1|1|1|1|1|0|1|1|1|1|1|0|1|1|1|1|1|0|1|1|1|0|1|1|1|1|1|1|0|1|1|0|1|1|1|1|1|1|1|1|1|1|1|1|1|0|Anganwadi Post Test|1|0|1|1|1|0|1|1|0|1|1|0|1|1|1|1|0|1|1|1|0|0|1|1|0|1|0|0|1|1|1|0|1|1|0|0|1|1|1|0|0|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|
+{\footnotesize 29607|BADAMAKAAN I|KANNADA|1445172|Girl|URDU|1NoSection|Aug 2010 Assessment|1|0|1|1|0|1|0|1|1|1|1|1|1|1|1|0|1|1|1|1|1|0|1|1|1|1|1|0|1|1|1|0|1|1|1|1|1|1|0|1|1|0|1|1|1|1|1|1|1|1|1|1|1|1|1|0|Anganwadi Post Test|1|0|1|1|1|0|1|1|0|1|1|0|1|1|1|1|0|1|1|1|0|0|1|1|0|1|0|0|1|1|1|0|1|1|0|0|1|1|1|0|0|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|
 ...
 }\\
 
@@ -111,14 +112,20 @@ We also found a large fraction of records which did not have a LANGUAGE attribut
 \newpage
 \section{Shape of the Data}
 \subsection{Univariate distributions}
+\includegraphics[width=160mm]{ReportMedia/ShapeOfData.jpg}
 \subsection{Bivariate distribution}
 \subsection{Summary plots}
+\includegraphics[width=160mm]{ReportMedia/BoxPlotPrePost.jpg}
 
 \newpage
 \section{Data exploration}
 \subsection{Parallel Coordinates}
 \subsection{Covariance plot}
+\includegraphics[width=120mm]{ReportMedia/CovariancePre.jpg}\\
+\includegraphics[width=120mm]{ReportMedia/CovariancePost.jpg}
+
 \subsection{Answer distribution}
+\includegraphics[width=120mm]{ReportMedia/AnswerDistribution.jpg}
 
 \newpage
 \section{Tests for Univariate Normality}
@@ -130,6 +137,47 @@ We also found a large fraction of records which did not have a LANGUAGE attribut
 \newpage
 \section{Tests for variable independence}
 \subsection{Chi-square test}
+\textbf{Null hypothesis: Area and Improvement are NOT related.} \\
+ For \textbf{area vs. improvement}\\
+ Chi-Square statistic = 56499.4692602837\\
+ X2 = 9652.9739\\
+ Degrees of freedom = 9426\\
+ \textbf{Null hypothesis rejected}\\
+\\
+\textbf{Null hypothesis: Area and Pre-Score are NOT related.}\\
+ For \textbf{area vs. pre-score}\\
+ Chi-Square statistic = 58665.7089390644\\
+ X2 = 8062.2959\\
+ Degrees of freedom = 7855\\
+ \textbf{Null hypothesis rejected}\\
+\\
+\textbf{Null hypothesis: Area and Post-Score are NOT related.}\\
+ For \textbf{area vs. post-score}\\
+ Chi-Square statistic = 38567.0016158761\\
+ X2 = 8062.2959\\
+ Degrees of freedom = 7855\\
+ \textbf{Null hypothesis rejected}\\
+\\
+\textbf{Null hypothesis: Language and Post-Score are NOT related.}\\
+ For \textbf{language vs. post-score}\\
+ Chi-Square statistic = 280.234448946825\\
+ X2 = 96.2166\\
+ Degrees of freedom = 75\\
+ \textbf{Null hypothesis rejected}\\
+\\
+\textbf{Null hypothesis: Language and Improvement are NOT related.}\\
+ For \textbf{language vs. improvement}\\
+ Chi-Square statistic = 232.464548410971\\
+ X2 = 113.1452\\
+ Degrees of freedom = 90\\
+ \textbf{Null hypothesis rejected}\\
+\\
+\textbf{Null hypothesis: Language and Pre-Score are NOT related.}\\
+ For \textbf{language vs. pre-score}\\
+ Chi-Square statistic = 277.85501653079\\
+ X2 = 96.2166\\
+ Degrees of freedom = 75\\
+ \textbf{Null hypothesis rejected}\\
 
 \newpage
 \section{Prediction}

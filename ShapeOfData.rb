@@ -28,7 +28,7 @@ class MySketch < Processing::App
 
 		responses = Response.find(:all)
 
-		@c = CoordinateSystem.standard({:minimum => -60, :maximum => 60}, {:minimum => 0.0, :maximum => 1.0}, self)
+		@c = CoordinateSystem.standard({:minimum => -60, :maximum => 60}, {:minimum => 0.0, :maximum => 0.12}, self, {:x => 'Score', :y => 'Probability'})
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
