@@ -19,7 +19,7 @@ class MySketch < Processing::App
 					rect(m[:x], m[:y], 5, 5)
 				   end
 
-		metric = lambda {|r| r.improvement}
+		metric = lambda {|r| 56 - r[:post_total]}
 		@screen_height = 700
 		@width = width
 		@height = height
@@ -46,8 +46,8 @@ class MySketch < Processing::App
 			sum_of_squares += (metric.call(r) - mean)**2
 		end
 		variance = sum_of_squares.to_f/responses.count
-
-		quantile_fn = Quantiles.quantile_normal(mean, variance)
+		exponential_rate = 0.106
+		quantile_fn = Quantiles.quantile_exponential(exponential_rate)
 		cumulative_improvement_bins.each_pair do |improvement, percentage|
 			normal_bins[percentage] = quantile_fn.call(percentage/100.0)
 			data_bins[percentage] = improvement
@@ -58,7 +58,7 @@ class MySketch < Processing::App
 		@screen_transform = Transform.new({:x => 6.0, :y => -6.0}, {:x => @width / 2, :y => 500})
 		x_range = {:minimum => least_improvement, :maximum => most_improvement}
 		y_range = {:minimum => least_improvement, :maximum => most_improvement}
-		@c = CoordinateSystem.standard(x_range, y_range, self)
+		@c = CoordinateSystem.standard(x_range, y_range, self, {:x => 'Probability (x)', :y => 'Probability (y)'})
 		@screen = Screen.new(@screen_transform, self, @c)
 		@screen.join = true
 
@@ -66,15 +66,15 @@ class MySketch < Processing::App
 		keys = normal_bins.keys.sort
 #		no_fill()
 		stroke(1,1,0,1)
-		keys.each do |p|
-			@screen.plot({:x => normal_bins[p], :y => data_bins[p]}, :track => true)
-		end
+		fill(1,1,0,1)
+		actual = keys.collect {|p| {:x => normal_bins[p], :y => data_bins[p]}}
+		@screen.plot(actual, :track => true, :legend => 'Actual distribution quantile')
 		@screen.join=false
 		@screen.join=true
 		stroke(0,1,0,1)
-		keys.each do |p|
-			@screen.plot({:x => normal_bins[p], :y => normal_bins[p]}, :track => true) { |o,m,s| rect(m[:x], m[:y], 4, 4)}
-		end
+		fill(0,1,0,1)
+		theoretical = keys.collect {|p| {:x => normal_bins[p], :y => normal_bins[p]}}
+		@screen.plot(theoretical, :track => true, :legend => 'Theoretical exponential distribution quantile (#{exponential_rate})')
 		stroke(1,1,1,1)
 		@screen.draw_axes(10,10)
 	end

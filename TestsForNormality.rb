@@ -19,7 +19,7 @@ class MySketch < Processing::App
 		@width = width
 		@height = height
 #		@screen_transform = Transform.new({:x => 18.0, :y => -7500.0}, {:x => 100.0, :y => @screen_height})
-		@screen_transform = Transform.new({:x => 500.0, :y => -0.1}, {:x => 100, :y => @screen_height})
+		@screen_transform = Transform.new({:x => 500.0, :y => -300}, {:x => 500, :y => @screen_height/2})
 		smooth
 		no_loop
 		background(0,0,0)
@@ -27,55 +27,51 @@ class MySketch < Processing::App
 
 		@responses = Response.find(:all)
 
-		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 10}, {:minimum => 0.0, :maximum => 9000.0}, self)
+		@c = CoordinateSystem.standard({:minimum => -10, :maximum => 10}, {:minimum => 0.0, :maximum => 9000.0}, self)
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
 		
-#		l = 0.1
-#		@screen.join = true
-#		while (l < 1.5)
-#			transform = box_cox(l)
-#			jb_statistic = jb_stats(transform)
-#			@screen.plot({:x => l, :y => jb_statistic}, :track => true)
-#			if (l >= 0.4 && l <= 0.5)
-#				l+= 0.00625
-#			else
-#				l += 0.025
-#			end
-#		end
-#		transform = ->(x) {Math.log(x)}
-#		jb_statistic = jb_stats(transform)
-
-		transform = ->(x) {x}
-		bins = {}
-		@responses.each do |r|
-			bins[r[:area]] = [] if bins[r[:area]].nil?
-			bins[r[:area]] << r
-		end
-		
-		puts bins.keys.count
-		aberrations = []
-		bins.each_pair do |k,v|
-			jb_statistic = jb_stats(transform, v)
-			puts "#{k}=#{jb_statistic}" if jb_statistic > 9.2103
-			aberrations << v if jb_statistic > 9.2103
-		end
-		@screen.join = false
-		aberrations.each do |a|
+		l = -10
+		@screen.join = true
+		while (l < 1.0)
+			transform = box_cox(l)
+			jb_statistic = jb_stats(transform, @responses)
 			@screen.plot({:x => l, :y => jb_statistic}, :track => true)
+			l += 0.05
 		end
+#		transform = ->(x) {Math.log(x)}
+#		jb_statistic = jb_stats(transform, @responses)
+
+#		transform = ->(x) {x}
+#		bins = {}
+#		@responses.each do |r|
+#			bins[r[:area]] = [] if bins[r[:area]].nil?
+#			bins[r[:area]] << r
+#		end
+#		
+#		puts bins.keys.count
+#		aberrations = []
+#		bins.each_pair do |k,v|
+#			jb_statistic = jb_stats(transform, v)
+#			puts "#{k}=#{jb_statistic}" if jb_statistic > 9.2103
+#			aberrations << v if jb_statistic > 9.2103
+#		end
+#		@screen.join = false
+#		aberrations.each do |a|
+#			@screen.plot({:x => l, :y => jb_statistic}, :track => true)
+#		end
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
-		@screen.draw_axes(0.2, 400)
+		@screen.draw_axes(0.2, 0.1)
 	end
 	
 	def draw
 	end
 	
 	def jb_stats(transform, responses)
-		metric = lambda {|r| transform.call(r.improvement + 57)}
+		metric = lambda {|r| transform.call(r[:post_total])}
 
 		n = responses.count.to_f
 		mean = 0.0
@@ -89,11 +85,13 @@ class MySketch < Processing::App
 		alpha4 = variance**2
 
 		s = mu3.to_f/alpha3
-		k = mu4.to_f/alpha4 - 3
+		k = mu4.to_f/alpha4
 
 		jb = n/6 * (s**2 + 0.25 * (k-3)**2)
-#		puts "JB statistic = #{jb}"
-		jb
+		puts "JB statistic = #{jb}"
+#		puts "Variance = #{variance}"
+#		puts "Skew = #{s}"
+		s
 #		puts "n = #{n}"
 #		puts "Skewness = #{s}"
 #		puts "Kurtosis = #{k}"
@@ -101,7 +99,7 @@ class MySketch < Processing::App
 	end
 	
 	def box_cox(l)
-		lambda {|x|(x**l - 1)/l}
+		lambda {|x|(Math.exp(x*l) - 1)/l}
 	end
 	
 	def mu(samples, mean, order, met)

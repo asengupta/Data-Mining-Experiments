@@ -16,5 +16,9 @@ module Quantiles
 	def self.quantile_cauchy(location, scale)
 		lambda {|p| location + scale * Math.tan(Math::PI*(p - 0.5))}
 	end
+
+	def self.quantile_exponential(rate)
+		lambda {|p| - Math.log(1-p)/rate}
+	end
 end
 

@@ -31,24 +31,19 @@ class MySketch < Processing::App
 		@c = CoordinateSystem.standard({:minimum => -60, :maximum => 60}, {:minimum => 0.0, :maximum => 0.12}, self, {:x => 'Score', :y => 'Probability'})
 		@screen = Screen.new(@screen_transform, self, @c)
 
-		transform = box_cox(0.5)
-		stroke(0.1,0.5,1)
-		fill(0.1,0.5,1)
-		plot_distribution(responses, ->(r) {r.improvement}, "Improvement")
-		stroke(0.2,0.5,1)
-		fill(0.2,0.5,1)
-		plot_distribution(responses, ->(r) {r[:pre_total]}, "Pre-Total")
+#		stroke(0.1,0.5,1)
+#		fill(0.1,0.5,1)
+#		plot_distribution(responses, ->(r) {r.improvement}, "Improvement")
+#		stroke(0.2,0.5,1)
+#		fill(0.2,0.5,1)
+#		plot_distribution(responses, ->(r) {r[:pre_total]}, "Pre-Total")
 		stroke(0.4,0.5,1)
 		fill(0.4,0.5,1)
 		plot_distribution(responses, ->(r) {r[:post_total]}, "Post-Total")
-		l = 0.107
-		p = ->(x) {l * Math.exp(-l*(56-x))}
-		@screen.join=true
-		0.upto(56) do |x|
-			point = {:x => x, :y => p.call(x)}
-			puts point.inspect
-			@screen.plot(point) {|o,m,s|}
-		end
+		stroke(0.1,0.5,1)
+		fill(0.1,0.5,1)
+		plot_theoretical{|x| 0.106 * Math.exp(-0.106*(56-x))}
+#		plot_theoretical{|x| 0.04 * Math.exp(-0.04*(56-x))}
 #		transform = box_cox(0.5)
 #		stroke(0.2,0.5,1)
 #		fill(0.2,0.5,1)
@@ -102,6 +97,15 @@ class MySketch < Processing::App
 #		improvement_bins.keys.sort.each do|k|
 #			@screen.plot({:x => k, :y => improvement_bins[k]}, :track => true)
 #		end
+	end
+
+	def plot_theoretical(&p)
+		@screen.join=true
+		0.upto(56) do |x|
+			point = {:x => x, :y => p.call(x)}
+			@screen.plot(point) {|o,m,s|}
+		end
+		@screen.join=false
 	end
 
 	def box_cox(l)
