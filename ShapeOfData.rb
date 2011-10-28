@@ -31,6 +31,7 @@ class MySketch < Processing::App
 		@c = CoordinateSystem.standard({:minimum => -60, :maximum => 60}, {:minimum => 0.0, :maximum => 0.12}, self, {:x => 'Score', :y => 'Probability'})
 		@screen = Screen.new(@screen_transform, self, @c)
 
+		transform = box_cox(0.5)
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
 		plot_distribution(responses, ->(r) {r.improvement}, "Improvement")
@@ -40,6 +41,14 @@ class MySketch < Processing::App
 		stroke(0.4,0.5,1)
 		fill(0.4,0.5,1)
 		plot_distribution(responses, ->(r) {r[:post_total]}, "Post-Total")
+		l = 0.107
+		p = ->(x) {l * Math.exp(-l*(56-x))}
+		@screen.join=true
+		0.upto(56) do |x|
+			point = {:x => x, :y => p.call(x)}
+			puts point.inspect
+			@screen.plot(point) {|o,m,s|}
+		end
 #		transform = box_cox(0.5)
 #		stroke(0.2,0.5,1)
 #		fill(0.2,0.5,1)

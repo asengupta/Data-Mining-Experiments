@@ -138,13 +138,85 @@ There is not a huge disparity between the two sexes, which indicates that any an
 \section{Shape of the Data}
 Before embarking on any deep analysis of data, it behooves us to look at the shape of the raw data. There are a few reasons why we want to do this.\\
 \begin{itemize}
-\item Evident trends/outliers: Visualisation of the raw data set 
-\item Evidence of conformance to well-known distributions
-
+\item Evident trends/outliers: Visualisation of the raw data set is always a quick way to spot trends without doing too much analysis. Of course, visualisation is best suited for 1,2 and 3-dimensional data: data of higher dimensionality must usually be either sliced prior to visualisation, or have its dimensionality reduced, before projecting it onto the 2D plane.\\
+Having said that, there are other ways of visualising the data without sacrificing any dimensions at all, such as Parallel Coordinates, though it is more suited to data exploration.
+\item Evidence of conformance to well-known distributions: There exist many probability distributions, some of whose properties are well-studied and well-known, like the Normal distribution. If the data approximates one of these distributions, there are several mature statistical methods which may be applied to test different hypotheses and properties of the data.\\
+Indeed, many of the classical statistical analyses make the assumption that the underlying data is normally distributed.
 \end{itemize}
 
+In the following sections, we shall explore the shape of the Anganwadi 2010 dataset, and record our observations on it.
+
 \subsection{Univariate distributions}
+The graph below shows 3 distributions: the pre-intervention scores, the post-intervention scores, and the improvements.\\
 \includegraphics[width=160mm]{ReportMedia/ShapeOfData.jpg}
+\subsubsection{Observations}
+\begin{itemize}
+\item The pre-intervention score with the highest number of students is 56, which is the highest score possible. This implies that, even prior to intervention, a sizeable fraction of the students have score very high.
+\item The post-intervention score also follows the same trend, albeit with a steeper curve, which implies that many students have scored better in the post-test than in the pre-test.
+\item The improvement distribution is peaked, the peak being near zero. This makes sense, because if a large fraction of students answered all 56 questions as 1 in the pre-intervention score, there really is no way for them to improve. This is assuming that their performance did not worsen in the post-test.
+\item There is a significant fraction of students whose performance has worsened in the post-test. This number is 7081. Out of those, we noticed that the worsening was dramatic for a small set. We have listed down the records which had a regression of 40 or more, below.
+
+{\tt
+\begin{verbatim}
++------------+-----------------------+-----------+------------+----------+
+| student_id | area                  | pre_total | post_total | language |
++------------+-----------------------+-----------+------------+----------+
+|    1506619 | VABASANDRA            |        52 |          0 | KANNADA  |
+|    1444355 | KITTAGANA COLONY      |        56 |          0 | KANNADA  |
+|    1426910 | PRIYA DARSHINI        |        53 |          0 | KANNADA  |
+|    1445387 | KYALASANAHALLI        |        51 |          1 | TELUGU   |
+|    1445382 | KOTHANUR              |        44 |          0 | TAMIL    |
+|    1445383 | KOTHANUR              |        41 |          0 | KANNADA  |
+|    1442911 | BETTANA PALYA         |        55 |         12 | KANNADA  |
+|    1445160 | KODIGEHALLI           |        52 |          0 | KANNADA  |
+|    1457095 | KAVERI NAGARA         |        41 |          0 | KANNADA  |
+|    1457090 | KAVERI NAGARA         |        44 |          0 | TELUGU   |
+|    1457092 | KAVERI NAGARA         |        41 |          0 | TELUGU   |
+|    1507686 | REHMATH NAGAR         |        44 |          0 | URDU     |
+|    1448385 | MALSANDRA             |        50 |          0 | KANNADA  |
+|    1455798 | KANTEERAVA COLONY     |        55 |         15 | KANNADA  |
+|    1444466 | PRIYA DARSHINI        |        52 |          0 | KANNADA  |
+|    1444467 | PRIYA DARSHINI        |        44 |          0 | KANNADA  |
+|    1445337 | RACHENAHALLI          |        52 |          0 | KANNADA  |
+|    1425269 | VINYAKNAGAR           |        41 |          0 | KANNADA  |
+|     552534 | KYALASANAHALLI        |        52 |          1 | TELUGU   |
+|    1448976 | KRISHNA SAGARA COLONY |        54 |         14 | KANNADA  |
+|    1507157 | BELTHURU              |        52 |          7 | KANNADA  |
+|    1444897 | MUNESHWARA NAGAR      |        45 |          0 | TAMIL    |
+|    1444890 | MUNESHWARA NAGAR      |        40 |          0 | KANNADA  |
+|    1542861 | VERABADRA NAGAR 1     |        56 |          1 | KANNADA  |
+|    1358415 | KOTHANUR              |        48 |          8 |          |
+|    1445437 | THRIVENINAGARA        |        40 |          0 | TELUGU   |
+|    1442907 | BETTANA PALYA         |        55 |          8 | KANNADA  |
+|    1457106 | KAVERI NAGARA         |        40 |          0 | TELUGU   |
+|    1445444 | THRIVENINAGARA        |        41 |          0 | TELUGU   |
+|    1444474 | PRIYA DARSHINI        |        54 |          0 | KANNADA  |
+|    1445159 | KODIGEHALLI           |        41 |          0 | KANNADA  |
+|     511998 | KODIGEHALLI           |        55 |          0 | KANNADA  |
+|    1356274 | KAVERI NAGARA         |        56 |          0 |          |
+|    1358429 | KOTHANUR              |        42 |          0 |          |
+|    1497510 | JALAHALLI 1           |        42 |          0 | KANNADA  |
+|    1443914 | BIDARAHALLI           |        56 |         12 | KANNADA  |
+|    1366955 | PRIYA DARSHINI        |        53 |          0 | KANNADA  |
+|    1366956 | PRIYA DARSHINI        |        53 |          0 | KANNADA  |
+|    1447019 | MADAPPANA HALLI       |        42 |          0 | TELUGU   |
+|    1355112 | BYRATHI BANDE         |        55 |         14 |          |
+|    1504259 | MAYASANDRA  A         |        56 |          0 | KANNADA  |
+|    1457120 | KAVERI NAGARA         |        43 |          0 | TAMIL    |
+|    1457089 | KAVERI NAGARA         |        43 |          0 | TAMIL    |
+|    1445171 | KODIGEHALLI           |        44 |          0 | KANNADA  |
+|    1457203 | SARAIPALYA            |        51 |          0 | URDU     |
+|    1457179 | BYRATHI BANDE         |        55 |         14 | KANNADA  |
+|    1504538 | KEMPEGOWDA NAGAR      |        51 |          7 | KANNADA  |
+|    1444486 | PRIYA DARSHINI        |        49 |          0 | KANNADA  |
+|    1444488 | PRIYA DARSHINI        |        42 |          0 | KANNADA  |
+|    1451831 | AMBED NAGAR           |        50 |          9 | TAMIL    |
++------------+-----------------------+-----------+------------+----------+
+\end{verbatim}
+}
+\item Lololol
+\end{itemize}
+\subsection{Outlier Analysis}
 \subsection{Bivariate distribution}
 \subsection{Summary plots}
 \includegraphics[width=160mm]{ReportMedia/BoxPlotPrePost.jpg}
