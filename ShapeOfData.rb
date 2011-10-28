@@ -100,11 +100,12 @@ class MySketch < Processing::App
 	end
 
 	def plot_theoretical(&p)
+		points = []
 		@screen.join=true
 		0.upto(56) do |x|
-			point = {:x => x, :y => p.call(x)}
-			@screen.plot(point) {|o,m,s|}
+			points << {:x => x, :y => p.call(x)}
 		end
+		@screen.plot(points, :legend => 'Exponential distribution r = 0.106 (reflected)') {|o,m,s|}
 		@screen.join=false
 	end
 

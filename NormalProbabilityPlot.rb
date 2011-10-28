@@ -55,7 +55,7 @@ class MySketch < Processing::App
 		least_improvement = cumulative_improvement_bins.keys.min
 		most_improvement = cumulative_improvement_bins.keys.max
 
-		@screen_transform = Transform.new({:x => 6.0, :y => -6.0}, {:x => @width / 2, :y => 500})
+		@screen_transform = Transform.new({:x => 6.0, :y => -6.0}, {:x => 100, :y => 500})
 		x_range = {:minimum => least_improvement, :maximum => most_improvement}
 		y_range = {:minimum => least_improvement, :maximum => most_improvement}
 		@c = CoordinateSystem.standard(x_range, y_range, self, {:x => 'Probability (x)', :y => 'Probability (y)'})
@@ -74,7 +74,7 @@ class MySketch < Processing::App
 		stroke(0,1,0,1)
 		fill(0,1,0,1)
 		theoretical = keys.collect {|p| {:x => normal_bins[p], :y => normal_bins[p]}}
-		@screen.plot(theoretical, :track => true, :legend => 'Theoretical exponential distribution quantile (#{exponential_rate})')
+		@screen.plot(theoretical, :track => true, :legend => "Theoretical exponential distribution quantile (#{exponential_rate})")
 		stroke(1,1,1,1)
 		@screen.draw_axes(10,10)
 	end
