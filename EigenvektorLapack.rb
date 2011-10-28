@@ -1,9 +1,6 @@
 require 'rubygems'
-require 'numru/lapack'
-require 'activerecord'
-require 'lambda-queuer'
-
-include NumRu
+require 'statsample'
+require 'active_record'
 
 #a = NArray[	[1,2,3,4,1],
 #		[2,2,3,4,2],
@@ -19,7 +16,7 @@ include NumRu
 #exit
 
 ActiveRecord::Base.establish_connection(
-  :adapter => "mysql",
+  :adapter => "mysql2",
   :host => "localhost",
   :database => "data_mining",
   :username => "root",
@@ -78,44 +75,52 @@ covariance_matrix = []
 	covariance_matrix << matrix_row
 end
 
+cov = Matrix.rows(covariance_matrix)
 
-uplo = "U"
-a = NArray.to_na(covariance_matrix)
-#a = NArray[	[1,2,3,4,1],
-#		[2,2,3,4,2],
-#		[3,3,3,3,5],
-#		[4,4,3,4,4],
-#		[1,2,5,4,5]
-#	   ]
+puts Time.now.inspect
+pca = Statsample::Factor::PCA.new(cov)
+puts Time.now.inspect
+puts pca.eigenvalues.inspect
+puts Time.now.inspect
+puts pca.eigenvectors.inspect
+puts Time.now.inspect
+#uplo = "U"
+#a = NArray.to_na(covariance_matrix)
+##a = NArray[	[1,2,3,4,1],
+##		[2,2,3,4,2],
+##		[3,3,3,3,5],
+##		[4,4,3,4,4],
+##		[1,2,5,4,5]
+##	   ]
 
-#d, e, tau, work, info, a = NumRu::Lapack.ssytrd( uplo, a, 50)
+##d, e, tau, work, info, a = NumRu::Lapack.ssytrd( uplo, a, 50)
 
 
-#info, d, e, z = NumRu::Lapack.ssteqr('I', d, e, a)
-w, work, info, a = NumRu::Lapack.ssyev('V', 'L', a)
+##info, d, e, z = NumRu::Lapack.ssteqr('I', d, e, a)
+#w, work, info, a = NumRu::Lapack.ssyev('V', 'L', a)
 
-eigenvalue =  w.to_a.last
+#eigenvalue =  w.to_a.last
 
-vektor = a.to_a.last
+#vektor = a.to_a.last
 
-[vektor].to_a.each do |vek|
-	vek_as_matrix = NVector.ref(NArray.to_na(vektor))
-	test = NMatrix.ref(NArray.to_na(covariance_matrix))
-	result = test * vek_as_matrix
-	scaled_vektor = result.to_a
-	vek.each_index do |index|
-		puts "#{scaled_vektor[index]} /  #{vektor[index]} = #{scaled_vektor[index]/vektor[index]}" if (scaled_vektor[index]/vektor[index] - eigenvalue).abs > 0.1
-	end
-end
+#[vektor].to_a.each do |vek|
+#	vek_as_matrix = NVector.ref(NArray.to_na(vektor))
+#	test = NMatrix.ref(NArray.to_na(covariance_matrix))
+#	result = test * vek_as_matrix
+#	scaled_vektor = result.to_a
+#	vek.each_index do |index|
+#		puts "#{scaled_vektor[index]} /  #{vektor[index]} = #{scaled_vektor[index]/vektor[index]}" if (scaled_vektor[index]/vektor[index] - eigenvalue).abs > 0.1
+#	end
+#end
 
-reduced = inputs.collect do |i|
-	transformed = 0
-	i.each_index do |score_index|
-#		p "[#{score_index}] = #{vektor[score_index]}" if vektor[score_index] == nil
-		transformed += i[score_index] * vektor[score_index]
-	end
-	transformed
-end
+#reduced = inputs.collect do |i|
+#	transformed = 0
+#	i.each_index do |score_index|
+##		p "[#{score_index}] = #{vektor[score_index]}" if vektor[score_index] == nil
+#		transformed += i[score_index] * vektor[score_index]
+#	end
+#	transformed
+#end
 
-reduced.each {|r| p r}
+#reduced.each {|r| p r}
 

@@ -24,7 +24,7 @@ class MySketch < Processing::App
 
 		responses = Response.find(:all)
 		predictor_metric = ->(r) {r.improvement}
-		predicted_metric = ->(r) {r[:language]}
+		predicted_metric = ->(r) {r[:pre_total].to_s}
 		
 		bins = {}
 		priors = {}
@@ -34,6 +34,10 @@ class MySketch < Processing::App
 			bins[bin] << r
 			priors[bin] = 0 if priors[bin].nil?
 			priors[bin] += 1
+		end
+		
+		bins.each_key do |k|
+			puts "#{k}=#{bins[k].count}"
 		end
 
 		priors.each_pair do |k,v|
@@ -70,7 +74,7 @@ class MySketch < Processing::App
 			end
 			@screen.plot(points, :legend => k, :track => true) {|o,m,s|}
 			@screen.join = false
-			hue += 0.05
+			hue += 0.01
 		end
 #		hue = 0.0
 #		rect_mode(CENTER)

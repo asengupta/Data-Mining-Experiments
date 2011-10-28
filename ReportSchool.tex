@@ -106,11 +106,43 @@ We also found a large fraction of records which did not have a LANGUAGE attribut
 
 \newpage
 \section{Bias}
-\subsection{Population breakdown by language}
+Analysis is most suscpetible to bias in the data collection stage. Sampling is one such activity. If, for a statistical study, participating individuals are not equally likely to have been selected, it may be difficult to distinguish between the actual phenomenon and this biased sampling.
+This sort of bias is called sampling bias.
+
 \subsection{Sampling bias}
+To find evidence for bias, we looked at a few parameters.
+Here is the breakdown of the population by language, with the biggest language bucket highlighted.\\\\
+Unspecified=869\\
+URDU=3564\\
+\textbf{KANNADA=18685}\\
+TELUGU=1688\\
+TAMIL=2051\\
+MARATHI=91\\
+OTHER=239\\
+HINDI=243\\
+KONKANI=18\\
+GUJARATHI=12\\
+NOT KNOWN=3\\
+ORIYA=2\\
+MULTI LNG=1\\
+BENGALI=1\\
+NEPALI=1\\
+\\
+There is an overwhelming proportion of students who speak Kannada as their mother tongue (leading by an order of magnitude), a fact that is very likely to bias any sort of analysis where language is involved. We must remain cognizant of such biases, and interpret the results accordingly.\\\\
+Here is the breakdown of the population by gender.\\\\
+\textbf{Girl=14822}\\
+Boy=12646\\\\
+There is not a huge disparity between the two sexes, which indicates that any analysis/prediction based on gender may be less biased.
 
 \newpage
 \section{Shape of the Data}
+Before embarking on any deep analysis of data, it behooves us to look at the shape of the raw data. There are a few reasons why we want to do this.\\
+\begin{itemize}
+\item Evident trends/outliers: Visualisation of the raw data set 
+\item Evidence of conformance to well-known distributions
+
+\end{itemize}
+
 \subsection{Univariate distributions}
 \includegraphics[width=160mm]{ReportMedia/ShapeOfData.jpg}
 \subsection{Bivariate distribution}
@@ -186,7 +218,9 @@ We also found a large fraction of records which did not have a LANGUAGE attribut
 \subsection{Density estimators}
 \subsubsection{Naive Bayes density}
 \subsubsection{Kernel density estimation}
-\includegraphics[width=120mm]{ReportMedia/BayesLanguageFromImprovement.jpg}
+\includegraphics[width=160mm]{ReportMedia/BayesLanguageFromImprovement.jpg}
+\newpage
+\includegraphics[width=160mm]{ReportMedia/BayesGenderFromImprovement.jpg}
 
 \newpage
 \section{Dimension reduction/Factor analysis}
