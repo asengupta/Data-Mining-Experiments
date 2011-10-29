@@ -6,3 +6,6 @@ class Response < ActiveRecord::Base
 	end
 end
 
+class School < ActiveRecord::Base
+end
+
