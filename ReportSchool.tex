@@ -94,6 +94,8 @@ A {\tt desc responses;} command on the table reveals the schema we ended up with
 | pre_total        | int(11)    | YES  |     | NULL    |                |
 | post_total       | int(11)    | YES  |     | NULL    |                |
 | id               | int(11)    | NO   | PRI | NULL    | auto_increment |
+| school_id        | int(11)    | YES  |     | NULL    |                |
+| year             | int(11)    | YES  |     | NULL    |                |
 +------------------+------------+------+-----+---------+----------------+
 \end{verbatim}
 }
@@ -153,7 +155,7 @@ The graph below shows 3 distributions: the pre-intervention scores, the post-int
 \begin{itemize}
 \item The pre-intervention score with the highest number of students is 56, which is the highest score possible. This implies that, even prior to intervention, a sizeable fraction of the students have score very high.
 \item The post-intervention score also follows the same trend, albeit with a steeper curve, which implies that many students have scored better in the post-test than in the pre-test.
-\item The improvement distribution is peaked, the peak being near zero. This makes sense, because if a large fraction of students answered all 56 questions as 1 in the pre-intervention score, there really is no way for them to improve. This is assuming that their performance did not worsen in the post-test.
+\item The improvement distribution is peaked, the peak being near zero. This makes sense, because if a large fraction of students answered all 56 questions as 1 in the pre-intervention score, there really is no way for them to improve. This is assuming that their performance did not worsen in the post-test. In fact, the calculated mean is around 7.
 \item There is a significant fraction of students whose performance has worsened in the post-test. This number is 7081. Out of those, we noticed that the worsening was dramatic for a small set. We have listed down the records which had a regression of 40 or more, below.
 
 {\tt
@@ -214,7 +216,7 @@ The graph below shows 3 distributions: the pre-intervention scores, the post-int
 +------------+-----------------------+-----------+------------+----------+
 \end{verbatim}
 }
-\item Lololol
+\item The post-intervention score distribution seems to follow a power law. We shall consider modeling this attribute in the next section.
 \end{itemize}
 \subsection{Outlier Analysis}
 \subsection{Bivariate distribution}
@@ -231,7 +233,8 @@ The graph below shows 3 distributions: the pre-intervention scores, the post-int
 \subsection{Covariance plot}
 \includegraphics[width=120mm]{ReportMedia/CovariancePre.jpg}\\
 \includegraphics[width=120mm]{ReportMedia/CovariancePost.jpg}
-
+\subsection{Geographical distribution}
+\includegraphics[width=170mm]{ReportMedia/GeographicalDistributionOfPopulation.jpg}
 \subsection{Answer distribution}
 \includegraphics[width=120mm]{ReportMedia/AnswerDistribution.jpg}
 

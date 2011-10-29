@@ -13,7 +13,7 @@ class MySketch < Processing::App
 			rect_mode(CENTER)
 			no_fill
 			stroke(0.5,1,1)
-			rect(m[:x], m[:y], 40, 40)
+			rect(m[:x], m[:y], 50, 50)
 			text("#{o[:cluster]}", m[:x] + 5, m[:y] + 5)
 		end
 		@screen_height = 900
@@ -37,20 +37,25 @@ class MySketch < Processing::App
 		@screen = Screen.new(@screen_transform, self, @c)
 		rect_mode(CENTER)
 		randomiser = -> {(rand(100)-50)/2.0}
+		already_written = {}
 		bins.each_pair do |bin,responses|
 			puts "Plotting for #{bin}"
 			index = schools.index {|s| s[:school_id] == bin}
 			school = schools[index]
 			scaled_brilliance = responses.count/50.0
-			fill(0.1,0.5,scaled_brilliance)
-			stroke(0.1,0.5,scaled_brilliance)
+			fill(0.3,0.5,scaled_brilliance)
+			stroke(0.3,0.5,scaled_brilliance)
 			@screen.plot({:x => school[:latitude] - 12.8, :y => school[:longitude] - 77.4, :cluster => school[:cluster]}, :track => true) {|o,m,s|}
 			@screen.plot({:x => school[:latitude] - 12.8, :y => school[:longitude] - 77.4, :value => responses.count.to_f/all_responses.count, :name => school[:school_name]}) do |o,m,s|
 				ellipse(m[:x] + randomiser.call, m[:y] + randomiser.call, 2, 2)
 				rect_mode(CENTER)
-				stroke(0.1,0.5,0.6)
+				stroke(0.1,0.5,0.3)
 				no_fill()
-				rect(m[:x], m[:y], 40, 40)
+				rect(m[:x], m[:y], 50, 50)
+				fill(0.1,0.5,1)
+#				text("#{school[:cluster]}", m[:x] + randomiser.call, m[:y] + randomiser.call) if already_written[school[:cluster]].nil?
+				ellipse(m[:x] + 30, m[:y] + randomiser.call, 4, 4) if already_written[school[:cluster]].nil?
+				already_written[school[:cluster]] = true
 			end
 		end
 		stroke(0.1,0.5,1)
