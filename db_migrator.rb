@@ -1,7 +1,7 @@
-require 'mysql'
+require 'mysql2'
 
 handle = File.open('/home/avishek/Code/DataMiningExperiments/csv/Ang2010TestsModified.csv', 'r')
-my = Mysql::new("localhost", "root", "", "data_mining")
+my = Mysql2::Client.new(:host => "localhost", :username => "root", :database => "data_mining")
 
 #my.query('CREATE TABLE responses (student_id int(11) DEFAULT NULL, area char(50) DEFAULT NULL, pre_performance bigint(20) DEFAULT NULL, post_performance bigint(20) DEFAULT NULL, language char(50) DEFAULT NULL, gender char(20) DEFAULT NULL, pre_total int, post_total int, id int(11) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`));')
 
@@ -44,9 +44,11 @@ handle.each_line do |line|
 		    	:language => split_elements[5], 
 		    	:gender => split_elements[4],
 			:pre_total => pre_total,
-			:post_total => post_total
+			:post_total => post_total,
+			:school_id => split_elements[0],
+			:year => 2010
 		  }
-	query = "insert into responses (student_id, area, language, gender, pre_performance, post_performance, pre_total, post_total) values (#{input[:student_id]}, '#{input[:area]}', '#{input[:language]}', '#{input[:gender]}', #{input[:before]}, #{input[:after]}, #{input[:pre_total]}, #{input[:post_total]});"
+	query = "insert into responses (student_id, area, language, gender, pre_performance, post_performance, pre_total, post_total, school_id, year) values (#{input[:student_id]}, '#{input[:area]}', '#{input[:language]}', '#{input[:gender]}', #{input[:before]}, #{input[:after]}, #{input[:pre_total]}, #{input[:post_total]}, #{input[:school_id]}, #{input[:year]});"
 	my.query(query)
 
 end
