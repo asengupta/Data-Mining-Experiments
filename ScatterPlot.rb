@@ -32,15 +32,15 @@ class MySketch < Processing::App
 		end
 
 #		@c = CoordinateSystem.standard({:minimum => 0.0, :maximum => 3.0}, {:minimum => 0.0, :maximum => 3.0}, self)
-		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => -60, :maximum => 60}, self)
+		@c = CoordinateSystem.standard({:minimum => 0, :maximum => 60}, {:minimum => 0, :maximum => 60}, self, {:x => 'Pre-Intervention Total', :y => 'Post-Intervention Total'})
 		@screen_transform = Transform.new({:x => 8, :y => -8}, {:x => 500, :y => @screen_height/2 + 50})
 		@screen = Screen.new(@screen_transform, self, @c)
 
 		stroke(0.1,0.5,1)
 		fill(0.1,0.5,1)
-		@screen.draw_axes(10, 10)
 		
-		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r.improvement})
+		plot_distribution(responses, ->(r) {r[:pre_total]}, ->(r) {r[:post_total]})
+		@screen.draw_axes(10, 10)
 	end
 
 	def plot_distribution(responses, x_metric, y_metric)
@@ -53,14 +53,15 @@ class MySketch < Processing::App
 			array[y][x] = 0 if array[y][x].nil?
 			array[y][x] += 1
 		end
-#		array.each_key do |r|
-#			array[r].each_key do |c|
-#				b = 500 * array[r][c]/28000.0
-#				stroke(0.5,0.5,0.07)
-#				fill(0.1,0.5,b)
-#				@screen.plot({:x => c, :y => r, :value => array[r][c]}, :track => true)
-#			end
-#		end
+		rect_mode(CENTER)
+		array.each_key do |r|
+			array[r].each_key do |c|
+				b = 500 * array[r][c]/28000.0
+				stroke(0.5,0.5,0.07)
+				fill(0.3,0.5,b)
+				@screen.plot({:x => c, :y => r, :value => array[r][c]}, :track => true) {|o,m,s| rect(m[:x], m[:y], 8, 8)}
+			end
+		end
 		
 		sigma_x = 0.0
 		sigma_y = 0.0
@@ -87,18 +88,12 @@ class MySketch < Processing::App
 
 		fill(0.1,1,1)
 		while (x <= 56)
-			@screen.plot({:x => x, :y => m*x + c})
+			@screen.plot({:x => x, :y => m*x + c}, :join => true) {|o,m,s|}
 			x += 0.1
 		end
 
-		residuals = []
-		responses.each do |r|
-			fitted = m * r[:pre_total] + c
-			residuals << {:x => fitted, :y => r.improvement - fitted}
-		end
-		
-		residuals.each {|r| @screen.plot(r)}
 #		responses.each do |r|
+#			fill(0.3,1,)
 #			@screen.plot({:x => x_metric.call(r), :y => y_metric.call(r)})
 #		end
 end
