@@ -77,7 +77,6 @@ Before any sort of sanitisation or analysis may be performed, it is important to
 We were dealing with only about 29000 records, and most of the analysis would probably be performed outside the database. Thus, we opted to use MySQL as our datastore.
 \subsubsection{Schema}
 The decisions when creating the database schema affect the ease of querying for relevant information. Apart from the attributes of interest, we wanted to store the individual binary responses as well. One way is to create one column for each response, giving us a total of 112 columns for storing these responses (56 for pre-intervention, 56 for post-intervention). The other way, and that is the one that we chose was to store this information as a 64-bit integer (bigint for MySQL). When required, we could unpack the individual response bits from this number.\\
-We elected to not create any more schema elements like reference data for area or language at this point, because we were not sure (yet) whether there was any data corruption which could lead to duplicate reference data.\\\\
 A {\tt desc responses;} command on the table reveals the schema we ended up with.
 
 {\tt
@@ -99,6 +98,28 @@ A {\tt desc responses;} command on the table reveals the schema we ended up with
 +------------------+------------+------+-----+---------+----------------+
 \end{verbatim}
 }
+
+The most important use of the reference data is to locate the schools geographically. Given that geocoding the school from its name, we used the cluster to locate schools in 2D space. We deal with geographical analysis in a later section. The schema of the master data mostly mirrors the CSV master data file format, with the addition of latitude and longitude, like so:
+
+{\tt
+\begin{verbatim}
++-------------+----------------+------+-----+---------+----------------+
+| Field       | Type           | Null | Key | Default | Extra          |
++-------------+----------------+------+-----+---------+----------------+
+| district    | char(50)       | YES  |     | NULL    |                |
+| block       | char(50)       | YES  |     | NULL    |                |
+| cluster     | char(50)       | YES  |     | NULL    |                |
+| school_id   | int(11)        | YES  |     | NULL    |                |
+| school_code | char(20)       | YES  |     | NULL    |                |
+| school_name | char(50)       | YES  |     | NULL    |                |
+| id          | int(11)        | NO   | PRI | NULL    | auto_increment |
+| latitude    | decimal(20,10) | YES  |     | NULL    |                |
+| longitude   | decimal(20,10) | YES  |     | NULL    |                |
++-------------+----------------+------+-----+---------+----------------+
+\end{verbatim}
+}
+
+To identify latitude and longitude, we used Google's Map API to geocode the cluster information. It is to be noted that there may be some clusters which weren't located by the Map API, and some more work is needed to cross-validate the coordinate information taken from the Map API.
 
 \subsection{Data migration: Identifying invalid data}
 It is natural to expect missing or corrupted data. The most crucial attribute are the score data, as any misinterpretation of that data may adversely bias the quality of our analysis. Thus, specific checks were put in place to ensure that none of the binary responses was null or some string other than 0 or 1.\\\\
