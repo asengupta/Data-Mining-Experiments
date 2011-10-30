@@ -297,7 +297,10 @@ Summary plots are so called for their ability to summarise up a data set as a se
 \end{itemize}
 
 \newpage
-\subsection{Rank Order Charts: Cluster}
+\subsection{Rank Order Charts: Geoclusters}
+One of the types of data that is pretty common is categorical nominal data. Categorical data is that which is non-numeric. Nominal data is that which does not lend itself to any intrinsic ordering. Names of places (if we ignore their coordinate system representation) are categorical data that is nominal.\\\\
+The best way to summarise categorical data, especially if it is the Independent Variable, is to order records based on an ordinal Dependent Variable. This sort of a representation is called a Rank Order chart.
+We have rank ordered the geographical clusters based on the student population in each cluster.
 \newcounter{rownum}
 \setcounter{rownum}{0}
 \begin{longtable}{|c|c|c|c|}
@@ -369,12 +372,19 @@ Index & Cluster &  Probability    &   Cumulative Distribution  \\
 \addtocounter{rownum}{1}\arabic{rownum}. & ASHRAYA NAGAR & 0.00036405999708752004 & 1.0 \\
 \hline
 \end{longtable}
+\subsubsection{Observations/Notes}
+\begin{itemize}
+\item Out of 63 clusters, the top 38 clusters account for 75\% of the population.
+\end{itemize}
 
 \newpage
-\section{Data exploration}
+\section{Data analysis/exploration}
 There are multiple ways of exploring datasets when simple visual inspection is tedious and unintuitive. Many of them are standard, but some of them may reveal more about the nature of the data. Often, they are motivated by specific business drivers and questions, and some exploration may be custom to the dataset under analysis. Data exploration is also commonly done through queries to an OLAP database.
 \newpage
 \subsection{Parallel Coordinates}
+Parallel coordinates are an interesting way to explore high-dimensional data without discarding any detail. The only downside is that the elegance of presentation is somewhat sacrificed.\\
+Essentially, instead of aligning axes in orthogonal directions (we can visualise only upto 3), the axes are stacked horizontally, giving the impression of n parallel lines. A single data point in this n-dimensional representation is a set of broken lines spanning the widths between the axes.\\\\
+The way to explore this visualisation is to highlight the samples of interest, based on some criteria. The highlighted samples can then be inspected visually to discover trends, if any. Figure~\ref{ParallelCoordinates} shows an example of exploration using parallel coordinates on the Anganwadi data.
 \begin{figure}
 \caption{Parallel Coordinates showing language, gender, school, pre- and post-intervention scores}
 \label{ParallelCoordinates}
@@ -384,6 +394,9 @@ There are multiple ways of exploring datasets when simple visual inspection is t
 \end{figure}
 \newpage
 \subsection{Covariance plot}
+The covariance plot is a first step towards looking at the correlations between responses to individual questions. Basically, the kind of question such analysis can answer is, for example, how dependent is a response to question 40 on the response to question 3? Do they change together, i.e., is there a strong dependency between answer to question X and the answer to question Y?\\\\
+Figure~\ref{CovariancePre} shows the covariance plot for the pre-intervention responses.\\
+Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention responses.\\
 \begin{figure}
 \caption{Covariance plot of pre-intervention responses}
 \label{CovariancePre}
@@ -399,6 +412,15 @@ There are multiple ways of exploring datasets when simple visual inspection is t
 \includegraphics[width=120mm]{ReportMedia/CovariancePost.jpg}\\
 \end{center}
 \end{figure}
+\subsubsection{Observations/Notes}
+\begin{itemize}
+\item The plots are color coded such that the darker the hue, higher the covariance. The plot is symmetric about the diagonal, and the diagonal is much darker because it is essentially the covariance of a single response with itself. The data has not been normalised yet, hence the diagonal hues vary.
+\item The covariance between the responses appears weakened in the post-intervention scores, indicating that the degree of dependence between the responses has decreased.
+\item There appear to be clusters of relatively high covariance, for example, between the questions in the range of (40-43), (26-31), etc. Further investigation may be needed to answer specific questions in this area.
+\item Correlation does not imply causation. Inferred links between responses may be result of a deeper phenomenon; thus a high covariance doesn't necessarily imply a direct causative link between two responses.
+
+\end{itemize}
+
 \newpage
 \subsection{Geographical distribution}
 \begin{figure}
@@ -449,15 +471,18 @@ lolol
 \end{center}
 \end{figure}
 \newpage
+
+\subsection{Effectiveness of intervention}
+
+\newpage
 \subsection{Modeling responses as Bernoulli trials}
 \newpage
 \subsubsection{The Binomial Distribution}
 \newpage
 \subsubsection{Typical questions}
-
-\section{Tests for variable independence}
+\subsection{Test for variable independence}
 \newpage
-\subsection{Chi-square test}
+\subsubsection{Chi-square test}
 \textbf{Null hypothesis: Area and Improvement are NOT related.} \\
  For \textbf{area vs. improvement}\\
  Chi-Square statistic = 56499.4692602837\\
