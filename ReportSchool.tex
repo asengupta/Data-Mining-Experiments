@@ -172,7 +172,7 @@ Boy=12646\\\\
 There is not a huge disparity between the two sexes, which indicates that any analysis/prediction based on gender may be less biased.
 
 \newpage
-\section{Shape of the data}
+\section{Shape of the Data}
 Before embarking on any deep analysis of data, it behooves us to look at the shape of the raw data. There are a few reasons why we want to do this.\\
 \begin{itemize}
 \item \textbf{Evident trends/outliers}: Visualisation of the raw data set is always a quick way to spot trends without doing too much analysis. Of course, visualisation is best suited for 1,2 and 3-dimensional data: data of higher dimensionality must usually be either sliced prior to visualisation, or have its dimensionality reduced, before projecting it onto the 2D plane.\\
@@ -378,7 +378,7 @@ Index & Cluster &  Probability    &   Cumulative Distribution  \\
 \end{itemize}
 
 \newpage
-\section{Data analysis/exploration}
+\section{Data Analysis and Exploration}
 There are multiple ways of exploring datasets when simple visual inspection is tedious and unintuitive. Many of them are standard, but some of them may reveal more about the nature of the data. Often, they are motivated by specific business drivers and questions, and some exploration may be custom to the dataset under analysis. Data exploration is also commonly done through queries to an OLAP database.
 \newpage
 \subsection{Parallel Coordinates}
@@ -431,7 +431,7 @@ Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention 
 \end{center}
 \end{figure}
 \newpage
-\section{Models of probability distribution}
+\section{Models and Statistical Tests}
 \newpage
 \subsection{Tests for conformance to distributions}
 \newpage
@@ -473,6 +473,7 @@ lolol
 \newpage
 
 \subsection{Effectiveness of intervention}
+\subsubsection{Intervention effect on indivdual responses: McNemar's Test}
 
 \newpage
 \subsection{Modeling responses as Bernoulli trials}
@@ -526,7 +527,7 @@ lolol
  \textbf{Null hypothesis rejected}\\
 
 \newpage
-\section{Prediction}
+\section{Prediction and Classification}
 \newpage
 \subsection{Decision Trees}
 \newpage
@@ -566,5 +567,7 @@ lolol
 
 \newpage
 \section{Technical notes}
-
+For base visualisation and interactivity, Processing was used through its Ruby bindings (Ruby-Processing). All plots were done using a coordinate plotting gem called Basis-Processing.\\
+Some calculations like Principal Component Analysis were done using the Statsample gem from the SciRuby project.\\
+JRuby 1.6.4 was used for all code needing visualisation; Ruby 1.9.2 was used for everything else.
 \end{document} 
