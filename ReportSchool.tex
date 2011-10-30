@@ -2,9 +2,11 @@
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \begin{document}
-\title{Initial report on analysis of the Anganwadi dataset 2010} 
+\title{Initial report on analysis of the Anganwadi 2010 dataset} 
 \author{Avishek Sen Gupta\\ThoughtWorks}
 \maketitle
+\newpage
+\tableofcontents
 \newpage
 
 \section{Abstract}
@@ -44,6 +46,7 @@ Work on the Evaluation step is still preliminary, and will probably be the subje
 
 \newpage
 \section{Data Preparation}
+\newpage
 \subsection{Nature of the source data}
 The dataset comes from the education domain. The source data is a file, with each line corresponding to a single student evaluation record. Roughly, there are 29000 records, prior to any data sanitisation. Each line is pipe(|)-delimited into multiple fields. The fields salient to this analysis are listed below:
 
@@ -68,6 +71,7 @@ The score is not a single number, it is a set of 56 responses marked as 0/1. Gen
 
 Looking at the second row, we see that the location of the Anganwadi is BADAMAKAAN I, the student is female and speaks Urdu. The first contiguous set of 0s and 1s is the pre-intervention score, and the next set is the post-intervention one.
 
+\newpage
 \subsection{Data representation}
 \subsubsection{Data store}
 Before any sort of sanitisation or analysis may be performed, it is important to ensure that the source data is stored in a format/datastore which makes querying and modifying the data relatively painless. This decision is largely driven by technological considerations, like:
@@ -79,6 +83,8 @@ Before any sort of sanitisation or analysis may be performed, it is important to
 \end{itemize}
 
 We were dealing with only about 29000 records, and most of the analysis would probably be performed outside the database. Thus, we opted to use MySQL as our datastore.
+
+\newpage
 \subsubsection{Schema}
 The decisions when creating the database schema affect the ease of querying for relevant information. Apart from the attributes of interest, we wanted to store the individual binary responses as well. One way is to create one column for each response, giving us a total of 112 columns for storing these responses (56 for pre-intervention, 56 for post-intervention). The other way, and that is the one that we chose was to store this information as a 64-bit integer (bigint for MySQL). When required, we could unpack the individual response bits from this number.\\
 A {\tt desc responses;} command on the table reveals the schema we ended up with.
@@ -125,6 +131,7 @@ The most important use of the reference data is to locate the schools geographic
 
 To identify latitude and longitude, we used Google's Map API to geocode the cluster information. It is to be noted that there may be some clusters which weren't located by the Map API, and some more work is needed to cross-validate the coordinate information taken from the Map API.
 
+\newpage
 \subsection{Data migration: Identifying invalid data}
 It is natural to expect missing or corrupted data. The most crucial attribute are the score data, as any misinterpretation of that data may adversely bias the quality of our analysis. Thus, specific checks were put in place to ensure that none of the binary responses was null or some string other than 0 or 1.\\\\
 Using this check, we found 1067 responses which violated it. All of them had either empty pre- or post-intervention scores. We did not migrate these response records, though it may be possible to do Monte Carlo simulations to predict the missing data.\\
@@ -136,6 +143,7 @@ We also found a large fraction of records which did not have a LANGUAGE attribut
 Analysis is most suscpetible to bias in the data collection stage. Sampling is one such activity. If, for a statistical study, participating individuals are not equally likely to have been selected, it may be difficult to distinguish between the actual phenomenon and this biased sampling.
 This sort of bias is called sampling bias.
 
+\newpage
 \subsection{Sampling bias}
 To find evidence for bias, we looked at a few parameters.
 Here is the breakdown of the population by language, with the biggest language bucket highlighted.\\\\
@@ -162,23 +170,24 @@ Boy=12646\\\\
 There is not a huge disparity between the two sexes, which indicates that any analysis/prediction based on gender may be less biased.
 
 \newpage
-\section{Shape of the Data}
+\section{Shape of the data}
 Before embarking on any deep analysis of data, it behooves us to look at the shape of the raw data. There are a few reasons why we want to do this.\\
 \begin{itemize}
 \item \textbf{Evident trends/outliers}: Visualisation of the raw data set is always a quick way to spot trends without doing too much analysis. Of course, visualisation is best suited for 1,2 and 3-dimensional data: data of higher dimensionality must usually be either sliced prior to visualisation, or have its dimensionality reduced, before projecting it onto the 2D plane.\\
 Having said that, there are other ways of visualising the data without sacrificing any dimensions at all, such as Parallel Coordinates, though it is more suited to data exploration.
 \item \textbf{Evidence of conformance to well-known distributions}: There exist many probability distributions, some of whose properties are well-studied and well-known, like the Normal distribution. If the data approximates one of these distributions, there are several mature statistical methods which may be applied to test different hypotheses and properties of the data.\\
-Indeed, many of the classical statistical analyses make the assumption that the underlying data is normally distributed.
+Indeed, many of the classical statistical analyses make the assumption that the underlying data is (approximately) normally distributed.
 \end{itemize}
 
 In the following sections, we shall explore the shape of the Anganwadi 2010 dataset, and record our observations on it.
 
+\newpage
 \subsection{Univariate distributions}
 The graph below shows 3 distributions: the pre-intervention scores, the post-intervention scores, and the improvements.\\
 \includegraphics[width=160mm]{ReportMedia/ShapeOfData.jpg}
-\subsubsection{Observations}
+\subsubsection{Observations/Notes}
 \begin{itemize}
-\item The pre-intervention score with the highest number of students is 56, which is the highest score possible. This implies that, even prior to intervention, a sizeable fraction of the students have score very high.
+\item The pre-intervention score with the highest number of students is 56, which is the highest score possible. This implies that, even prior to intervention, a sizeable fraction of the students have scored very high on the test.
 \item The post-intervention score also follows the same trend, albeit with a steeper curve, which implies that many students have scored better in the post-test than in the pre-test.
 \item The improvement distribution is peaked, the peak being near zero. This makes sense, because if a large fraction of students answered all 56 questions as 1 in the pre-intervention score, there really is no way for them to improve. This is assuming that their performance did not worsen in the post-test. In fact, the calculated mean is around 7.
 \item There is a significant fraction of students whose performance has worsened in the post-test. This number is 7081. Out of those, we noticed that the worsening was dramatic for a small set. We have listed down the records which had a regression of 40 or more, below.
@@ -241,39 +250,71 @@ The graph below shows 3 distributions: the pre-intervention scores, the post-int
 +------------+-----------------------+-----------+------------+----------+
 \end{verbatim}
 }
-\item The post-intervention score distribution seems to follow a power law. We shall consider modeling this attribute in the next section.
+\item The post-intervention score distribution seems to follow a power law. We shall consider modeling this attribute further on.
 \end{itemize}
-\subsection{Outlier Analysis}
+\newpage
+\subsection{Outlier analysis}
 
+\newpage
 \subsection{Bivariate distribution}
+So far, we've been looking at single variables in isolation. The next figure shows a bivariate histogram of pre- vs. post-intervention scores. The lighter a cell, the more the number of records in that 'bucket'.\\\\
 \includegraphics[width=160mm]{ReportMedia/BivariatePrePost.jpg}
+y = 0.224.x + 37.134
+\subsubsection{Observations/Notes}
+\begin{itemize}
+\item Many of the scores seem to be clustered near the top right. To further highlight this, we have draw a linear regression line as a rough indicator of a trend (To model the trend in more detail, we could use LOESS). What is somewhat puzzling is that there are not a few students whose performance has dropped after the intervention. This is evident even without doing a linear regression.
+\item The immediate outliers which are visible are the ones on the extreme left (pre~0, post~56) and at the origin (pre=0, post=0). The latter outlier(s) may be an artifact of corrupted data collection; we cannot say.
+\end{itemize}
+
+\newpage
 \subsection{Summary plots}
+Summary plots are so called for their ability to summarise up a data set as a set of numbers, which can be easily interpreted. We used Box Plots to summarise the data, broken down by language. The following figure shows that breakdown. The top row represents the box plots for the pre-intervention assessment, the bottom one for the post-intervention assessment.\\\\
 \includegraphics[width=160mm]{ReportMedia/BoxPlotPrePost.jpg}
+\subsubsection{Observations/Notes}
+\begin{itemize}
+\item Out of all the languages, we were not able to create box plots because the corresponding samples were too few in number to differentiate between the different quartiles. These languages are Bengali, MultiLng, Not Known and Oriya.
+\item There are no dramatic differences between the plots in each set. The medians, 1st and the 2nd quartiles are rather close to each other.
+\end{itemize}
+
+\newpage
+\subsection{Rank Order Charts: Cluster}
 
 \newpage
 \section{Data exploration}
-\subsection{Modeling the probability distributions}
-\includegraphics[width=160mm]{ReportMedia/ExponentialProbabilityPost.jpg}
+There are multiple ways of exploring datasets when simple visual inspection is tedious and unintuitive. Many of them are standard, but some of them may reveal more about the nature of the data. Often, they are motivated by specific business drivers and questions, and some exploration may be custom to the dataset under analysis. Data exploration is also commonly done through queries to an OLAP database.
 \newpage
-\includegraphics[width=120mm]{ReportMedia/QQPlotPostVsExponential.jpg}
 \subsection{Parallel Coordinates}
+\includegraphics[width=150mm]{ReportMedia/ParallelCoordinates.jpg}\\
+\newpage
 \subsection{Covariance plot}
 \includegraphics[width=120mm]{ReportMedia/CovariancePre.jpg}\\
 \includegraphics[width=120mm]{ReportMedia/CovariancePost.jpg}
+\newpage
 \subsection{Geographical distribution}
 \includegraphics[width=170mm]{ReportMedia/GeographicalDistributionOfPopulation.jpg}
-\subsection{Answer distribution}
-\includegraphics[width=120mm]{ReportMedia/AnswerDistribution.jpg}
 
 \newpage
-\section{Tests for Univariate Normality}
-\subsection{Evidence}
-\subsubsection{Jarque-Bera test}
-\subsubsection{Normal probability plot}
-\includegraphics[width=120mm]{ReportMedia/NormalProbabilityPlotImprovement.jpg}
-\subsection{Summary}
 \newpage
+\section{Models of probability distribution}
+\newpage
+\subsection{Tests for conformance to distributions}
+\newpage
+\subsubsection{Jarque-Bera test}
+\subsubsection{Quantile-Quantile plots}
+\includegraphics[width=120mm]{ReportMedia/NormalProbabilityPlotImprovement.jpg}
+\newpage
+\includegraphics[width=160mm]{ReportMedia/ExponentialProbabilityPost.jpg}
+\newpage
+\includegraphics[width=120mm]{ReportMedia/QQPlotPostVsExponential.jpg}
+\newpage
+\subsection{Answer distribution}
+\includegraphics[width=120mm]{ReportMedia/AnswerDistribution.jpg}
+\subsection{Modeling responses as Bernoulli trials}
+\subsubsection{The Binomial Distribution}
+\subsubsection{Typical questions}
+
 \section{Tests for variable independence}
+\newpage
 \subsection{Chi-square test}
 \textbf{Null hypothesis: Area and Improvement are NOT related.} \\
  For \textbf{area vs. improvement}\\
@@ -319,17 +360,23 @@ The graph below shows 3 distributions: the pre-intervention scores, the post-int
 
 \newpage
 \section{Prediction}
+\newpage
 \subsection{Decision Trees}
+\newpage
 \subsection{Bayes classifier}
+\newpage
 \subsection{Density estimators}
 \subsubsection{Naive Bayes density}
 \subsubsection{Kernel density estimation}
+\subsubsection{Results}
 \includegraphics[width=160mm]{ReportMedia/BayesLanguageFromImprovement.jpg}
 \newpage
 \includegraphics[width=160mm]{ReportMedia/BayesGenderFromImprovement.jpg}
-
+\newpage
+\includegraphics[width=160mm]{ReportMedia/BayesClusterFromImprovement.jpg}
 \newpage
 \section{Dimension reduction/Factor analysis}
+\newpage
 \subsection{Principal Component Analysis}
 
 \newpage

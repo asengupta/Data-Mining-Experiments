@@ -23,8 +23,9 @@ class MySketch < Processing::App
 		background(0,0,0)
 
 		responses = Response.find(:all)
+		schools = School.find(:all)
 		predictor_metric = ->(r) {r.improvement}
-		predicted_metric = ->(r) {r[:pre_total].to_s}
+		predicted_metric = ->(r) {schools[schools.index {|s| s[:school_name] == r[:area]}][:cluster] }
 		
 		bins = {}
 		priors = {}

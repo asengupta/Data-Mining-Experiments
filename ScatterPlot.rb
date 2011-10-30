@@ -87,8 +87,10 @@ class MySketch < Processing::App
 		x = 0.0
 
 		fill(0.1,1,1)
+		stroke(0.1,1,1)
+		@screen.join=true
 		while (x <= 56)
-			@screen.plot({:x => x, :y => m*x + c}, :join => true) {|o,m,s|}
+			@screen.plot({:x => x, :y => m*x + c}) {|o,m,s|}
 			x += 0.1
 		end
 
