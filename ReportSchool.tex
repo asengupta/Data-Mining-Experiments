@@ -183,8 +183,14 @@ In the following sections, we shall explore the shape of the Anganwadi 2010 data
 
 \newpage
 \subsection{Univariate distributions}
-The graph below shows 3 distributions: the pre-intervention scores, the post-intervention scores, and the improvements.\\
-\includegraphics[width=160mm]{ReportMedia/ShapeOfData.jpg}
+Figure~\ref{ShapeOfData} shows 3 distributions: the pre-intervention scores, the post-intervention scores, and the improvements.\\
+\begin{figure}
+\caption{Probability distributions of pre-, post-intervention, and improvement}
+\label{ShapeOfData}
+\begin{center}
+	\includegraphics[width=160mm]{ReportMedia/ShapeOfData.jpg}
+\end{center}
+\end{figure}
 \subsubsection{Observations/Notes}
 \begin{itemize}
 \item The pre-intervention score with the highest number of students is 56, which is the highest score possible. This implies that, even prior to intervention, a sizeable fraction of the students have scored very high on the test.
@@ -257,8 +263,14 @@ The graph below shows 3 distributions: the pre-intervention scores, the post-int
 
 \newpage
 \subsection{Bivariate distribution}
-So far, we've been looking at single variables in isolation. The next figure shows a bivariate histogram of pre- vs. post-intervention scores. The lighter a cell, the more the number of records in that 'bucket'.\\\\
+So far, we've been looking at single variables in isolation. Figure~\ref{BivariatePrePost} shows a bivariate histogram of pre- vs. post-intervention scores. The lighter a cell, the more the number of records in that 'bucket'.\\\\
+\begin{figure}
+\caption{Bivariate probability distribution of pre- vs. post-intervention scores}
+\label{BivariatePrePost}
+\begin{center}
 \includegraphics[width=160mm]{ReportMedia/BivariatePrePost.jpg}
+\end{center}
+\end{figure}
 y = 0.224.x + 37.134
 \subsubsection{Observations/Notes}
 \begin{itemize}
@@ -268,8 +280,14 @@ y = 0.224.x + 37.134
 
 \newpage
 \subsection{Summary plots}
-Summary plots are so called for their ability to summarise up a data set as a set of numbers, which can be easily interpreted. We used Box Plots to summarise the data, broken down by language. The following figure shows that breakdown. The top row represents the box plots for the pre-intervention assessment, the bottom one for the post-intervention assessment.\\\\
+Summary plots are so called for their ability to summarise up a data set as a set of numbers, which can be easily interpreted. We used Box Plots to summarise the data, broken down by language. Figure~\ref{BoxPlotPrePost} shows that breakdown. The top row represents the box plots for the pre-intervention assessment, the bottom one for the post-intervention assessment.\\\\
+\begin{figure}
+\caption{Box plots of pre- and post-intervention scores, broken down by language}
+\label{BoxPlotPrePost}
+\begin{center}
 \includegraphics[width=160mm]{ReportMedia/BoxPlotPrePost.jpg}
+\end{center}
+\end{figure}
 \subsubsection{Observations/Notes}
 \begin{itemize}
 \item Out of all the languages, we were not able to create box plots because the corresponding samples were too few in number to differentiate between the different quartiles. These languages are Bengali, MultiLng, Not Known and Oriya.
@@ -284,16 +302,39 @@ Summary plots are so called for their ability to summarise up a data set as a se
 There are multiple ways of exploring datasets when simple visual inspection is tedious and unintuitive. Many of them are standard, but some of them may reveal more about the nature of the data. Often, they are motivated by specific business drivers and questions, and some exploration may be custom to the dataset under analysis. Data exploration is also commonly done through queries to an OLAP database.
 \newpage
 \subsection{Parallel Coordinates}
+\begin{figure}
+\caption{Parallel Coordinates showing language, gender, school, pre- and post-intervention scores}
+\label{ParallelCoordinates}
+\begin{center}
 \includegraphics[width=150mm]{ReportMedia/ParallelCoordinates.jpg}\\
+\end{center}
+\end{figure}
 \newpage
 \subsection{Covariance plot}
+\begin{figure}
+\caption{Covariance plot of pre-intervention responses}
+\label{CovariancePre}
+\begin{center}
 \includegraphics[width=120mm]{ReportMedia/CovariancePre.jpg}\\
-\includegraphics[width=120mm]{ReportMedia/CovariancePost.jpg}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\caption{Covariance plot of post-intervention responses}
+\label{CovariancePost}
+\begin{center}
+\includegraphics[width=120mm]{ReportMedia/CovariancePost.jpg}\\
+\end{center}
+\end{figure}
 \newpage
 \subsection{Geographical distribution}
-\includegraphics[width=170mm]{ReportMedia/GeographicalDistributionOfPopulation.jpg}
-
-\newpage
+\begin{figure}
+\caption{Geocoded populations by cluster}
+\label{GeographicalDistributionOfPopulation}
+\begin{center}
+\includegraphics[width=170mm]{ReportMedia/GeographicalDistributionOfPopulation.jpg}\\
+\end{center}
+\end{figure}
 \newpage
 \section{Models of probability distribution}
 \newpage
@@ -301,14 +342,38 @@ There are multiple ways of exploring datasets when simple visual inspection is t
 \newpage
 \subsubsection{Jarque-Bera test}
 \subsubsection{Quantile-Quantile plots}
-\includegraphics[width=120mm]{ReportMedia/NormalProbabilityPlotImprovement.jpg}
+\begin{figure}
+\caption{Quantile-Quantile plot of score improvement vs. theoretical Gaussian}
+\label{NormalProbabilityPlotImprovement}
+\begin{center}
+\includegraphics[width=120mm]{ReportMedia/NormalProbabilityPlotImprovement.jpg}\\
+\end{center}
+\end{figure}
 \newpage
-\includegraphics[width=160mm]{ReportMedia/ExponentialProbabilityPost.jpg}
+\begin{figure}
+\caption{Curve-fitted theoretical exponential for reflected post-intervention probability distribution}
+\label{ExponentialProbabilityPost}
+\begin{center}
+\includegraphics[width=160mm]{ReportMedia/ExponentialProbabilityPost.jpg}\\
+\end{center}
+\end{figure}
 \newpage
-\includegraphics[width=120mm]{ReportMedia/QQPlotPostVsExponential.jpg}
+\begin{figure}
+\caption{Quantile-Quantile plot of post-intervention score (reflected) vs. theoretical exponential}
+\label{QQPlotPostVsExponential}
+\begin{center}
+\includegraphics[width=120mm]{ReportMedia/QQPlotPostVsExponential.jpg}\\
+\end{center}
+\end{figure}
 \newpage
 \subsection{Answer distribution}
-\includegraphics[width=120mm]{ReportMedia/AnswerDistribution.jpg}
+\begin{figure}
+\caption{Answer distribution vs. question number}
+\label{AnswerDistribution}
+\begin{center}
+\includegraphics[width=120mm]{ReportMedia/AnswerDistribution.jpg}\\
+\end{center}
+\end{figure}
 \subsection{Modeling responses as Bernoulli trials}
 \subsubsection{The Binomial Distribution}
 \subsubsection{Typical questions}
@@ -369,11 +434,29 @@ There are multiple ways of exploring datasets when simple visual inspection is t
 \subsubsection{Naive Bayes density}
 \subsubsection{Kernel density estimation}
 \subsubsection{Results}
-\includegraphics[width=160mm]{ReportMedia/BayesLanguageFromImprovement.jpg}
+\begin{figure}
+\caption{Probability distributions of pre-, post-intervention, and improvement}
+\label{BayesLanguageFromImprovement}
+\begin{center}
+\includegraphics[width=160mm]{ReportMedia/BayesLanguageFromImprovement.jpg}\\
+\end{center}
+\end{figure}
 \newpage
-\includegraphics[width=160mm]{ReportMedia/BayesGenderFromImprovement.jpg}
+\begin{figure}
+\caption{Probability distributions of pre-, post-intervention, and improvement}
+\label{BayesGenderFromImprovement}
+\begin{center}
+\includegraphics[width=160mm]{ReportMedia/BayesGenderFromImprovement.jpg}\\
+\end{center}
+\end{figure}
 \newpage
-\includegraphics[width=160mm]{ReportMedia/BayesClusterFromImprovement.jpg}
+\begin{figure}
+\caption{Probability distributions of pre-, post-intervention, and improvement}
+\label{BayesClusterFromImprovement}
+\begin{center}
+\includegraphics[width=160mm]{ReportMedia/BayesClusterFromImprovement.jpg}\\
+\end{center}
+\end{figure}
 \newpage
 \section{Dimension reduction/Factor analysis}
 \newpage
