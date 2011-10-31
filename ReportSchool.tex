@@ -511,12 +511,18 @@ The theoretical distribution's quantile plot comes out as a straight line. If th
 \end{figure}
 \subsubsection{Observations/Notes}
 \begin{itemize}
-\item Fat tails
-\item Thin narrow peak (high kurtosis)
-\item Fair amount of skew (Non-zero excess skew)
+\item The dataset shows a systematic deviation from the Gaussian quantile.
+\item Conformance to the theoretical distribution is never exactly possible, so the "fat pencil test" is used. Essentially, if the blunt end of a pencil covers both the theoretical and the actual dataset, we can say that the data approximates the model somewhat. In this case, the fat pencil test fails too.
 \end{itemize}
 
-\newpage
+We present another example of curve fitting to derive a probability distribution model, this time, with more success. We attempted to fit the exponential distribution to the post-intervention data. The exponential distribution is given as:
+\[f(x,\lambda)=\left\{\begin{matrix}
+ & {\lambda}e^{-{\lambda}x} &if x \geq 0\\ 
+ & 0 &if x < 0\\
+\end{matrix}\right.\]
+Because improvement can be negative is well, we applied the following transform to the data:
+\[I'(x)=I(x) + 57\]
+As Figure~\ref{ExponentialProbabilityPost} shows, the distribution is a reasonable fit to the data.
 \begin{figure}
 \caption{Curve-fitted theoretical exponential for reflected post-intervention probability distribution}
 \label{ExponentialProbabilityPost}
@@ -524,7 +530,7 @@ The theoretical distribution's quantile plot comes out as a straight line. If th
 \includegraphics[width=160mm]{ReportMedia/ExponentialProbabilityPost.jpg}\\
 \end{center}
 \end{figure}
-\newpage
+Further validation comes from the Q-Q plot of the dataset and the theoretical exponential in Figure~\ref{QQPlotPostVsExponential}. Note how closely the dataset tracks the theoretical quantile, except near the top right, which is where the 'kink' in the data set lies.
 \begin{figure}
 \caption{Quantile-Quantile plot of post-intervention score (reflected) vs. theoretical exponential}
 \label{QQPlotPostVsExponential}
