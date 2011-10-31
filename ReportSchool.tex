@@ -2,6 +2,8 @@
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage{longtable}
+\usepackage{mathtools}
+\usepackage{fixltx2e}
 \begin{document}
 \title{Initial report on analysis of the Anganwadi 2010 dataset} 
 \author{Avishek Sen Gupta\\ThoughtWorks}
@@ -432,12 +434,74 @@ Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention 
 \end{figure}
 \newpage
 \section{Models and Statistical Tests}
+Models are simplified descriptions of the real-world phenomena, based on simplifying assumptions. Their primary use is to explain variations in observed data, and hopefully make useful predictions about data yet unseen.\\
+Statistical tests, on the other hand, are designed to test certain hypotheses which might be inferred from the data set. These hypotheses may be proved or disproved by these tests, based on the notion of 'statistically significance'.\\ 
+This section summarises the models and tests we've applied to the Anganwadi dataset.
 \newpage
 \subsection{Tests for conformance to distributions}
 \newpage
-Many of the tests and analyses in frequentist statistics
+Many of the tests in statistics work under the assumption that the underlying dataset (with or without transformation) is normally distributed, i.e., it follows a Gaussian probability distribution, namely:\\
+\[f(x) = a e^ {\frac{(x-b)^2}{2c^2}}\]
+This verification is important because it dictates, to a great extent, the validity of any tests we run. If the data turns out to be not normal, we will probably want to use nonparametric methods, which do not make assumptions about the shape of the distribution.
 \subsubsection{Jarque-Bera test}
+The Jarque-Bera test measures the conformance of a dataset to a Gaussian distribution using its skewness and kurtosis. For reference, the Jarque-Bera statistic is given by:\\
+
+\[{JB}=\frac{n}{6} \left( S^2 + \frac14 (K-3)^2 \right)\]
+where S (skew) and K (kurtosis) are defined as:
+
+\[S = \frac{ \hat{\mu}_3 }{ \hat{\sigma}^3 } 
+        = \frac{\frac1n \sum_{i=1}^n (x_i-\bar{x})^3} {\left(\frac1n \sum_{i=1}^n (x_i-\bar{x})^2 \right)^{3/2}}\]
+\[
+K = \frac{ \hat{\mu}_4 }{ \hat{\sigma}^4 }  
+        = \frac{\frac1n \sum_{i=1}^n (x_i-\bar{x})^4} {\left(\frac1n \sum_{i=1}^n (x_i-\bar{x})^2 \right)^2}
+\]
+The null hypothesis that this statistic tests is that the skewness and excess kurtosis are both zero, which is the defining characteristic of a Gaussian distribution. The data below summarises the JB statistics for the pre-, post-intervention scores and the score improvements. Please note that the statistics from the data before the removal of the invalid data. This does not affect the results overmuch, however.\\\\
+\textbf{Pre-intervention Score}\\
+n = 28535
+Skewness = -1.0001504234198\\
+Kurtosis = -1.99959305171352\\
+JB statistic = 34476.3843030411\\
+\textbf{Conclusion : Pre-intervention scores are not normally distributed.}\\\\
+\textbf{Post-intervention Score}\\
+n = 28535\\
+Skewness = -1.00010106352368\\
+Kurtosis = -1.9997273050813\\
+JB statistic = 34477.5108572449\\
+\textbf{Conclusion : Post-intervention scores are not normally distributed.}\\\\
+\textbf{Score Improvement}\\
+n = 28535\\
+Skewness = -4.24685767755943\\
+Kurtosis = 37.1765663807246\\
+JB statistic = 1474523.40413686\\
+\textbf{Conclusion : Score improvements are not normally distributed.}\\\\
+The initial probability distributions provided very clear evidence that the pre- and post-intervention scores were not normal: this is merely validation. However, the test also shows that the improvement is not normally distributed either.\\
+If we notice the improvement distribution in Figure~\ref{ShapeOfData}, we notice a few things:
+\begin{itemize}
+\item Fat tails
+\item Thin narrow peak (high kurtosis)
+\item Fair amount of skew (Non-zero excess skew)
+\end{itemize}
+
+We did attempt to assess the visual fit of a Gaussian distribution, but this was not very successful. Figures 
+
+\begin{figure}
+\caption{Improvement data overlaid with theoretical Gaussian (${\sigma}^2$=245.47, $\bar{x}$= 7.22)}
+\label{ShapeOfImprovementWrtNormal}
+\begin{center}
+\includegraphics[width=120mm]{ReportMedia/ShapeOfImprovementWrtNormal.jpg}\\
+\end{center}
+\end{figure}
+
+\begin{figure}
+\caption{Translated log of data overlaid with theoretical Cauchy (scale=0.14, $\bar{x}$= 4.13)}
+\label{ShapeOfTranslatedLogOffImprovementWrtCauchy}
+\begin{center}
+\includegraphics[width=120mm]{ReportMedia/ShapeOfTranslatedLogOffImprovementWrtCauchy.jpg}\\
+\end{center}
+\end{figure}
 \subsubsection{Quantile-Quantile plots}
+There is a visually more intuitive way of measuring the goodness of fit of a dataset to any theoretical probability distribution. That method is called a Quantile-Quantile plot. They are points marked off at regular intervals on the cumulative distribution function of a random variable. The Q-Q plot is so named for the two quantile plots that are reflected in a single plot: one for the theoretical distribution, and one for the dataset.\\
+The theoretical distribution's quantile plot comes out as a straight line. If the dataset follows the distribution closely, it will also follow this line, more or less. Significant deviations indicate violation of fit. Figure~\ref{NormalProbabilityPlotImprovement} shows the Q-Q plot of score improvement and the Gaussian.
 \begin{figure}
 \caption{Quantile-Quantile plot of score improvement vs. theoretical Gaussian}
 \label{NormalProbabilityPlotImprovement}
@@ -445,6 +509,13 @@ Many of the tests and analyses in frequentist statistics
 \includegraphics[width=120mm]{ReportMedia/NormalProbabilityPlotImprovement.jpg}\\
 \end{center}
 \end{figure}
+\subsubsection{Observations/Notes}
+\begin{itemize}
+\item Fat tails
+\item Thin narrow peak (high kurtosis)
+\item Fair amount of skew (Non-zero excess skew)
+\end{itemize}
+
 \newpage
 \begin{figure}
 \caption{Curve-fitted theoretical exponential for reflected post-intervention probability distribution}
