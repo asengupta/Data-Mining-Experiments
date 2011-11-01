@@ -535,14 +535,18 @@ Further validation comes from the Q-Q plot of the dataset and the theoretical ex
 \includegraphics[width=120mm]{ReportMedia/QQPlotPostVsExponential.jpg}\\
 \end{center}
 \end{figure}
-\subsubsection{Observations/Notes}
 
 \subsection{The Central Limit Theorem}
+Fortunately, we need not discard classical statistical techniques because the underlying distribution is not normally distributed. This is because even though the data itself is non-normal, it's means are very probably normally distributed, regardless of the original distribution of the data.\\
+This statement is known as the Central Limit Theorem, which states that:\\\\
+\textbf{The distribution of the sum of a large number of independent, identically distributed variables will be approximately normal, regardless of the underlying distribution.}\\
+To illustrate the point, we show the histograms of the means of the pre-intervention scores, post-intervention scores, and the improvements, in Figures \ref{CentralLimitTheoremPreTotal}, \ref{CentralLimitTheoremPostTotal}, and \ref{CentralLimitTheoremImprovement}, respectively.\\
+The Jarque-Bera statistics for these three cases is well below the threshold. The shape validates that, too.
 \begin{figure}
 \caption{Central Limit Theorem illustration on the pre-intervention score}
 \label{CentralLimitTheoremPreTotal}
 \begin{center}
-\includegraphics[width=120mm]{ReportMedia/CentralLimitTheoremPreTotal.jpg}\\
+\includegraphics[width=90mm]{ReportMedia/CentralLimitTheoremPreTotal.jpg}\\
 \end{center}
 \end{figure}
 
@@ -550,7 +554,7 @@ Further validation comes from the Q-Q plot of the dataset and the theoretical ex
 \caption{Central Limit Theorem illustration on the post-intervention score}
 \label{CentralLimitTheoremPostTotal}
 \begin{center}
-\includegraphics[width=120mm]{ReportMedia/CentralLimitTheoremPostTotal.jpg}\\
+\includegraphics[width=90mm]{ReportMedia/CentralLimitTheoremPostTotal.jpg}\\
 \end{center}
 \end{figure}
 
@@ -558,12 +562,19 @@ Further validation comes from the Q-Q plot of the dataset and the theoretical ex
 \caption{Central Limit Theorem illustration on the improvement metric}
 \label{CentralLimitTheoremImprovement}
 \begin{center}
-\includegraphics[width=120mm]{ReportMedia/CentralLimitTheoremImprovement.jpg}\\
+\includegraphics[width=90mm]{ReportMedia/CentralLimitTheoremImprovement.jpg}\\
 \end{center}
 \end{figure}
 
+Why is the Central Limit Theorem important? It is because, even though statistical tests might not be appropriate for the raw, non-normal, data itself, they certainly can be applied to the sampling distribution of the means of the data. We can still proceed with these tests, at the expense of losing the richness of data, and boiling it down to a single metric, namely, the mean.\\
+This report does not cover any further tests on these sampling distributions.
 \newpage
 \subsection{Answer distribution}
+The answer distribution is a visual map of the pattern of answering in different groups segregated by the pre-intervention score.\\
+Each row in the map corresponds to the population of students in a single performance bracket. Thus, the topmost row corresponds to the group of students who score 56 in the pre-intervention, for example.\\
+Within each row, each cell (left to right) represents the answer to the corresponding question. Thus, the (10,5) represents the response to question number 5 in the bracket of students who scored 10 prior to intervention.\\
+The brightness of the hue in a cell represents the fraction of students in that corresponding bracket who answered 1 to that specific question.\\
+Therefore, starting from the bottom of the map, we get a sense of which questions only began to be answered in the affirmative in the higher brackets. This gives us a sense of the 'difficulty' of each question.
 \begin{figure}
 \caption{Answer distribution vs. question number}
 \label{AnswerDistribution}
@@ -571,6 +582,11 @@ Further validation comes from the Q-Q plot of the dataset and the theoretical ex
 \includegraphics[width=120mm]{ReportMedia/AnswerDistribution.jpg}\\
 \end{center}
 \end{figure}
+\subsubsection{Observations/Notes}
+\begin{itemize}
+\item The 'difficulty' metric of questions tends to clump together in bands in the left two-thirds of the map. Answering patterns from around question number 37 and above alternate much more uniformly.
+\end{itemize}
+
 \newpage
 
 \subsection{Effectiveness of intervention}
