@@ -437,9 +437,7 @@ Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention 
 Models are simplified descriptions of the real-world phenomena, based on simplifying assumptions. Their primary use is to explain variations in observed data, and hopefully make useful predictions about data yet unseen.\\
 Statistical tests, on the other hand, are designed to test certain hypotheses which might be inferred from the data set. These hypotheses may be proved or disproved by these tests, based on the notion of 'statistically significance'.\\ 
 This section summarises the models and tests we've applied to the Anganwadi dataset.
-\newpage
 \subsection{Tests for conformance to distributions}
-\newpage
 Many of the tests in statistics work under the assumption that the underlying dataset (with or without transformation) is normally distributed, i.e., it follows a Gaussian probability distribution, namely:\\
 \[f(x) = a e^ {\frac{(x-b)^2}{2c^2}}\]
 This verification is important because it dictates, to a great extent, the validity of any tests we run. If the data turns out to be not normal, we will probably want to use nonparametric methods, which do not make assumptions about the shape of the distribution.
@@ -482,8 +480,7 @@ If we notice the improvement distribution in Figure~\ref{ShapeOfData}, we notice
 \item Fair amount of skew (Non-zero excess skew)
 \end{itemize}
 
-We did attempt to assess the visual fit of a Gaussian distribution, but this was not very successful. Figures 
-
+We did attempt to assess the visual fit of a Gaussian distribution, but this was not very successful. Figures \ref{ShapeOfImprovementWrtNormal} and \ref{ShapeOfTranslatedLogOffImprovementWrtCauchy} show some of our attempts at fitting different theoretical distributions. The Cauchy distribution was a closer fit after a translation and a transform, but there are still outliers.
 \begin{figure}
 \caption{Improvement data overlaid with theoretical Gaussian (${\sigma}^2$=245.47, $\bar{x}$= 7.22)}
 \label{ShapeOfImprovementWrtNormal}
@@ -538,9 +535,10 @@ Further validation comes from the Q-Q plot of the dataset and the theoretical ex
 \includegraphics[width=120mm]{ReportMedia/QQPlotPostVsExponential.jpg}\\
 \end{center}
 \end{figure}
+\subsubsection{Observations/Notes}
+
 \newpage
 \subsection{Answer distribution}
-lolol
 \begin{figure}
 \caption{Answer distribution vs. question number}
 \label{AnswerDistribution}
@@ -552,9 +550,21 @@ lolol
 
 \subsection{Effectiveness of intervention}
 \subsubsection{Intervention effect on indivdual responses: McNemar's Test}
+McNemar's test for matched pairs is used to measure statistical difference between two tests on matched pairs of data. Examples of matched pairs of data are:
+\begin{itemize}
+\item Test scores of siblings
+\item Test scores before and after intervention of the same student.
+\end{itemize}
+The second point is aligned with the situation that we are dealing with. The two, disjoint, tests essentially are:
+\begin{itemize}
+\item Candidate answered 1 to the question.
+\item Candidate answered 0 to the question.
+\end{itemize}
+Using this, we will be able to deduce whether the intervention had any significant effect on the response to a particular question across the entire population of students. This has the side-effect of allowing us to analyse this data in a fine-grained fashion.
 
 \newpage
 \subsection{Modeling responses as Bernoulli trials}
+Modeling trials
 \newpage
 \subsubsection{The Binomial Distribution}
 \newpage
