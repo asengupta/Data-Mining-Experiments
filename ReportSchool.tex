@@ -50,7 +50,6 @@ Work on the Evaluation step is still preliminary, and will probably be the subje
 
 \newpage
 \section{Data Preparation}
-\newpage
 \subsection{Nature of the source data}
 The dataset comes from the education domain. The source data is a file, with each line corresponding to a single student evaluation record. Roughly, there are 29000 records, prior to any data sanitisation. Each line is pipe(|)-delimited into multiple fields. The fields salient to this analysis are listed below:
 
@@ -88,7 +87,6 @@ Before any sort of sanitisation or analysis may be performed, it is important to
 
 We were dealing with only about 29000 records, and most of the analysis would probably be performed outside the database. Thus, we opted to use MySQL as our datastore.
 
-\newpage
 \subsubsection{Schema}
 The decisions when creating the database schema affect the ease of querying for relevant information. Apart from the attributes of interest, we wanted to store the individual binary responses as well. One way is to create one column for each response, giving us a total of 112 columns for storing these responses (56 for pre-intervention, 56 for post-intervention). The other way, and that is the one that we chose was to store this information as a 64-bit integer (bigint for MySQL). When required, we could unpack the individual response bits from this number.\\
 A {\tt desc responses;} command on the table reveals the schema we ended up with.
@@ -135,7 +133,6 @@ The most important use of the reference data is to locate the schools geographic
 
 To identify latitude and longitude, we used Google's Map API to geocode the cluster information. It is to be noted that there may be some clusters which weren't located by the Map API, and some more work is needed to cross-validate the coordinate information taken from the Map API.
 
-\newpage
 \subsection{Data migration: Identifying invalid data}
 It is natural to expect missing or corrupted data. The most crucial attribute are the score data, as any misinterpretation of that data may adversely bias the quality of our analysis. Thus, specific checks were put in place to ensure that none of the binary responses was null or some string other than 0 or 1.\\\\
 Using this check, we found 1067 responses which violated it. All of them had either empty pre- or post-intervention scores. We did not migrate these response records, though it may be possible to do Monte Carlo simulations to predict the missing data.\\
@@ -185,7 +182,6 @@ Indeed, many of the classical statistical analyses make the assumption that the 
 
 In the following sections, we shall explore the shape of the Anganwadi 2010 dataset, and record our observations on it.
 
-\newpage
 \subsection{Univariate distributions}
 Figure~\ref{ShapeOfData} shows 3 distributions: the pre-intervention scores, the post-intervention scores, and the improvements.\\
 \begin{figure}
@@ -262,27 +258,23 @@ Figure~\ref{ShapeOfData} shows 3 distributions: the pre-intervention scores, the
 }
 \item The post-intervention score distribution seems to follow a power law. We shall consider modeling this attribute further on.
 \end{itemize}
-\newpage
 \subsection{Outlier analysis}
 
-\newpage
 \subsection{Bivariate distribution}
 So far, we've been looking at single variables in isolation. Figure~\ref{BivariatePrePost} shows a bivariate histogram of pre- vs. post-intervention scores. The lighter a cell, the more the number of records in that 'bucket'.\\\\
 \begin{figure}
-\caption{Bivariate probability distribution of pre- vs. post-intervention scores}
+\caption{Bivariate probability distribution of pre- vs. post-intervention scores, with linear regression line $y = 0.224.x + 37.134$}
 \label{BivariatePrePost}
 \begin{center}
 \includegraphics[width=160mm]{ReportMedia/BivariatePrePost.jpg}
 \end{center}
 \end{figure}
-y = 0.224.x + 37.134
 \subsubsection{Observations/Notes}
 \begin{itemize}
 \item Many of the scores seem to be clustered near the top right. To further highlight this, we have draw a linear regression line as a rough indicator of a trend (To model the trend in more detail, we could use LOESS). What is somewhat puzzling is that there are not a few students whose performance has dropped after the intervention. This is evident even without doing a linear regression.
 \item The immediate outliers which are visible are the ones on the extreme left (pre~0, post~56) and at the origin (pre=0, post=0). The latter outlier(s) may be an artifact of corrupted data collection; we cannot say.
 \end{itemize}
 
-\newpage
 \subsection{Summary plots}
 Summary plots are so called for their ability to summarise up a data set as a set of numbers, which can be easily interpreted. We used Box Plots to summarise the data, broken down by language. Figure~\ref{BoxPlotPrePost} shows that breakdown. The top row represents the box plots for the pre-intervention assessment, the bottom one for the post-intervention assessment.\\\\
 \begin{figure}
@@ -298,7 +290,6 @@ Summary plots are so called for their ability to summarise up a data set as a se
 \item There are no dramatic differences between the plots in each set. The medians, 1st and the 2nd quartiles are rather close to each other.
 \end{itemize}
 
-\newpage
 \subsection{Rank Order Charts: Geoclusters}
 One of the types of data that is pretty common is categorical nominal data. Categorical data is that which is non-numeric. Nominal data is that which does not lend itself to any intrinsic ordering. Names of places (if we ignore their coordinate system representation) are categorical data that is nominal.\\\\
 The best way to summarise categorical data, especially if it is the Independent Variable, is to order records based on an ordinal Dependent Variable. This sort of a representation is called a Rank Order chart.
@@ -382,7 +373,6 @@ Index & Cluster &  Probability    &   Cumulative Distribution  \\
 \newpage
 \section{Data Analysis and Exploration}
 There are multiple ways of exploring datasets when simple visual inspection is tedious and unintuitive. Many of them are standard, but some of them may reveal more about the nature of the data. Often, they are motivated by specific business drivers and questions, and some exploration may be custom to the dataset under analysis. Data exploration is also commonly done through queries to an OLAP database.
-\newpage
 \subsection{Parallel Coordinates}
 Parallel coordinates are an interesting way to explore high-dimensional data without discarding any detail. The only downside is that the elegance of presentation is somewhat sacrificed.\\
 Essentially, instead of aligning axes in orthogonal directions (we can visualise only upto 3), the axes are stacked horizontally, giving the impression of n parallel lines. A single data point in this n-dimensional representation is a set of broken lines spanning the widths between the axes.\\\\
@@ -394,7 +384,6 @@ The way to explore this visualisation is to highlight the samples of interest, b
 \includegraphics[width=150mm]{ReportMedia/ParallelCoordinates.jpg}\\
 \end{center}
 \end{figure}
-\newpage
 \subsection{Covariance plot}
 The covariance plot is a first step towards looking at the correlations between responses to individual questions. Basically, the kind of question such analysis can answer is, for example, how dependent is a response to question 40 on the response to question 3? Do they change together, i.e., is there a strong dependency between answer to question X and the answer to question Y?\\\\
 Figure~\ref{CovariancePre} shows the covariance plot for the pre-intervention responses.\\
@@ -423,7 +412,6 @@ Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention 
 
 \end{itemize}
 
-\newpage
 \subsection{Geographical distribution}
 \begin{figure}
 \caption{Geocoded populations by cluster}
@@ -432,7 +420,6 @@ Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention 
 \includegraphics[width=170mm]{ReportMedia/GeographicalDistributionOfPopulation.jpg}\\
 \end{center}
 \end{figure}
-\newpage
 \section{Models and Statistical Tests}
 Models are simplified descriptions of the real-world phenomena, based on simplifying assumptions. Their primary use is to explain variations in observed data, and hopefully make useful predictions about data yet unseen.\\
 Statistical tests, on the other hand, are designed to test certain hypotheses which might be inferred from the data set. These hypotheses may be proved or disproved by these tests, based on the notion of 'statistically significance'.\\ 
@@ -537,9 +524,9 @@ Further validation comes from the Q-Q plot of the dataset and the theoretical ex
 \end{figure}
 
 \subsection{The Central Limit Theorem}
-Fortunately, we need not discard classical statistical techniques because the underlying distribution is not normally distributed. This is because even though the data itself is non-normal, it's means are very probably normally distributed, regardless of the original distribution of the data.\\
+Fortunately, we need not discard classical statistical techniques because the underlying distribution is not normally distributed. This is because even though the data itself is non-normal, its means are very probably normally distributed, regardless of the original distribution of the data.\\
 This statement is known as the Central Limit Theorem, which states that:\\\\
-\textbf{The distribution of the sum of a large number of independent, identically distributed variables will be approximately normal, regardless of the underlying distribution.}\\
+\textbf{The distribution of the sum of a large number of independent, identically distributed variables will be approximately normal, regardless of the underlying distribution.}\\\\
 To illustrate the point, we show the histograms of the means of the pre-intervention scores, post-intervention scores, and the improvements, in Figures \ref{CentralLimitTheoremPreTotal}, \ref{CentralLimitTheoremPostTotal}, and \ref{CentralLimitTheoremImprovement}, respectively.\\
 The Jarque-Bera statistics for these three cases is well below the threshold. The shape validates that, too.
 \begin{figure}
@@ -565,10 +552,8 @@ The Jarque-Bera statistics for these three cases is well below the threshold. Th
 \includegraphics[width=90mm]{ReportMedia/CentralLimitTheoremImprovement.jpg}\\
 \end{center}
 \end{figure}
-
 Why is the Central Limit Theorem important? It is because, even though statistical tests might not be appropriate for the raw, non-normal, data itself, they certainly can be applied to the sampling distribution of the means of the data. We can still proceed with these tests, at the expense of losing the richness of data, and boiling it down to a single metric, namely, the mean.\\
 This report does not cover any further tests on these sampling distributions.
-\newpage
 \subsection{Answer distribution}
 The answer distribution is a visual map of the pattern of answering in different groups segregated by the pre-intervention score.\\
 Each row in the map corresponds to the population of students in a single performance bracket. Thus, the topmost row corresponds to the group of students who score 56 in the pre-intervention, for example.\\
@@ -587,8 +572,6 @@ Therefore, starting from the bottom of the map, we get a sense of which question
 \item The 'difficulty' metric of questions tends to clump together in bands in the left two-thirds of the map. Answering patterns from around question number 37 and above alternate much more uniformly.
 \end{itemize}
 
-\newpage
-
 \subsection{Effectiveness of intervention}
 \subsubsection{Intervention effect on indivdual responses: McNemar's Test}
 McNemar's test for matched pairs is used to measure statistical difference between two tests on matched pairs of data. Examples of matched pairs of data are:
@@ -603,15 +586,14 @@ The second point is aligned with the situation that we are dealing with. The two
 \end{itemize}
 Using this, we will be able to deduce whether the intervention had any significant effect on the response to a particular question across the entire population of students. This has the side-effect of allowing us to analyse this data in a fine-grained fashion.
 
-\newpage
 \subsection{Modeling responses as Bernoulli trials}
+There are $n$ students. All of them have answered either 0 or 1, to, say, question 3. We may restate this phenomenon and say that there were $n$ Bernoulli trials performed on question 3, each outcome being either true or false. The probability of the outcome is, say, $p$. The definition of 'true' and 'false' in this case is arbitrary, and does not need to specifically correspond to the perceived value of the answer.\\
+Under these conditions, the phenomenon can be modelled as a Binomial Distribution. Formally, the binomial distribution is the discrete probability distribution of the number of successes in a sequence of $n$ independent yes/no experiments, each of which yields success with probability $p$.
+The probability $p$ will be specific to each question, and can be estimated from the dataset.
 
-\newpage
 \subsubsection{The Binomial Distribution}
-\newpage
 \subsubsection{Typical questions}
 \subsection{Test for variable independence}
-\newpage
 \subsubsection{Chi-square test}
 \textbf{Null hypothesis: Area and Improvement are NOT related.} \\
  For \textbf{area vs. improvement}\\
@@ -657,11 +639,8 @@ Using this, we will be able to deduce whether the intervention had any significa
 
 \newpage
 \section{Prediction and Classification}
-\newpage
 \subsection{Decision Trees}
-\newpage
 \subsection{Bayes classifier}
-\newpage
 \subsection{Density estimators}
 \subsubsection{Naive Bayes density}
 \subsubsection{Kernel density estimation}
@@ -673,7 +652,6 @@ Using this, we will be able to deduce whether the intervention had any significa
 \includegraphics[width=160mm]{ReportMedia/BayesLanguageFromImprovement.jpg}\\
 \end{center}
 \end{figure}
-\newpage
 \begin{figure}
 \caption{Bayes posterior distribution of gender from score improvement}
 \label{BayesGenderFromImprovement}
@@ -681,7 +659,6 @@ Using this, we will be able to deduce whether the intervention had any significa
 \includegraphics[width=160mm]{ReportMedia/BayesGenderFromImprovement.jpg}\\
 \end{center}
 \end{figure}
-\newpage
 \begin{figure}
 \caption{Bayes posterior distribution of geocluster from score improvement}
 \label{BayesClusterFromImprovement}
@@ -691,7 +668,6 @@ Using this, we will be able to deduce whether the intervention had any significa
 \end{figure}
 \newpage
 \section{Dimension reduction/Factor analysis}
-\newpage
 \subsection{Principal Component Analysis}
 
 \newpage
