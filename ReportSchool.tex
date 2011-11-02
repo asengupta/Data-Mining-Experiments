@@ -590,9 +590,80 @@ Using this, we will be able to deduce whether the intervention had any significa
 There are $n$ students. All of them have answered either 0 or 1, to, say, question 3. We may restate this phenomenon and say that there were $n$ Bernoulli trials performed on question 3, each outcome being either true or false. The probability of the outcome is, say, $p$. The definition of 'true' and 'false' in this case is arbitrary, and does not need to specifically correspond to the perceived value of the answer.\\
 Under these conditions, the phenomenon can be modelled as a Binomial Distribution. Formally, the binomial distribution is the discrete probability distribution of the number of successes in a sequence of $n$ independent yes/no experiments, each of which yields success with probability $p$.
 The probability $p$ will be specific to each question, and can be estimated from the dataset.
-
+Here is an example of the type of question that this modeling will be able to answer:\\\\
+\textbf{If I choose 6000 students randomly from the population, what is the probability that at least 100 of them have answered 1 to question 45?
+}
 \subsubsection{The Binomial Distribution}
-\subsubsection{Typical questions}
+The binomial distribution for a random variable $S$ (in our case, the response to a particular question), for which $n$ experiments have been conducted is a discrete probability distribution given by:
+\[P(S=k) =^{n}C_{r}.p^{k}.(1-p)^{n-k}\]
+where:
+\[^{n}C_{r} = {n!\over{k!(n-k)!}}\]
+Table~\ref{BernoulliProbabilitiesPrePost} summarises the probabilities for the pre- and post-intervention answers.
+\begin{longtable}{|c|c|c|c|}
+	\hline
+Index & $P_{pre}(Answer=1)$ &  $P_{post}(Answer=1)$\\
+	\hline
+1 & 0.9462283384301733 & 0.982233872142129 \\
+2 & 0.5107397699140819 & 0.6418377748652978 \\
+3 & 0.8927479248580166 & 0.963885248288918 \\
+4 & 0.8855759429153924 & 0.9571137323430902 \\
+5 & 0.7667831658657347 & 0.8963157128294743 \\
+6 & 0.8795689529634484 & 0.9554754623561963 \\
+7 & 0.8994466288044269 & 0.9667613222659094 \\
+8 & 0.8741444590068443 & 0.9521625163826999 \\
+9 & 0.7712246978302024 & 0.8880515508955876 \\
+10 & 0.623452745012378 & 0.7670380078636959 \\
+11 & 0.7710426678316586 & 0.9049803407601573 \\
+12 & 0.8090505315275958 & 0.9207077326343381 \\
+13 & 0.8611839231105286 & 0.9410950924712392 \\
+14 & 0.7652905198776758 & 0.8864132809086938 \\
+15 & 0.5783457113732343 & 0.744575506043396 \\
+16 & 0.4260594145915247 & 0.5671326634629387 \\
+17 & 0.5827144313382846 & 0.7254259501965924 \\
+18 & 0.7672564438619485 & 0.8914009028687928 \\
+19 & 0.662807630697539 & 0.7944881316440949 \\
+20 & 0.7896097276831222 & 0.9197611766419106 \\
+21 & 0.59188874326489 & 0.747051114023591 \\
+22 & 0.4380369884957041 & 0.59247123926023 \\
+23 & 0.8520824231833406 & 0.9350516965195864 \\
+24 & 0.8316950633464395 & 0.9384010484927916 \\
+25 & 0.8089413135284695 & 0.9293723605650211 \\
+26 & 0.7880442696956459 & 0.9172491626620067 \\
+27 & 0.6848332605213339 & 0.8484782292121742 \\
+28 & 0.4887869520897044 & 0.6438401048492791 \\
+29 & 0.6410004368719965 & 0.8189529634483763 \\
+30 & 0.6163899810688801 & 0.7939420416484637 \\
+31 & 0.49344692005242463 & 0.6865807485073541 \\
+32 & 0.5105941459152469 & 0.7051114023591087 \\
+33 & 0.5081913499344692 & 0.7071865443425076 \\
+34 & 0.8340978593272171 & 0.9393840104849279 \\
+35 & 0.780690257754478 & 0.9070190767438474 \\
+36 & 0.7031454783748362 & 0.850116499199068 \\
+37 & 0.8453109072375128 & 0.9269695645842435 \\
+38 & 0.5957477792340178 & 0.7741735838066113 \\
+39 & 0.44033056647735547 & 0.6132226590942187 \\
+40 & 0.5306538517547692 & 0.7051842143585263 \\
+41 & 0.7143221202854231 & 0.8831731469346148 \\
+42 & 0.5657856414737149 & 0.7348551041211592 \\
+43 & 0.6976481724188146 & 0.8690476190476191 \\
+44 & 0.550203873598369 & 0.7196009902431921 \\
+45 & 0.673074122615407 & 0.8979903888160768 \\
+46 & 0.5836609873307121 & 0.7459953400320373 \\
+47 & 0.7170889762632882 & 0.8698485510412116 \\
+48 & 0.6857798165137615 & 0.8449104412407165 \\
+49 & 0.6198485510412116 & 0.8022062035823504 \\
+50 & 0.6704528906363769 & 0.8373379933012961 \\
+51 & 0.6138779670889762 & 0.8026066695791466 \\
+52 & 0.5696446774428425 & 0.7395878840832969 \\
+53 & 0.4630479102956167 & 0.6245449250036406 \\
+54 & 0.6854885685160914 & 0.8392675112858599 \\
+55 & 0.5814038153487695 & 0.7639070918887433 \\
+56 & 0.29219455366244357 & 0.3939493228484054 \\
+\hline
+\caption{Known probabilities of pre- and post-intervention scores}
+\label{BernoulliProbabilitiesPrePost}
+\end{longtable}
+
 \subsection{Test for variable independence}
 \subsubsection{Chi-square test}
 \textbf{Null hypothesis: Area and Improvement are NOT related.} \\
