@@ -1,6 +1,24 @@
 require 'set'
-
+require 'rubygems'
+require 'active_record'
 include Math
+
+ActiveRecord::Base.establish_connection(
+  :adapter => "mysql2",
+  :host => "localhost",
+  :database => "data_mining",
+  :username => "root",
+  :password => ""
+)
+
+class Response < ActiveRecord::Base
+	def improvement
+		self[:post_total] - self[:pre_total]
+	end
+end
+
+responses = Response.find(:all)
+
 
 def improvement_category(r)
 	return "BETTER_THAN_NOTHING" if r[:before] == 0 && r[:after] > r[:before]
@@ -47,22 +65,17 @@ def information_gain(attribute_to_predict, given_attribute, records, attribute_r
 	h_y - h_y_x
 end
 
-handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', 'r')
+#handle = File.open('/home/avishek/BitwiseOperations/Ang2010TestsModified.csv', 'r')
 inputs = []
-dimension_keys = [:language, :gender, :pre_performance]
+dimension_keys = [:language, :gender, :pre_performance, :area]
 dimensions = {:language => Set.new, :gender => Set.new, :area => Set.new, :pre_performance => Set.new, :improvement => Set.new}
 languages = Set.new
 
-samples = 28535
+samples = 500
 i = 1
-handle.each_line do |line|
-	break if i > samples
-	split_elements = line.split('|')
-	pre_score = 0
-	post_score = 0
-	split_elements[8..63].each {|e| pre_score+= e.to_i}
-	split_elements[65..120].each {|e| post_score+= e.to_i}
-	record = {:language => split_elements[5], :gender => split_elements[4], :before => pre_score, :after => post_score, :id => split_elements[0], :area => split_elements[1]}
+responses.each do |r|
+#	break if i > samples
+	record = {:language => r[:language], :gender => r[:gender], :before => r[:pre_total], :after => r[:post_total], :id => r[:school_id], :area => r[:area]}
 	record[:improvement] = improvement_category(record)
 	record[:pre_performance] = performance(record[:before])
 	dimensions[:language].add(record[:language])
