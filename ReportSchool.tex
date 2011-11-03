@@ -258,7 +258,6 @@ Figure~\ref{ShapeOfData} shows 3 distributions: the pre-intervention scores, the
 }
 \item The post-intervention score distribution seems to follow a power law. We shall consider modeling this attribute further on.
 \end{itemize}
-\subsection{Outlier analysis}
 
 \subsection{Bivariate distribution}
 So far, we've been looking at single variables in isolation. Figure~\ref{BivariatePrePost} shows a bivariate histogram of pre- vs. post-intervention scores. The lighter a cell, the more the number of records in that 'bucket'.\\\\
@@ -586,6 +585,8 @@ The second point is aligned with the situation that we are dealing with. The two
 \end{itemize}
 Using this, we will be able to deduce whether the intervention had any significant effect on the response to a particular question across the entire population of students. This has the side-effect of allowing us to analyse this data in a fine-grained fashion.
 
+[TODO: Get calculation results]
+
 \subsection{Modeling responses as Bernoulli trials}
 There are $n$ students. All of them have answered either 0 or 1, to, say, question 3. We may restate this phenomenon and say that there were $n$ Bernoulli trials performed on question 3, each outcome being either true or false. The probability of the outcome is, say, $p$. The definition of 'true' and 'false' in this case is arbitrary, and does not need to specifically correspond to the perceived value of the answer.\\
 Under these conditions, the phenomenon can be modelled as a Binomial Distribution. Formally, the binomial distribution is the discrete probability distribution of the number of successes in a sequence of $n$ independent yes/no experiments, each of which yields success with probability $p$.
@@ -715,7 +716,7 @@ Hypothesis testing is one of the practices in classical statistics, where a prop
 Decision trees are tree-like graphs used to model the possible outcomes reached by taking a certain path through the tree. This path represents a set of decisions or a specific set of predictor attributes. In the domain of classification/prediction, the graph is constructed by splitting the entire dataset recursively based on the predictor attributes.\\
 The order of this recursive splitting is determined by the information gain of an attribute. Intuitively, information gain is the increase in the amount of information gotten when the value of a certain attribute is made known, from the state when this value is not known, i.e., how well a particular attribute is capable of distinguishing between data points. Information gain is also known as Kullback-Leibler divergence.\\
 The decision tree for the dataset, using the predictor attributes of area, language, and pre-intervention score, and the predicted attribute as the score improvement.\\
-Table~\ref{DecisionTreeFragment} shows a fragment of the decision tree generated for this dataset.
+The prediction is on the attribute of score improvement, and the categorical distinction for improvement has been made to make it easier to interpret the improvement. Table~\ref{DecisionTreeFragment} shows a fragment of the decision tree generated for this dataset.
 
 \begin{tabbing}
 \label{DecisionTreeFragment}
@@ -748,10 +749,17 @@ Table~\ref{DecisionTreeFragment} shows a fragment of the decision tree generated
 \end{tabbing}
 
 \subsection{Bayes classifier}
+The Bayes Theorem is widely used for making statements about the possibility of a particular outcome. In this interpretation, there is no one correct outcome, only probabilities of multiple outcomes. One of the frequently used tools used in Bayesian data analysis is the Bayes classifier.\\
+The Bayes classifier uses a density estimator to make predictions about a particular outcome, given some information. There are many density estimators which can be plugged into the Bayesian classifier, to do this. This accounts for the popularity of the Bayesian classifier. Density estimators may be based on very simple assumptions, like the naive Bayes density estimator, or may assume particular distribution of the data, like the Gaussian density estimator.\\
 \subsection{Density estimators}
-\subsubsection{Naive Bayes density}
-\subsubsection{Kernel density estimation}
+A density estimator is a model of the probability distribution of a random variable. This may be discretely built up (naive density estimator, joint density estimator), or it may be modelled smoothly (kernel density estimator). In our analysis, we have chosen the kernel density estimator as our estimator. In all these scenarios, we have dealt with the bivariate case, but this can be extended to higher dimensions. Kernel density estimation is costlier in higher dimensions, thus a different estimator may be needed depending upon the number of dimensions under analysis.
 \subsubsection{Results}
+Figure~\ref{BayesLanguageFromImprovement} plots the posterior probabilities of language, predicted from the improvement in score. The kind of question that this plot can answer is:\\
+\textbf{Given that a student improved by 30 as a result of intervention, what is the probability that the student speaks Marathi?}
+We also note the overwhelming probability that the student speaks Kannada, no matter what the improvement is. This is a direct result of the sampling bias we noted earlier.
+Figure~\ref{BayesGenderFromImprovement} show the posterior graphs of gender predicted from improvement.\\
+Figure~\ref{BayesClusterFromImprovement} show the posterior graphs of geographical cluster predicted from improvement.\\
+
 \begin{figure}
 \caption{Bayes posterior distribution of language from score improvement}
 \label{BayesLanguageFromImprovement}
@@ -773,10 +781,6 @@ Table~\ref{DecisionTreeFragment} shows a fragment of the decision tree generated
 \includegraphics[width=160mm]{ReportMedia/BayesClusterFromImprovement.jpg}\\
 \end{center}
 \end{figure}
-\newpage
-\section{Dimension reduction/Factor analysis}
-\subsection{Principal Component Analysis}
-
 \newpage
 \section{Technical notes}
 For base visualisation and interactivity, Processing was used through its Ruby bindings (Ruby-Processing). All plots were done using a coordinate plotting gem called Basis-Processing.\\
