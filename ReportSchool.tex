@@ -712,6 +712,41 @@ Hypothesis testing is one of the practices in classical statistics, where a prop
 \newpage
 \section{Prediction and Classification}
 \subsection{Decision Trees}
+Decision trees are tree-like graphs used to model the possible outcomes reached by taking a certain path through the tree. This path represents a set of decisions or a specific set of predictor attributes. In the domain of classification/prediction, the graph is constructed by splitting the entire dataset recursively based on the predictor attributes.\\
+The order of this recursive splitting is determined by the information gain of an attribute. Intuitively, information gain is the increase in the amount of information gotten when the value of a certain attribute is made known, from the state when this value is not known, i.e., how well a particular attribute is capable of distinguishing between data points. Information gain is also known as Kullback-Leibler divergence.\\
+The decision tree for the dataset, using the predictor attributes of area, language, and pre-intervention score, and the predicted attribute as the score improvement.\\
+Table~\ref{DecisionTreeFragment} shows a fragment of the decision tree generated for this dataset.
+
+\begin{tabbing}
+\label{DecisionTreeFragment}
+ \= ~~~~~~ \= ~~~~~~ \= ~~~~~ \= \\
+\> area - YALLAMMANADODDI Prediction = NO \\
+\> area - BADAMAKAAN I  \\
+\> \> pre-performance - EXCELLENT Prediction = DECLINE \\
+\> \> pre-performance - GOOD  \\
+\> \> \> gender - Girl Prediction = DECLINE \\
+\> \> \> gender - Boy  \\
+\> \> \> \> language - URDU Prediction = NO \\
+\> \> pre-performance - AVERAGE Prediction = NO \\
+\> area - BINGIPURA HODU  \\
+\> \> gender - Girl  \\
+\> \> \> language - KANNADA  \\
+\> \> \> \> pre-performance - GOOD Prediction = SLIGHT \\
+\> \> gender - Boy  \\
+\> \> \> language - KANNADA  \\
+\> \> \> \> pre-performance - GOOD Prediction = SLIGHT \\
+\> \> \> language - TAMIL Prediction = SLIGHT \\
+\> area - ADUGODI Prediction = DECLINE \\
+\> area - MUTTAGADAHALLI  \\
+\> \> pre-performance - EXCELLENT  \\
+\> \> \> gender - Girl  \\
+\> \> \> \> language - KANNADA Prediction = DECLINE \\
+\> \> \> gender - Boy Prediction = DECLINE \\
+\> \> pre-performance - AVERAGE Prediction = GOOD \\
+\> \> pre-performance - REASONABLE Prediction = GOOD \\
+. . .
+\end{tabbing}
+
 \subsection{Bayes classifier}
 \subsection{Density estimators}
 \subsubsection{Naive Bayes density}

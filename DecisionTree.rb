@@ -105,7 +105,7 @@ class DecisionNode
 
 	def describe(level)
 		return if @prediction == "FAILURE"
-		puts "\t"*level + "#{@attribute} - #{@range_bin} #{("Prediction = " + @prediction) if @is_leaf}"
+		puts "\\> "*level + "#{@attribute} - #{@range_bin} #{("Prediction = " + @prediction) if @is_leaf} \\"
 		@nodes.each {|n| n.describe(level + 1)}
 	end
 end
