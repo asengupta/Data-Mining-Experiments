@@ -3,4 +3,8 @@ artifacts
 csv
 para
 som
+*.aux
+*.dvi
+*.log
+*.swp
 
