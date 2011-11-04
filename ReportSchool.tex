@@ -829,7 +829,7 @@ The prediction is on the attribute of score improvement, and the categorical dis
 \> \> pre-performance - REASONABLE Prediction = GOOD \\
 . . .
 \end{tabbing}
-
+One of the drawbacks of decision trees is that information gain is biased towards attributes with the higher number of levels. This could be one reason, area is chosen as the first attribute to split upon. Random forests may be used to mitigate this issue.
 \subsection{Bayes classifier}
 The Bayes Theorem is widely used for making statements about the possibility of a particular outcome. In this interpretation, there is no one correct outcome, only probabilities of multiple outcomes. One of the frequently used tools used in Bayesian data analysis is the Bayes classifier.\\
 The Bayes classifier uses a density estimator to make predictions about a particular outcome, given some information. There are many density estimators which can be plugged into the Bayesian classifier, to do this. This accounts for the popularity of the Bayesian classifier. Density estimators may be based on very simple assumptions, like the naive Bayes density estimator, or may assume particular distribution of the data, like the Gaussian density estimator.\\
@@ -863,6 +863,9 @@ Figure~\ref{BayesClusterFromImprovement} show the posterior graphs of geographic
 \includegraphics[width=160mm]{ReportMedia/BayesClusterFromImprovement.jpg}\\
 \end{center}
 \end{figure}
+\newpage
+\section{Collected Observations}
+Blah blah
 \newpage
 \section{Technical notes}
 For base visualisation and interactivity, Processing was used through its Ruby bindings (Ruby-Processing). All plots were done using a coordinate plotting gem called Basis-Processing.\\
