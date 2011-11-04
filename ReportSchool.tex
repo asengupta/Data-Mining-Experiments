@@ -5,24 +5,29 @@
 \usepackage{mathtools}
 \usepackage{fixltx2e}
 \usepackage{fancyhdr}
-\pagestyle{fancy}
+\fancyhead{}
 \renewcommand{\footrulewidth}{0.4pt}
-\fancyfoot[CO,CE]{\tiny{The information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to ThoughtWorks.}}
+\renewcommand{\headrulewidth}{0pt}
 \begin{document}
+\fancyfoot{}
+\fancyfoot[LO,LE]{The information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to ThoughtWorks.}
 \title{\textbf{Initial report on analysis of the Anganwadi 2010 dataset}} 
 \author{Avishek Sen Gupta\\ThoughtWorks\\}
 \maketitle
-~\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-\begin{flushleft}The information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to ThoughtWorks.
-\end{flushleft}\newpage
+\thispagestyle{fancy}
+
+\newpage
+\fancyfoot{}
+\pagestyle{fancy}
+\fancyfoot[CO,CE]{\thepage}
+
 \tableofcontents
 \listoffigures
 \listoftables
 \newpage
-
 \section{Abstract}
 This report summarises the results of exploration of the Anganwadi dataset provided by the Akshara Foundation. The analysis aims to characterise the structure of the data, and reveal trends (which would otherwise be obscured by the format of the source data) which may inform strategy through subsequent prediction and/or classification procedures.\\\\
-This report encompasses a range of statistical procedures, given the exploratory nature of the engagement. It is hoped that the results and explorations contained herein will spur further questions and discussion.\\
+This report encompasses a range of statistical procedures, given the exploratory nature of the engagement. It is hoped that the results and explorations contained herein will spur further questions and discussion.\\\\
 Information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to us.
 
 \newpage
@@ -740,47 +745,49 @@ Index & $P_{pre}(Answer=1)$ &  $P_{post}(Answer=1)$\\
 \end{longtable}
 
 \subsection{Test for variable independence}
-Hypothesis testing is one of the practices in classical statistics, where a proposition, or a null hypothesis is either rejected or not. Failure to reject a null hypothesis does not necessarily imply its acceptance. One of the questions we asked is whether any of the variables in the school dataset were independent of each other. To frame this in terms of a hypothesis test, we used the Chi-Square test.
+Hypothesis testing is one of the practices in classical statistics, where a proposition, or a null hypothesis is either rejected or not. Failure to reject a null hypothesis does not necessarily imply its acceptance.\\\\
+One of the questions we asked is whether any of the variables in the school dataset were independent of each other. To frame this in terms of a hypothesis test, we used the Chi-Square test, which tests the null hypothesis that two random variables are distributed normally (and are thus uncorrelated to each other).
 \subsubsection{Chi-square test}
+The null hypotheses are listed below, and the chi-square statistic for each hypothesis is calculated, with appropriate conclusion.\\\\
 \textbf{Null hypothesis: Area and Improvement are NOT related.} \\
  For \textbf{area vs. improvement}\\
  Chi-Square statistic = 56499.4692602837\\
- X2 = 9652.9739\\
+ ${\chi}^2$ = 9652.9739\\
  Degrees of freedom = 9426\\
- \textbf{Null hypothesis rejected}\\c
+ \textbf{Null hypothesis rejected}\\
 \\
 \textbf{Null hypothesis: Area and Pre-Score are NOT related.}\\
  For \textbf{area vs. pre-score}\\
  Chi-Square statistic = 58665.7089390644\\
- X2 = 8062.2959\\
+ ${\chi}^2$ = 8062.2959\\
  Degrees of freedom = 7855\\
  \textbf{Null hypothesis rejected}\\
 \\
 \textbf{Null hypothesis: Area and Post-Score are NOT related.}\\
  For \textbf{area vs. post-score}\\
  Chi-Square statistic = 38567.0016158761\\
- X2 = 8062.2959\\
+ ${\chi}^2$ = 8062.2959\\
  Degrees of freedom = 7855\\
  \textbf{Null hypothesis rejected}\\
 \\
 \textbf{Null hypothesis: Language and Post-Score are NOT related.}\\
  For \textbf{language vs. post-score}\\
  Chi-Square statistic = 280.234448946825\\
- X2 = 96.2166\\
+ ${\chi}^2$ = 96.2166\\
  Degrees of freedom = 75\\
  \textbf{Null hypothesis rejected}\\
 \\
 \textbf{Null hypothesis: Language and Improvement are NOT related.}\\
  For \textbf{language vs. improvement}\\
  Chi-Square statistic = 232.464548410971\\
- X2 = 113.1452\\
+ ${\chi}^2$ = 113.1452\\
  Degrees of freedom = 90\\
  \textbf{Null hypothesis rejected}\\
 \\
 \textbf{Null hypothesis: Language and Pre-Score are NOT related.}\\
  For \textbf{language vs. pre-score}\\
  Chi-Square statistic = 277.85501653079\\
- X2 = 96.2166\\
+ ${\chi}^2$ = 96.2166\\
  Degrees of freedom = 75\\
  \textbf{Null hypothesis rejected}\\
 
