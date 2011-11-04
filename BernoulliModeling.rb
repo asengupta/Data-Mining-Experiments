@@ -1,19 +1,6 @@
 require 'rubygems'
 require 'active_record'
 
-#a = NArray[	[1,2,3,4,1],
-#		[2,2,3,4,2],
-#		[3,3,3,3,5],
-#		[4,4,3,4,4],
-#		[1,2,5,4,5]
-#	   ]
-
-#m1 = NMatrix.ref(a)
-#m2 = NMatrix.ref(a)
-#product = m1*m2
-#puts product.inspect
-#exit
-
 ActiveRecord::Base.establish_connection(
   :adapter => "mysql2",
   :host => "localhost",

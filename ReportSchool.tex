@@ -4,17 +4,26 @@
 \usepackage{longtable}
 \usepackage{mathtools}
 \usepackage{fixltx2e}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[CO,CE]{\tiny{The information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to us.}}
 \begin{document}
-\title{Initial report on analysis of the Anganwadi 2010 dataset} 
-\author{Avishek Sen Gupta\\ThoughtWorks}
+\title{\textbf{Initial report on analysis of the Anganwadi 2010 dataset}} 
+\author{Avishek Sen Gupta\\ThoughtWorks\\}
 \maketitle
-\newpage
+~\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\begin{flushleft}The information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to us.
+\end{flushleft}\newpage
 \tableofcontents
 \listoffigures
+\listoftables
 \newpage
 
 \section{Abstract}
-This report summarises the results of exploration of the Anganwadi dataset provided by the Akshara Foundation. The analysis aims to characterise the structure of the data, and reveal trends (which would otherwise be obscured by the format of the source data) which may inform strategy through subsequent prediction and/or classification procedures.
+This report summarises the results of exploration of the Anganwadi dataset provided by the Akshara Foundation. The analysis aims to characterise the structure of the data, and reveal trends (which would otherwise be obscured by the format of the source data) which may inform strategy through subsequent prediction and/or classification procedures.\\\\
+This report encompasses a range of statistical procedures, given the exploratory nature of the engagement. It is hoped that the results and explorations contained herein will spur further questions and discussion.\\
+Information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to us.
 
 \newpage
 \section{Methodology}
@@ -143,8 +152,6 @@ We also found a large fraction of records which did not have a LANGUAGE attribut
 \section{Bias}
 Analysis is most suscpetible to bias in the data collection stage. Sampling is one such activity. If, for a statistical study, participating individuals are not equally likely to have been selected, it may be difficult to distinguish between the actual phenomenon and this biased sampling.
 This sort of bias is called sampling bias.
-
-\newpage
 \subsection{Sampling bias}
 To find evidence for bias, we looked at a few parameters.
 Here is the breakdown of the population by language, with the biggest language bucket highlighted.\\\\
@@ -583,10 +590,77 @@ The second point is aligned with the situation that we are dealing with. The two
 \item Candidate answered 1 to the question.
 \item Candidate answered 0 to the question.
 \end{itemize}
-Using this, we will be able to deduce whether the intervention had any significant effect on the response to a particular question across the entire population of students. This has the side-effect of allowing us to analyse this data in a fine-grained fashion.
+Using this, we will be able to deduce whether the intervention had any significant effect on the response to a particular question across the entire population of students. This has the side-effect of allowing us to analyse this data in a fine-grained fashion.\\\\
+Table~\ref{McNemarsQuestions} summarises the chi-square values for the answers to questions 1-56.
 
-[TODO: Get calculation results]
+\begin{longtable}
+{|c|c|c|c|}
+	\hline
+Question & ${\chi}^2$\\
+	\hline
+1 & 539.5539757040309 \\
+2 & 1184.214876221796 \\
+3 & 1102.9370664739884 \\
+4 & 1022.8625099390406 \\
+5 & 1779.500316366704 \\
+6 & 1071.0229849642592 \\
+7 & 1034.4996215561612 \\
+8 & 1105.8314261623705 \\
+9 & 1453.4056543837357 \\
+10 & 1560.424668874172 \\
+11 & 1951.1697548666186 \\
+12 & 1546.8699210396446 \\
+13 & 1049.4291239921552 \\
+14 & 1530.3004079657032 \\
+15 & 1936.795228582048 \\
+16 & 1266.707471943296 \\
+17 & 1459.7567702394526 \\
+18 & 1620.8435931399888 \\
+19 & 1365.3901503288444 \\
+20 & 1978.177775197399 \\
+21 & 1669.1527803308823 \\
+22 & 1527.4513712005435 \\
+23 & 1038.5201540308062 \\
+24 & 1613.950432249577 \\
+25 & 1872.57039541253 \\
+26 & 1990.1773747431641 \\
+27 & 2263.872044155553 \\
+28 & 1617.8804755107503 \\
+29 & 2443.0002301084064 \\
+30 & 2330.7117759482503 \\
+31 & 2365.1105530806085 \\
+32 & 2403.9675103175273 \\
+33 & 2503.9136839899415 \\
+34 & 1606.604967332821 \\
+35 & 1829.9529112192156 \\
+36 & 1896.999912679008 \\
+37 & 939.0861344537815 \\
+38 & 2279.5349074513524 \\
+39 & 1912.9763510647324 \\
+40 & 2063.365862966954 \\
+41 & 2602.420891819942 \\
+42 & 1997.2297378658764 \\
+43 & 2571.4268101647713 \\
+44 & 1963.3339002267574 \\
+45 & 4302.31186583991 \\
+46 & 1882.942336838117 \\
+47 & 2112.097462203024 \\
+48 & 2111.804339414041 \\
+49 & 2466.3329318651067 \\
+50 & 2245.9346001710496 \\
+51 & 2626.4586754643205 \\
+52 & 2033.3728066081762 \\
+53 & 1648.2624204088472 \\
+54 & 2006.5188132733408 \\
+55 & 2356.7354141262545 \\
+56 & 758.8407589155573 \\
+	\hline
+\caption{Chi-square values for questions 1-56}
+\label{McNemarsQuestions}
+\end{longtable}
 
+If the intervention was not effective for a particular question, then the chi-square number for that question in Table~\ref{McNemarsQuestions} will be less than 3.8414, according to a p-value of 0.05 from the Chi-square distribution.\\\\
+We note that none of the questions have a McNemar's statistic less than this threshold, thus, we may conclude that the intervention made a statistical significance to the answers to these questions.
 \subsection{Modeling responses as Bernoulli trials}
 There are $n$ students. All of them have answered either 0 or 1, to, say, question 3. We may restate this phenomenon and say that there were $n$ Bernoulli trials performed on question 3, each outcome being either true or false. The probability of the outcome is, say, $p$. The definition of 'true' and 'false' in this case is arbitrary, and does not need to specifically correspond to the perceived value of the answer.\\
 Under these conditions, the phenomenon can be modelled as a Binomial Distribution. Formally, the binomial distribution is the discrete probability distribution of the number of successes in a sequence of $n$ independent yes/no experiments, each of which yields success with probability $p$.
