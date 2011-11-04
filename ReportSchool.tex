@@ -88,7 +88,6 @@ The score is not a single number, it is a set of 56 responses marked as 0/1. Gen
 
 Looking at the second row, we see that the location of the Anganwadi is BADAMAKAAN I, the student is female and speaks Urdu. The first contiguous set of 0s and 1s is the pre-intervention score, and the next set is the post-intervention one.
 
-\newpage
 \subsection{Data representation}
 \subsubsection{Data store}
 Before any sort of sanitisation or analysis may be performed, it is important to ensure that the source data is stored in a format/datastore which makes querying and modifying the data relatively painless. This decision is largely driven by technological considerations, like:
@@ -424,6 +423,8 @@ Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention 
 \end{itemize}
 
 \subsection{Geographical distribution}
+To identify latitude and longitude, we used Google's Map API to geocode the cluster information. It is to be noted that there may be some clusters which weren't located by the Map API, and some more work is needed to cross-validate the coordinate information taken from the Map API.\\\\
+In Figure~\ref{GeographicalDistributionOfPopulation}, the schools are plotted according to their latitude and longitude; the brightness represents the number of students in each school relative to others. Once the coordinate information is cross-validated, we will be able to answer questions specific to correlations between geographical and other attributes. More visualisations will also be possible.
 \begin{figure}
 \caption{Geocoded populations by cluster}
 \label{GeographicalDistributionOfPopulation}
@@ -432,7 +433,7 @@ Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention 
 \end{center}
 \end{figure}
 \section{Models and Statistical Tests}
-Models are simplified descriptions of the real-world phenomena, based on simplifying assumptions. Their primary use is to explain variations in observed data, and hopefully make useful predictions about data yet unseen.\\
+Models are simplified descriptions of the real-world phenomena, based on simplifying assumptions. Their primary use is to explain variations in observed data, and hopefully make useful predictions about data yet unseen.\\\\
 Statistical tests, on the other hand, are designed to test certain hypotheses which might be inferred from the data set. These hypotheses may be proved or disproved by these tests, based on the notion of 'statistically significance'.\\ 
 This section summarises the models and tests we've applied to the Anganwadi dataset.
 \subsection{Tests for conformance to distributions}
