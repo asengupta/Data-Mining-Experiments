@@ -42,11 +42,12 @@ This report is broken up into several sections, each section discussing related 
 \item There is \textbf{a significant fraction of students whose performance has worsened} in the post-test. This number is 7081. Out of those, we noticed that the worsening was dramatic for a small set. Section~\ref{sec:ObservationsShapeOfData} provides more details on this observation.
 \item \textbf{Out of all the languages, some had populations too low} in number to differentiate between the different quartiles. These languages are Bengali, MultiLng, Not Known and Oriya. Section~\ref{sec:SummaryPlots} discusses how this was discovered while creating the Box Plot.
 \item Out of 63 geographical clusters, the \textbf{top 38 clusters account for 75\% of the population}. The rank order chart in Table~\ref{tab:RankOrderChartGeoCluster} provides the exact data.
-\item There appear to be \textbf{clusters of relatively high covariance}, for example,between the questions in the range of (40-43), (26-31), etc. Further investigation may be needed to answer specifc questions in this area. The plot is described in Section~\ref{sec:CovariancePlots}.
+\item There appear to be \textbf{clusters of answers which seem to be correlated}, for example, between the questions in the range of (40-43), (26-31), etc. Further investigation may be needed to answer specifc queries in this area. The plot is described in Section~\ref{sec:CovariancePlots}.
 \item The \textbf{pre-intervention, post-intervention scores and the improvements are not normally distributed}. However, their means are, implying that \textbf{they obey the Central Limit Theorem}. We may be able to deduce useful statistics for their means, if not for the distributions themselves. Section~\ref{ref:CentralLimitTheorem} illustrates this phenomenon.
 \item \textbf{The 'diffculty' metric of questions} tends to clump together in bands in the left two-thirds of the answer distribution map. Answering patterns from around question number 37 and above alternate much more uniformly. This metric, and the corresponding map, are discussed in Section~\ref{sec:AnswerDistribution}.
 \item The \textbf{intervention has been effective on the overall population}, as shown by McNemar's test for matched pairs. However, \textbf{for specific questions, they are ineffective for specific geoclusters}. Section~\ref{sec:InterventionEffectiveness} provides more information on this statistic.
-\item \textbf{Decision trees and Bayesian classifiers} may be used to predict some attribute given specific data. These relationships are derived based on concepts of information gain and Bayesian probability. \textbf{These relationships are non-parametric}, and thus cannot be summarised succinctly. Some examples are shown in the report, in Sections~\ref{sec:DecisionTrees} and \ref{sec:BayesClassifiers}.
+\item Treating the responses to each question across the entire population as Bernoulli trials, will allow us to answer questions like: \textbf{If I choose 6000 students randomly from the population, what is the probability that at least 100 of them have answered 1 to question 45?}. Section~\ref{sec:ResponsesAsBernoulliTrials} explains this modeling.
+\item \textbf{Decision trees and Bayesian classifiers} may be used to predict some attribute given specific data. These relationships are derived based on concepts of information gain and Bayesian probability. \textbf{These relationships are non-parametric}, and thus cannot be summarised succinctly. Some examples are shown in the report, in Sections~\ref{sec:DecisionTrees} and \ref{sec:BayesClassifiers}. These sorts of models allow us to answer questions like: \textbf{Given that a student improved by 30 as a result of intervention, what is the probability that the student speaks Marathi?} Note that Decision trees give more deterministic answers to such queries.
 \end{itemize}
 \newpage
 \section{Methodology}
@@ -708,12 +709,12 @@ However, we decided to break down the responses by their geoclusters, and ran th
 It is important to note that this approximation to the chi-square distribution does not hold true for $b+c<25$. In such cases, a separate approach is needed. In our tests, we simply excluded such cases, which were around 400 in number. These need to be dealt with separately.
 
 \subsection{Modeling responses as Bernoulli trials}
+\label{sec:ResponsesAsBernoulliTrials}
 There are $n$ students. All of them have answered either 0 or 1, to, say, question 3. We may restate this phenomenon and say that there were $n$ Bernoulli trials performed on question 3, each outcome being either true or false. The probability of the outcome is, say, $p$. The definition of 'true' and 'false' in this case is arbitrary, and does not need to specifically correspond to the perceived value of the answer.\\
 Under these conditions, the phenomenon can be modelled as a Binomial Distribution. Formally, the binomial distribution is the discrete probability distribution of the number of successes in a sequence of $n$ independent yes/no experiments, each of which yields success with probability $p$.
 The probability $p$ will be specific to each question, and can be estimated from the dataset.
 Here is an example of the type of question that this modeling will be able to answer:\\\\
-\textbf{If I choose 6000 students randomly from the population, what is the probability that at least 100 of them have answered 1 to question 45?
-}
+\textbf{If I choose 6000 students randomly from the population, what is the probability that at least 100 of them have answered 1 to question 45?}
 \subsubsection{The Binomial Distribution}
 The binomial distribution for a random variable $S$ (in our case, the response to a particular question), for which $n$ experiments have been conducted is a discrete probability distribution given by:
 \[P(S=k) =^{n}C_{r}.p^{k}.(1-p)^{n-k}\]
