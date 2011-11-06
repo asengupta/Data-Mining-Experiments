@@ -28,8 +28,26 @@
 \section{Abstract}
 This report summarises the results of exploration of the Anganwadi dataset provided by the Akshara Foundation. The analysis aims to characterise the structure of the data, and reveal trends (which would otherwise be obscured by the format of the source data) which may inform strategy through subsequent prediction and/or classification procedures.\\\\
 This report encompasses a range of statistical procedures, given the exploratory nature of the engagement. It is hoped that the results and explorations contained herein will spur further questions and discussion.\\\\
-Information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to us.
-
+Information contained in this report is only for discussion purposes and is based on very limited understanding of the background of the data, provided to us.\\\\
+\subsection{Organisation of this Document}
+This report is broken up into several sections, each section discussing related sets of activities carried out in analysing this data set. To make it easier to digest this information, Section~\ref{sec:CollectedObservations} summarises our observations. Each observation also points to the relevant section (or subsection) which expands upon the approaches applied to make the observation.
+\newpage
+\section{Collected Observations}
+\label{sec:CollectedObservations}
+\begin{itemize}
+\item There are \textbf{1067} data points which have invalid (empty) pre- or post-intervention scores. See Section~\ref{sec:InvalidData} for details.
+\item There is a \textbf{massive sampling bias in the favor of Kannada} for language. Analysis/prediction based on language may be adversely affected by this bias. See Section~\ref{sec:SamplingBias} for detailed numbers.
+\item The pre-intervention score with the highest number of students is 56, which is the highest score possible. This implies that, \textbf{even prior to intervention, a sizeable fraction of the students have scored very high} on the test. See Section~\ref{sec:ShapeOfData} for more discussion.
+\item The improvement distribution is peaked, the peak being near zero. This makes sense, because if a large fraction of students answered all 56 questions as 1 in the pre-intervention score, there really is no way for them to improve. This is assuming that their performance did not worsen in the post-test. In fact, the \textbf{calculated mean improvement is around 7}. See Section~\ref{sec:ShapeOfData} for more discussion.
+\item There is \textbf{a significant fraction of students whose performance has worsened} in the post-test. This number is 7081. Out of those, we noticed that the worsening was dramatic for a small set. Section~\ref{sec:ObservationsShapeOfData} provides more details on this observation.
+\item \textbf{Out of all the languages, some had populations too low} in number to differentiate between the different quartiles. These languages are Bengali, MultiLng, Not Known and Oriya. Section~\ref{sec:SummaryPlots} discusses how this was discovered while creating the Box Plot.
+\item Out of 63 geographical clusters, the \textbf{top 38 clusters account for 75\% of the population}. The rank order chart in Table~\ref{tab:RankOrderChartGeoCluster} provides the exact data.
+\item There appear to be \textbf{clusters of relatively high covariance}, for example,between the questions in the range of (40-43), (26-31), etc. Further investigation may be needed to answer specifc questions in this area. The plot is described in Section~\ref{sec:CovariancePlots}.
+\item The \textbf{pre-intervention, post-intervention scores and the improvements are not normally distributed}. However, their means are, implying that \textbf{they obey the Central Limit Theorem}. We may be able to deduce useful statistics for their means, if not for the distributions themselves. Section~\ref{ref:CentralLimitTheorem} illustrates this phenomenon.
+\item \textbf{The 'diffculty' metric of questions} tends to clump together in bands in the left two-thirds of the answer distribution map. Answering patterns from around question number 37 and above alternate much more uniformly. This metric, and the corresponding map, are discussed in Section~\ref{sec:AnswerDistribution}.
+\item The \textbf{intervention has been effective on the overall population}, as shown by McNemar's test for matched pairs. However, \textbf{for specific questions, they are ineffective for specific geoclusters}. Section~\ref{sec:InterventionEffectiveness} provides more information on this statistic.
+\item \textbf{Decision trees and Bayesian classifiers} may be used to predict some attribute given specific data. These relationships are derived based on concepts of information gain and Bayesian probability. \textbf{These relationships are non-parametric}, and thus cannot be summarised succinctly. Some examples are shown in the report, in Sections~\ref{sec:DecisionTrees} and \ref{sec:BayesClassifiers}.
+\end{itemize}
 \newpage
 \section{Methodology}
 \subsection{CRISP-DM}
@@ -147,6 +165,7 @@ The most important use of the reference data is to locate the schools geographic
 To identify latitude and longitude, we used Google's Map API to geocode the cluster information. It is to be noted that there may be some clusters which weren't located by the Map API, and some more work is needed to cross-validate the coordinate information taken from the Map API.
 
 \subsection{Data migration: Identifying invalid data}
+\label{sec:InvalidData}
 It is natural to expect missing or corrupted data. The most crucial attribute are the score data, as any misinterpretation of that data may adversely bias the quality of our analysis. Thus, specific checks were put in place to ensure that none of the binary responses was null or some string other than 0 or 1.\\\\
 Using this check, we found 1067 responses which violated it. All of them had either empty pre- or post-intervention scores. We did not migrate these response records, though it may be possible to do Monte Carlo simulations to predict the missing data.\\
 As a result, out of a total of 28535 records in the original source, 27468 were migrated to the database.\\
@@ -157,6 +176,7 @@ We also found a large fraction of records which did not have a LANGUAGE attribut
 Analysis is most suscpetible to bias in the data collection stage. Sampling is one such activity. If, for a statistical study, participating individuals are not equally likely to have been selected, it may be difficult to distinguish between the actual phenomenon and this biased sampling.
 This sort of bias is called sampling bias.
 \subsection{Sampling bias}
+\label{sec:SamplingBias}
 To find evidence for bias, we looked at a few parameters.
 Here is the breakdown of the population by language, with the biggest language bucket highlighted.\\\\
 Unspecified=869\\
@@ -183,6 +203,7 @@ There is not a huge disparity between the two sexes, which indicates that any an
 
 \newpage
 \section{Shape of the Data}
+\label{sec:ShapeOfData}
 Before embarking on any deep analysis of data, it behooves us to look at the shape of the raw data. There are a few reasons why we want to do this.\\
 \begin{itemize}
 \item \textbf{Evident trends/outliers}: Visualisation of the raw data set is always a quick way to spot trends without doing too much analysis. Of course, visualisation is best suited for 1,2 and 3-dimensional data: data of higher dimensionality must usually be either sliced prior to visualisation, or have its dimensionality reduced, before projecting it onto the 2D plane.\\
@@ -203,6 +224,7 @@ Figure~\ref{ShapeOfData} shows 3 distributions: the pre-intervention scores, the
 \end{center}
 \end{figure}
 \subsubsection{Observations/Notes}
+\label{sec:ObservationsShapeOfData}
 \begin{itemize}
 \item The pre-intervention score with the highest number of students is 56, which is the highest score possible. This implies that, even prior to intervention, a sizeable fraction of the students have scored very high on the test.
 \item The post-intervention score also follows the same trend, albeit with a steeper curve, which implies that many students have scored better in the post-test than in the pre-test.
@@ -286,6 +308,7 @@ So far, we've been looking at single variables in isolation. Figure~\ref{Bivaria
 \end{itemize}
 
 \subsection{Summary plots}
+\label{sec:SummaryPlots}
 Summary plots are so called for their ability to summarise up a data set as a set of numbers, which can be easily interpreted. We used Box Plots to summarise the data, broken down by language. Figure~\ref{BoxPlotPrePost} shows that breakdown. The top row represents the box plots for the pre-intervention assessment, the bottom one for the post-intervention assessment.\\\\
 \begin{figure}
 \caption{Box plots of pre- and post-intervention scores, broken down by language}
@@ -306,7 +329,8 @@ The best way to summarise categorical data, especially if it is the Independent 
 We have rank ordered the geographical clusters based on the student population in each cluster.
 \newcounter{rownum}
 \setcounter{rownum}{0}
-\begin{longtable}{|c|c|c|c|}
+\begin{longtable}
+{|c|c|c|c|}
 	\hline
 Index & Cluster &  Probability    &   Cumulative Distribution  \\
 	\hline
@@ -374,6 +398,7 @@ Index & Cluster &  Probability    &   Cumulative Distribution  \\
 \addtocounter{rownum}{1}\arabic{rownum}. & DODDA BANASAWADI & 0.000400465996796272 & 0.9996359400029126 \\
 \addtocounter{rownum}{1}\arabic{rownum}. & ASHRAYA NAGAR & 0.00036405999708752004 & 1.0 \\
 \hline
+\label{tab:RankOrderChartGeoCluster}
 \end{longtable}
 \subsubsection{Observations/Notes}
 \begin{itemize}
@@ -395,6 +420,7 @@ The way to explore this visualisation is to highlight the samples of interest, b
 \end{center}
 \end{figure}
 \subsection{Covariance plot}
+\label{sec:CovariancePlots}
 The covariance plot is a first step towards looking at the correlations between responses to individual questions. Basically, the kind of question such analysis can answer is, for example, how dependent is a response to question 40 on the response to question 3? Do they change together, i.e., is there a strong dependency between answer to question X and the answer to question Y?\\\\
 Figure~\ref{CovariancePre} shows the covariance plot for the pre-intervention responses.\\
 Figure~\ref{CovariancePost} shows the covariance plot for the post-intervention responses.\\
@@ -536,6 +562,7 @@ Further validation comes from the Q-Q plot of the dataset and the theoretical ex
 \end{figure}
 
 \subsection{The Central Limit Theorem}
+\label{ref:CentralLimitTheorem}
 Fortunately, we need not discard classical statistical techniques because the underlying distribution is not normally distributed. This is because even though the data itself is non-normal, its means are very probably normally distributed, regardless of the original distribution of the data.\\
 This statement is known as the Central Limit Theorem, which states that:\\\\
 \textbf{The distribution of the sum of a large number of independent, identically distributed variables will be approximately normal, regardless of the underlying distribution.}\\\\
@@ -567,6 +594,7 @@ The Jarque-Bera statistics for these three cases is well below the threshold. Th
 Why is the Central Limit Theorem important? It is because, even though statistical tests might not be appropriate for the raw, non-normal, data itself, they certainly can be applied to the sampling distribution of the means of the data. We can still proceed with these tests, at the expense of losing the richness of data, and boiling it down to a single metric, namely, the mean.\\
 This report does not cover any further tests on these sampling distributions.
 \subsection{Answer distribution}
+\label{sec:AnswerDistribution}
 The answer distribution is a visual map of the pattern of answering in different groups segregated by the pre-intervention score.\\
 Each row in the map corresponds to the population of students in a single performance bracket. Thus, the topmost row corresponds to the group of students who score 56 in the pre-intervention, for example.\\
 Within each row, each cell (left to right) represents the answer to the corresponding question. Thus, the (10,5) represents the response to question number 5 in the bracket of students who scored 10 prior to intervention.\\
@@ -585,6 +613,7 @@ Therefore, starting from the bottom of the map, we get a sense of which question
 \end{itemize}
 
 \subsection{Effectiveness of intervention}
+\label{sec:InterventionEffectiveness}
 \subsubsection{Intervention effect on indivdual responses: McNemar's Test}
 McNemar's test for matched pairs is used to measure statistical difference between two tests on matched pairs of data. Examples of matched pairs of data are:
 \begin{itemize}
@@ -806,6 +835,7 @@ The null hypotheses are listed below, and the chi-square statistic for each hypo
 \newpage
 \section{Prediction and Classification}
 \subsection{Decision Trees}
+\label{sec:DecisionTrees}
 Decision trees are tree-like graphs used to model the possible outcomes reached by taking a certain path through the tree. This path represents a set of decisions or a specific set of predictor attributes. In the domain of classification/prediction, the graph is constructed by splitting the entire dataset recursively based on the predictor attributes.\\
 The order of this recursive splitting is determined by the information gain of an attribute. Intuitively, information gain is the increase in the amount of information gotten when the value of a certain attribute is made known, from the state when this value is not known, i.e., how well a particular attribute is capable of distinguishing between data points. Information gain is also known as Kullback-Leibler divergence.\\
 The decision tree for the dataset, using the predictor attributes of area, language, and pre-intervention score, and the predicted attribute as the score improvement.\\
@@ -841,7 +871,9 @@ The prediction is on the attribute of score improvement, and the categorical dis
 . . .
 \end{tabbing}
 One of the drawbacks of decision trees is that information gain is biased towards attributes with the higher number of levels. This could be one reason, area is chosen as the first attribute to split upon. Random forests may be used to mitigate this issue.
+
 \subsection{Bayes classifier}
+\label{sec:BayesClassifiers}
 The Bayes Theorem is widely used for making statements about the possibility of a particular outcome. In this interpretation, there is no one correct outcome, only probabilities of multiple outcomes. One of the frequently used tools used in Bayesian data analysis is the Bayes classifier.\\
 The Bayes classifier uses a density estimator to make predictions about a particular outcome, given some information. There are many density estimators which can be plugged into the Bayesian classifier, to do this. This accounts for the popularity of the Bayesian classifier. Density estimators may be based on very simple assumptions, like the naive Bayes density estimator, or may assume particular distribution of the data, like the Gaussian density estimator.\\
 \subsection{Density estimators}
@@ -875,11 +907,9 @@ Figure~\ref{BayesClusterFromImprovement} show the posterior graphs of geographic
 \end{center}
 \end{figure}
 \newpage
-\section{Collected Observations}
-Blah blah
-\newpage
 \section{Technical notes}
-For base visualisation and interactivity, Processing was used through its Ruby bindings (Ruby-Processing). All plots were done using a coordinate plotting gem called Basis-Processing.\\
+For base visualisation and interactivity, Processing was used through its Ruby bindings (Ruby-Processing).\\
+All plots were done using a coordinate plotting library called Basis-Processing.\\
 Some calculations like Principal Component Analysis were done using the Statsample gem from the SciRuby project.\\
 JRuby 1.6.4 was used for all code needing visualisation; Ruby 1.9.2 was used for everything else.\\
 Data was stored in a MySQL database.
