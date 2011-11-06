@@ -666,7 +666,17 @@ Question & ${\chi}^2$\\
 \end{longtable}
 
 If the intervention was not effective for a particular question, then the chi-square number for that question in Table~\ref{McNemarsQuestions} will be less than 3.8414, according to a p-value of 0.05 from the Chi-square distribution.\\\\
-We note that none of the questions have a McNemar's statistic less than this threshold, thus, we may conclude that the intervention made a statistical significance to the answers to these questions.
+We note that none of the questions have a McNemar's statistic less than this threshold, thus, we may conclude that the intervention made a statistical significance to the answers to these questions, overall.
+\subsubsection{Intervention effect per geocluster on indivdual responses}
+However, we decided to break down the responses by their geoclusters, and ran the McNemar's test for each group, separately. Figure~\ref{McNemarUnaffectedQuestions} shows the questions for which intervention was statistically ineffective, per geocluster.
+\begin{figure}
+\caption{Intervention ineffectiveness by geocluster}
+\label{McNemarUnaffectedQuestions}
+\begin{center}
+\includegraphics[width=120mm]{ReportMedia/McNemarUnaffectedQuestions.jpg}\\
+\end{center}
+\end{figure}
+
 \subsection{Modeling responses as Bernoulli trials}
 There are $n$ students. All of them have answered either 0 or 1, to, say, question 3. We may restate this phenomenon and say that there were $n$ Bernoulli trials performed on question 3, each outcome being either true or false. The probability of the outcome is, say, $p$. The definition of 'true' and 'false' in this case is arbitrary, and does not need to specifically correspond to the perceived value of the answer.\\
 Under these conditions, the phenomenon can be modelled as a Binomial Distribution. Formally, the binomial distribution is the discrete probability distribution of the number of successes in a sequence of $n$ independent yes/no experiments, each of which yields success with probability $p$.
