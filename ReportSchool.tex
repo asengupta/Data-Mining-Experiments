@@ -668,14 +668,15 @@ Question & ${\chi}^2$\\
 If the intervention was not effective for a particular question, then the chi-square number for that question in Table~\ref{McNemarsQuestions} will be less than 3.8414, according to a p-value of 0.05 from the Chi-square distribution.\\\\
 We note that none of the questions have a McNemar's statistic less than this threshold, thus, we may conclude that the intervention made a statistical significance to the answers to these questions, overall.
 \subsubsection{Intervention effect per geocluster on indivdual responses}
-However, we decided to break down the responses by their geoclusters, and ran the McNemar's test for each group, separately. Figure~\ref{McNemarUnaffectedQuestions} shows the questions for which intervention was statistically ineffective, per geocluster.
+However, we decided to break down the responses by their geoclusters, and ran the McNemar's test for each group, separately. Figure~\ref{McNemarUnaffectedQuestions} shows the questions for which intervention was statistically ineffective, per geocluster.\\
 \begin{figure}
 \caption{Intervention ineffectiveness by geocluster}
 \label{McNemarUnaffectedQuestions}
 \begin{center}
 \includegraphics[width=120mm]{ReportMedia/McNemarUnaffectedQuestions.jpg}\\
 \end{center}
-\end{figure}
+\end{figure}\\
+It is important to note that this approximation to the chi-square distribution does not hold true for $b+c<25$. In such cases, a separate approach is needed. In our tests, we simply excluded such cases, which were around 400 in number. These need to be dealt with separately.
 
 \subsection{Modeling responses as Bernoulli trials}
 There are $n$ students. All of them have answered either 0 or 1, to, say, question 3. We may restate this phenomenon and say that there were $n$ Bernoulli trials performed on question 3, each outcome being either true or false. The probability of the outcome is, say, $p$. The definition of 'true' and 'false' in this case is arbitrary, and does not need to specifically correspond to the perceived value of the answer.\\

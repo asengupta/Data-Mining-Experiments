@@ -36,7 +36,6 @@ def mc_nemar(responses)
 
 	fill_contingency(responses, contingency_tables)
 
-	i = 1
 	statistics = []
 	contingency_tables.each do |table|
 		before_1 = table[:b] + table[:a]
@@ -47,8 +46,7 @@ def mc_nemar(responses)
 		b = table[:b]
 		c = table[:c]
 		mc_nemar_statistic = (((b-c).abs() -0.5)**2).to_f/(b+c)
-		statistics << mc_nemar_statistic
-		i += 1
+		statistics << ((b+c < 25)? -1 : mc_nemar_statistic)
 	end
 	statistics
 end
