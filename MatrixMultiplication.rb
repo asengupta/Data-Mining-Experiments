@@ -21,36 +21,52 @@ class Matrix
 	end
 end
 
-def product(a,b,level)
+class Inputs
+	attr_accessor :inputs
+	def initialize
+		@inputs = []
+	end
+
+	def setup(a,b,key)
+		if a.row_size == 2
+			@inputs << {:key=> key, :a => a, :b => b}
+			return
+		end
+		setup(a.block(0,0), b.block(0,0), key + "00A")
+		setup(a.block(0,1), b.block(1,0), key + "00B")
+
+		setup(a.block(0,0), b.block(0,1), key + "01A")
+		setup(a.block(0,1), b.block(1,1), key + "01B")
+
+		setup(a.block(1,0), b.block(0,0), key + "10A")
+		setup(a.block(1,1), b.block(1,0), key + "10B")
+
+		setup(a.block(1,0), b.block(0,1), key + "11A")
+		setup(a.block(1,1), b.block(1,1), key + "11B")
+	
+	end
+end
+
+
+def product(a,b,key)
 	result = nil
-	if a.row_size == 16
+	if a.row_size == 2
 		time = Benchmark.measure do
 			result = a * b
 		end
-#		puts "\t"*level + "Low level #{UUID.new} finished in #{time}"
+#		puts "\t"*key + "Low key #{UUID.new} finished in #{time}"
 		return result
 	end
 	time = Benchmark.measure do
-		next_level = level + 1
-		tp00 = Thread.new{ Thread.current[:result] = product(a.block(0,0), b.block(0,0), next_level) + product(a.block(0,1), b.block(1,0), next_level)}
-		tp01 = Thread.new{ Thread.current[:result] = product(a.block(0,0), b.block(0,1), next_level) + product(a.block(0,1), b.block(1,1), next_level)}
-		tp10 = Thread.new{ Thread.current[:result] = product(a.block(1,0), b.block(0,0), next_level) + product(a.block(1,1), b.block(1,0), next_level)}
-		tp11 = Thread.new{ Thread.current[:result] = product(a.block(1,0), b.block(0,1), next_level) + product(a.block(1,1), b.block(1,1), next_level)}
-	
-#		p00 = product(a.block(0,0), b.block(0,0)) + product(a.block(0,1), b.block(1,0))
-#		p01 = product(a.block(0,0), b.block(0,1)) + product(a.block(0,1), b.block(1,1))
-#		p10 = product(a.block(1,0), b.block(0,0)) + product(a.block(1,1), b.block(1,0))
-#		p11 = product(a.block(1,0), b.block(0,1)) + product(a.block(1,1), b.block(1,1))
+		next_key = key + 1
+		p00 = product(a.block(0,0), b.block(0,0)) + product(a.block(0,1), b.block(1,0))
+		p01 = product(a.block(0,0), b.block(0,1)) + product(a.block(0,1), b.block(1,1))
+		p10 = product(a.block(1,0), b.block(0,0)) + product(a.block(1,1), b.block(1,0))
+		p11 = product(a.block(1,0), b.block(0,1)) + product(a.block(1,1), b.block(1,1))
 
-		tp00.join
-		tp01.join
-		tp10.join
-		tp11.join
-
-		result = Matrix.rows(join(tp00[:result], tp01[:result]) + join(tp10[:result], tp11[:result]))
-#		result = Matrix.rows(join(p00, p01) + join(p10, p11))
+		result = Matrix.rows(join(p00, p01) + join(p10, p11))
 	end
-#	puts "\t"*level + "#{UUID.new} finished in #{time}" if level == 1
+#	puts "\t"*key + "#{UUID.new} finished in #{time}" if key == 1
 	result
 end
 
@@ -67,23 +83,28 @@ def m(order)
 	Matrix.build(order, order) {|row, col| rand(20) }
 end
 
-order = 64
+order = 8
 
 m1 = m(order)
 m2 = m(order)
 
-threaded = nil
-normal = nil
-unthreaded_time = Benchmark.measure do
-	normal = m1*m2
+inputs = Inputs.new
+inputs.setup(m1,m2,"X")
+
+def map1(primitive)
+	{:key => primitive[:key][0..-2], :matrix =>  primitive[:a] * primitive[:b]}
 end
-puts "Unthreaded version = #{unthreaded_time}"
 
-threaded_time = Benchmark.measure do
-	threaded = product(m1,m2,0)
+space = inputs.inputs.collect {|i| map1(i)}
+puts space
+
+
+keys = space.collect {|i| i[:key]}
+partitions = {}
+
+space.each do |i|
+	partitions[i[:key]] = [] if partitions[i[:key]].nil?
+	partitions[i[:key]] << i[:matrix]
 end
-puts "Threaded version = #{threaded_time}"
 
-
-puts threaded == normal
-
+puts partitions
