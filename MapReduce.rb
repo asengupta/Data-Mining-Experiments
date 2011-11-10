@@ -47,29 +47,6 @@ class Inputs
 	end
 end
 
-
-def product(a,b,key)
-	result = nil
-	if a.row_size == 2
-		time = Benchmark.measure do
-			result = a * b
-		end
-#		puts "\t"*key + "Low key #{UUID.new} finished in #{time}"
-		return result
-	end
-	time = Benchmark.measure do
-		next_key = key + 1
-		p00 = product(a.block(0,0), b.block(0,0)) + product(a.block(0,1), b.block(1,0))
-		p01 = product(a.block(0,0), b.block(0,1)) + product(a.block(0,1), b.block(1,1))
-		p10 = product(a.block(1,0), b.block(0,0)) + product(a.block(1,1), b.block(1,0))
-		p11 = product(a.block(1,0), b.block(0,1)) + product(a.block(1,1), b.block(1,1))
-
-		result = Matrix.rows(join(p00, p01) + join(p10, p11))
-	end
-#	puts "\t"*key + "#{UUID.new} finished in #{time}" if key == 1
-	result
-end
-
 def join(left_block, right_block)
 	rows = []
 	lower_order = left_block.row_size
