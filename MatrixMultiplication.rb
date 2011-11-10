@@ -92,8 +92,8 @@ inputs = Inputs.new
 inputs.setup(m1,m2,"X")
 
 #puts inputs
-def map1(key, primitive)
-	{:key => key[0..-2], :value =>  {:matrix => primitive[:a] * primitive[:b], :order => key[0..-2]}}
+def map1(key, value)
+	{:key => key[0..-2], :value =>  {:matrix => value[:a] * value[:b], :identity => key[0..-2]}}
 end
 
 space = inputs.inputs.collect {|i| map1(i[:key], i)}
@@ -113,23 +113,53 @@ end
 def reduce1(key, values)
 	sum = Matrix.zero(values.first[:matrix].row_size)
 	values.each {|m| sum += m[:matrix]}
-	{:key => key, :value => {:matrix => sum, :order => key[-2..-1]}}
+	{:key => key[0..-3], :value => {:matrix => sum, :identity => key[-2..-1]}}
 end
 
 space = []
-partitions.each do |k,v|
+partitions.each_pair do |k,v|
+	space << reduce1(k,v)
+end
+
+#puts space
+
+partitions = {}
+space.each do |i|
+	key = i[:key]
+	partitions[key] = [] if partitions[key].nil?
+	partitions[key] << i[:value]
+end
+
+#puts partitions
+
+def reduce2(key, values)
+	p00 = values[values.index {|v| v[:identity] == '00'}][:matrix]
+	p01 = values[values.index {|v| v[:identity] == '01'}][:matrix]
+	p10 = values[values.index {|v| v[:identity] == '10'}][:matrix]
+	p11 = values[values.index {|v| v[:identity] == '11'}][:matrix]
+	{:key => key[0..-2], :value => {:identity => key[-1], :matrix => Matrix.rows(join(p00, p01) + join(p10, p11))}}
+end
+
+space = []
+partitions.each_pair do |k,v|
+	space << reduce2(k,v)
+end
+
+#puts space
+
+partitions = {}
+space.each do |i|
+	key = i[:key]
+	partitions[key] = [] if partitions[key].nil?
+	partitions[key] << i[:value]
+end
+
+#puts partitions
+
+space = []
+partitions.each_pair do |k,v|
 	space << reduce1(k,v)
 end
 
 puts space
-
-#space.each do |i|
-#	key = i[:key][0..-2]
-#	partitions[key] = [] if partitions[key].nil?
-#	partitions[key] << i[:value]
-#end
-
-#def reduce2(key, values)
-#	
-#end
 
