@@ -43,7 +43,7 @@ def m(order)
 end
 
 
-def reduce2(key, values)
+def block_join_reduce(key, values)
 	p00 = values[values.index {|v| v[:identity] == '00'}][:matrix]
 	p01 = values[values.index {|v| v[:identity] == '01'}][:matrix]
 	p10 = values[values.index {|v| v[:identity] == '10'}][:matrix]
@@ -51,13 +51,13 @@ def reduce2(key, values)
 	{:key => key[0..-2], :value => {:identity => key[-1], :matrix => Matrix.rows(join(p00, p01) + join(p10, p11))}}
 end
 
-def reduce1(key, values)
+def block_matrix_sum(key, values)
 	sum = Matrix.zero(values.first[:matrix].row_size)
 	values.each {|m| sum += m[:matrix]}
 	{:key => key[0..-3], :value => {:matrix => sum, :identity => key[-2..-1]}}
 end
 
-def map1(key, value)
+def primitive_map(key, value)
 	{:key => key[0..-2], :value =>  {:matrix => value[:a] * value[:b], :identity => key[0..-2]}}
 end
 
@@ -71,12 +71,12 @@ inputs.setup(m1,m2,"X")
 space = inputs.inputs
 
 
-mappers = [->(k,v) {map1(k,v)}]
+mappers = [->(k,v) {primitive_map(k,v)}]
 reducers = []
 
 reductions.times do
-	reducers << ->(k,v) {reduce1(k,v)}
-	reducers << ->(k,v) {reduce2(k,v)}
+	reducers << ->(k,v) {block_matrix_sum(k,v)}
+	reducers << ->(k,v) {block_join_reduce(k,v)}
 end
 
 mappers.each {|mapper| space = Mapper.new.run(space) {|k,v| mapper.call(k,v)}}
