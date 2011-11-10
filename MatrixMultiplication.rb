@@ -161,5 +161,22 @@ partitions.each_pair do |k,v|
 	space << reduce1(k,v)
 end
 
-puts space
+#puts space
+
+partitions = {}
+space.each do |i|
+	key = i[:key]
+	partitions[key] = [] if partitions[key].nil?
+	partitions[key] << i[:value]
+end
+
+#puts partitions
+
+space = []
+partitions.each_pair do |k,v|
+	space << reduce2(k,v)
+end
+
+#puts space[0][:value][:matrix]
+puts m1*m2 == space[0][:value][:matrix]
 
