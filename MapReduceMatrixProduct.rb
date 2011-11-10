@@ -42,7 +42,6 @@ def m(order)
 	Matrix.build(order, order) {|row, col| rand(20) }
 end
 
-
 def block_join_reduce(key, values)
 	p00 = values[values.index {|v| v[:identity] == '00'}][:matrix]
 	p01 = values[values.index {|v| v[:identity] == '01'}][:matrix]
@@ -79,12 +78,8 @@ reductions.times do
 	reducers << ->(k,v) {block_join_reduce(k,v)}
 end
 
-mappers.each {|mapper| space = Mapper.new.run(space) {|k,v| mapper.call(k,v)}}
-reducers.each do |reducer|
-	partitions = Partitioner.new.run(space)
-	space = Reducer.new.run(partitions) {|k,v| reducer.call(k,v)}
-end
- 
-puts space[0][:value][:matrix]
-puts m1*m2 == space[0][:value][:matrix]
+result = MapReduceRunner.new(mappers, reducers).run(space)
+puts result
+puts result[0][:value][:matrix]
+puts m1*m2 == result[0][:value][:matrix]
 
