@@ -83,6 +83,28 @@ def m(order)
 	Matrix.build(order, order) {|row, col| rand(20) }
 end
 
+class Partitioner
+	def run(space)
+		partitions = {}
+		space.each do |i|
+			key = i[:key]
+			partitions[key] = [] if partitions[key].nil?
+			partitions[key] << i[:value]
+		end
+		partitions
+	end
+end
+
+class Reducer
+	def run(partitions)
+		space = []
+		partitions.each_pair do |k,v|
+			space << yield(k,v)
+		end
+		space
+	end
+end
+
 order = 8
 
 m1 = m(order)
@@ -114,24 +136,9 @@ def reduce1(key, values)
 	{:key => key[0..-3], :value => {:matrix => sum, :identity => key[-2..-1]}}
 end
 
-space = []
-partitions.each_pair do |k,v|
-	space << reduce1(k,v)
-end
-
+space = Reducer.new.run(partitions) {|k,v| reduce1(k,v)}
 #puts space
 
-class Partitioner
-	def run(space)
-		partitions = {}
-		space.each do |i|
-			key = i[:key]
-			partitions[key] = [] if partitions[key].nil?
-			partitions[key] << i[:value]
-		end
-		partitions
-	end
-end
 
 partitions = Partitioner.new.run(space)
 
@@ -163,12 +170,7 @@ end
 
 #puts space
 
-partitions = {}
-space.each do |i|
-	key = i[:key]
-	partitions[key] = [] if partitions[key].nil?
-	partitions[key] << i[:value]
-end
+partitions = Partitioner.new.run(space)
 
 #puts partitions
 
