@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'statsample'
-require './matrix_block_mixin.rb'
+require './matrix_block_mixin'
+require './map_reduce'
 
 class Inputs
 	attr_accessor :inputs
