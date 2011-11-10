@@ -1,25 +1,6 @@
 require 'rubygems'
 require 'statsample'
-require 'benchmark'
-require 'uuidtools'
-
-class Matrix
-	def block(block_row, block_column)
-		raise "Non 2^n matrix" if (row_size & (row_size - 1)) != 0 || (column_size & (column_size - 1)) != 0
-		lower_order = row_size/2
-		start_row = block_row * lower_order
-		start_column = block_column * lower_order
-		b = []
-		lower_order.times do |r|
-			row = []
-			lower_order.times do |c|
-				row << self[start_row + r, start_column + c]
-			end
-			b << row
-		end
-		Matrix.rows(b)
-	end
-end
+require './matrix_block_mixin.rb'
 
 class Inputs
 	attr_accessor :inputs
@@ -60,33 +41,6 @@ def m(order)
 	Matrix.build(order, order) {|row, col| rand(20) }
 end
 
-class Partitioner
-	def run(space)
-		partitions = {}
-		space.each do |i|
-			key = i[:key]
-			partitions[key] = [] if partitions[key].nil?
-			partitions[key] << i[:value]
-		end
-		partitions
-	end
-end
-
-class Reducer
-	def run(partitions)
-		space = []
-		partitions.each_pair do |k,v|
-			space << yield(k,v)
-		end
-		space
-	end
-end
-
-class Mapper
-	def run(space)
-		space.collect {|i| yield(i[:key], i)}
-	end
-end
 
 def reduce2(key, values)
 	p00 = values[values.index {|v| v[:identity] == '00'}][:matrix]
