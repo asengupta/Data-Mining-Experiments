@@ -60,7 +60,7 @@ def primitive_map(key, value)
 	{:key => key[0..-2], :value =>  {:matrix => value[:a] * value[:b], :identity => key[0..-2]}}
 end
 
-order = 8
+order = 128
 reductions = (Math.log2(order) - 1).to_i
 m1 = m(order)
 m2 = m(order)
