@@ -160,10 +160,7 @@ partitions = Partitioner.new.run(space)
 
 #puts partitions
 
-space = []
-partitions.each_pair do |k,v|
-	space << reduce1(k,v)
-end
+space = Reducer.new.run(partitions) {|k,v| reduce1(k,v)}
 
 #puts space
 
