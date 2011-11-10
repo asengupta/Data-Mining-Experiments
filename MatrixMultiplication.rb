@@ -105,6 +105,12 @@ class Reducer
 	end
 end
 
+class Mapper
+	def run(space)
+		space.collect {|i| yield(i[:key], i)}
+	end
+end
+
 order = 8
 
 m1 = m(order)
@@ -118,18 +124,11 @@ def map1(key, value)
 	{:key => key[0..-2], :value =>  {:matrix => value[:a] * value[:b], :identity => key[0..-2]}}
 end
 
-space = space.collect {|i| map1(i[:key], i)}
-#puts space
+space = Mapper.new.run(space) {|k,v| map1(k,v)}
+#space = space.collect {|i| map1(i[:key], i)}
 
-partitions = {}
+partitions = Partitioner.new.run(space)
 
-space.each do |i|
-	key = i[:key]
-	partitions[key] = [] if partitions[key].nil?
-	partitions[key] << i[:value]
-end
-
-#puts partitions
 def reduce1(key, values)
 	sum = Matrix.zero(values.first[:matrix].row_size)
 	values.each {|m| sum += m[:matrix]}
@@ -137,12 +136,9 @@ def reduce1(key, values)
 end
 
 space = Reducer.new.run(partitions) {|k,v| reduce1(k,v)}
-#puts space
-
 
 partitions = Partitioner.new.run(space)
 
-#puts partitions
 
 def reduce2(key, values)
 	p00 = values[values.index {|v| v[:identity] == '00'}][:matrix]
@@ -153,25 +149,10 @@ def reduce2(key, values)
 end
 
 space = Reducer.new.run(partitions) {|k,v| reduce2(k,v)}
-
-#puts space
-
 partitions = Partitioner.new.run(space)
-
-#puts partitions
-
 space = Reducer.new.run(partitions) {|k,v| reduce1(k,v)}
-
-#puts space
-
 partitions = Partitioner.new.run(space)
-
-#puts partitions
-
-space = []
-partitions.each_pair do |k,v|
-	space << reduce2(k,v)
-end
+space = Reducer.new.run(partitions) {|k,v| reduce2(k,v)}
 
 puts space[0][:value][:matrix]
 puts m1*m2 == space[0][:value][:matrix]
