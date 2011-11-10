@@ -62,7 +62,7 @@ def map1(key, value)
 end
 
 order = 8
-
+reductions = (Math.log2(order) - 1).to_i
 m1 = m(order)
 m2 = m(order)
 
@@ -71,16 +71,20 @@ inputs.setup(m1,m2,"X")
 space = inputs.inputs
 
 
-space = Mapper.new.run(space) {|k,v| map1(k,v)}
-partitions = Partitioner.new.run(space)
-space = Reducer.new.run(partitions) {|k,v| reduce1(k,v)}
-partitions = Partitioner.new.run(space)
-space = Reducer.new.run(partitions) {|k,v| reduce2(k,v)}
-partitions = Partitioner.new.run(space)
-space = Reducer.new.run(partitions) {|k,v| reduce1(k,v)}
-partitions = Partitioner.new.run(space)
-space = Reducer.new.run(partitions) {|k,v| reduce2(k,v)}
+mappers = [->(k,v) {map1(k,v)}]
+reducers = []
 
+reductions.times do
+	reducers << ->(k,v) {reduce1(k,v)}
+	reducers << ->(k,v) {reduce2(k,v)}
+end
+
+mappers.each {|mapper| space = Mapper.new.run(space) {|k,v| mapper.call(k,v)}}
+reducers.each do |reducer|
+	partitions = Partitioner.new.run(space)
+	space = Reducer.new.run(partitions) {|k,v| reducer.call(k,v)}
+end
+ 
 puts space[0][:value][:matrix]
 puts m1*m2 == space[0][:value][:matrix]
 
