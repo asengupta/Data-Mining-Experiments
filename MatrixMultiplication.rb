@@ -152,10 +152,7 @@ def reduce2(key, values)
 	{:key => key[0..-2], :value => {:identity => key[-1], :matrix => Matrix.rows(join(p00, p01) + join(p10, p11))}}
 end
 
-space = []
-partitions.each_pair do |k,v|
-	space << reduce2(k,v)
-end
+space = Reducer.new.run(partitions) {|k,v| reduce2(k,v)}
 
 #puts space
 
