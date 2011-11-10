@@ -90,17 +90,15 @@ m2 = m(order)
 
 inputs = Inputs.new
 inputs.setup(m1,m2,"X")
+space = inputs.inputs
 
-#puts inputs
 def map1(key, value)
 	{:key => key[0..-2], :value =>  {:matrix => value[:a] * value[:b], :identity => key[0..-2]}}
 end
 
-space = inputs.inputs.collect {|i| map1(i[:key], i)}
+space = space.collect {|i| map1(i[:key], i)}
 #puts space
 
-
-keys = space.collect {|i| i[:key]}
 partitions = {}
 
 space.each do |i|
@@ -123,12 +121,19 @@ end
 
 #puts space
 
-partitions = {}
-space.each do |i|
-	key = i[:key]
-	partitions[key] = [] if partitions[key].nil?
-	partitions[key] << i[:value]
+class Partitioner
+	def run(space)
+		partitions = {}
+		space.each do |i|
+			key = i[:key]
+			partitions[key] = [] if partitions[key].nil?
+			partitions[key] << i[:value]
+		end
+		partitions
+	end
 end
+
+partitions = Partitioner.new.run(space)
 
 #puts partitions
 
@@ -147,12 +152,7 @@ end
 
 #puts space
 
-partitions = {}
-space.each do |i|
-	key = i[:key]
-	partitions[key] = [] if partitions[key].nil?
-	partitions[key] << i[:value]
-end
+partitions = Partitioner.new.run(space)
 
 #puts partitions
 
@@ -177,6 +177,6 @@ partitions.each_pair do |k,v|
 	space << reduce2(k,v)
 end
 
-#puts space[0][:value][:matrix]
+puts space[0][:value][:matrix]
 puts m1*m2 == space[0][:value][:matrix]
 
